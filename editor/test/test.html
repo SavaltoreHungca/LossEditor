@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+
+<script src="../dist/bundle.min.js"></script>
+
+<div id="myEditorDiv" style="margin-top:300px; margin-left: 300px;"></div>
+
+<button id="big">变大</button>
+
+<script>
+    editor = new Editor(myEditorDiv);
+    big.onclick = function(){
+        myEditorDiv.style.cssText += ";width: 1000px";
+    }
+</script>
