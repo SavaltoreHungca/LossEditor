@@ -1,0 +1,27 @@
+{
+    "name": "event-driven",
+    "description": "",
+    "version": "0.58.3",
+    "license": "MIT",
+    "repository": "git://github.com/ianstormtaylor/slate.git",
+    "main": "dist/index.js",
+    "module": "dist/index.es.js",
+    "types": "dist/index.d.ts",
+    "umd": "dist/event-driven.js",
+    "umdMin": "dist/event-driven.min.js",
+    "sideEffects": false,
+    "files": [
+      "dist/"
+    ],
+    "dependencies": {
+      "@types/esrever": "^0.2.0",
+      "esrever": "^0.2.0",
+      "immer": "^5.0.0",
+      "is-plain-object": "^3.0.0",
+      "tiny-warning": "^1.0.3"
+    },
+    "keywords": [
+      "canvas"
+    ]
+  }
+  

@@ -1,0 +1,8 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/event-driven" },
+    { "path": "./packages/scroll-page" },
+    { "path": "./packages/utils" },
+  ]
+}

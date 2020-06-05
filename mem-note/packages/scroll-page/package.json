@@ -1,0 +1,52 @@
+{
+    "name": "scroll-page",
+    "description": "",
+    "version": "0.58.3",
+    "license": "MIT",
+    "repository": "git://github.com/ianstormtaylor/slate.git",
+    "main": "dist/index.js",
+    "module": "dist/index.es.js",
+    "types": "dist/index.d.ts",
+    "umd": "dist/scroll-page.js",
+    "umdMin": "dist/scroll-page.min.js",
+    "sideEffects": false,
+    "files": [
+      "dist/"
+    ],
+    "dependencies": {
+      "@types/is-hotkey": "^0.1.1",
+      "@types/lodash": "^4.14.149",
+      "direction": "^1.0.3",
+      "is-hotkey": "^0.1.6",
+      "is-plain-object": "^3.0.0",
+      "lodash": "^4.17.4",
+      "scroll-into-view-if-needed": "^2.2.20"
+    },
+    "devDependencies": {
+      "event-driven": "*",
+      "utils": "*"
+    },
+    "keywords": [
+      "canvas",
+      "contenteditable",
+      "docs",
+      "document",
+      "edit",
+      "editor",
+      "editable",
+      "html",
+      "immutable",
+      "markdown",
+      "medium",
+      "paper",
+      "react",
+      "rich",
+      "richtext",
+      "richtext",
+      "slate",
+      "text",
+      "wysiwyg",
+      "wysiwym"
+    ]
+  }
+  
