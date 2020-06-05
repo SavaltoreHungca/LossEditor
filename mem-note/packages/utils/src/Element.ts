@@ -1,13 +1,26 @@
 
 import { Utils } from './Utils';
 
-interface DragState {
+export interface DragState {
     startX: number;
     startY: number;
     pressed: boolean;
     deltaX: number;
     deltaY: number;
     registered: boolean;
+    event?: Event
+}
+
+export class Global {
+    private globalElement: Map<String, Element> = new Map();
+
+    get(id: string): Element | undefined{
+        return this.globalElement.get(id);
+    }
+
+    set(id: string, elemt: Element){
+        this.globalElement.set(id, elemt);
+    }
 }
 
 export class Element {
@@ -18,10 +31,12 @@ export class Element {
         pressed: false,
         deltaX: 0,
         deltaY: 0,
-        registered: false
+        registered: false,
+        event: undefined
     }
-    private global = undefined;
-    constructor(element: HTMLElement, global) {
+    private global?: Global = undefined;
+    
+    constructor(element: HTMLElement, global: Global) {
         this.proxy = element;
         this.global = global;
     }
@@ -45,9 +60,9 @@ export class Element {
         return this.proxy.style;
     }
 
-    addEventListener<K extends keyof HTMLElementEventMap>(
+    addEventListener(
         name: string,
-        callback: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+        callback: Function,
         option: boolean | AddEventListenerOptions
     ) {
         if (name === 'drag') {
@@ -59,44 +74,43 @@ export class Element {
                 this.dragState.pressed = true;
             })
 
-            let resizing = (event) => {
+            let resizing = (event: MouseEvent) => {
                 if (this.dragState.pressed) {
                     this.dragState.deltaX = event.screenX - this.dragState.startX;
                     this.dragState.deltaY = event.screenY - this.dragState.startY;
                     this.dragState.startX += this.dragState.deltaX;
                     this.dragState.startY += this.dragState.deltaY;
-                    callback({
-                        ...event,
-                        ...this.dragState
-                    });
+
+                    this.dragState.event = event;
+                    callback(this.dragState);
                 }
             };
-            let resizeDone = (event) => {
+            let resizeDone = (event: MouseEvent) => {
                 this.dragState.pressed = false;
                 this.dragState.registered = false;
-                this.global.document.removeEventListener('mousemove', resizing);
-                this.global.document.removeEventListener('mouseup', resizeDone);
-                Utils.setStyle(this.global.document.body, { "user-select": "" });
-                callback({
-                    path: event.path,
-                    ...this.dragState
-                });
+                document.removeEventListener('mousemove', resizing);
+                document.removeEventListener('mouseup', resizeDone);
+                Utils.setStyle(document.body, { "user-select": "" });
+
+                callback(this.dragState);
             };
             this.proxy.addEventListener('mousemove', (event) => {
                 if (this.dragState.pressed && !this.dragState.registered) {
                     this.dragState.registered = true;
-                    Utils.setStyle(this.global.document.body, { "user-select": "none" });
-                    this.global.document.addEventListener('mousemove', resizing);
-                    this.global.document.addEventListener('mouseup', resizeDone);
+                    Utils.setStyle(document.body, { "user-select": "none" });
+                    document.addEventListener('mousemove', resizing);
+                    document.addEventListener('mouseup', resizeDone);
                 }
             })
             return;
         }
-        this.proxy.addEventListener(name, callback, option);
+        this.proxy.addEventListener(name, callback as any, option);
     }
+
     getInfo() {
         return Utils.getElementInfo(this.proxy);
     }
+
     show() {
         this.cancelDisappear();
         this.setStyle({ visibility: 'visible' });
@@ -104,42 +118,48 @@ export class Element {
 
     cancelDisappear() {
         for (let i of this.disappearIds) {
-            this.global.window.clearTimeout(i);
+            clearTimeout(i);
         }
     }
 
-    disappearIds = [];
-    disappear(delay) {
+    private disappearIds: Array<number> = [];
+    disappear(delay: number) {
         if (delay) {
             this.cancelDisappear();
-            let id = this.global.window.setTimeout(() => { this.setStyle({ visibility: 'hidden' }) }, delay);
+            let id = window.setTimeout(() => { this.setStyle({ visibility: 'hidden' }) }, delay);
             this.disappearIds.push(id);
         } else {
             this.setStyle({ visibility: 'hidden' });
         }
     }
 
-    cancelLastTimeout(id) {
-        let ids = this.timeoutIdMap.get(id);
-        if (Utils.isArray(ids)) {
-            for (let i of ids) {
-                this.global.window.clearTimeout(i);
-            }
+    cancelLastTimeout(id: string) {
+        let ids = this.timeoutIdMap.get(id) || [];
+        for (let i of ids) {
+            clearTimeout(i);
         }
     }
 
-    timeoutIdMap = new Map();
-    setLastTimeout(id, func, delay) {
+    timeoutIdMap: Map<String, Array<number>> = new Map();
+    setLastTimeout(id: string, func: Function, delay: number) {
         let ids = this.timeoutIdMap.get(id);
         if (!Utils.isArray(ids)) {
             ids = [];
             this.timeoutIdMap.set(id, ids);
         }
         this.cancelLastTimeout(id);
-        ids.push(this.global.window.setTimeout(func, delay));
+        ids?.push(window.setTimeout(func, delay));
     }
 
-    setRole(roleName) {
+    setRole(roleName: string) {
         this.proxy.setAttribute("data-role", roleName);
+    }
+
+    setWidth(width: string){
+        this.setStyle({width: width});
+    }
+
+    setHeight(height: string){
+        this.setStyle({height: height});
     }
 }
