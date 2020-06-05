@@ -82,6 +82,7 @@
     "rollup-plugin-typescript2": "^0.25.2",
     "rollup-plugin-uglify": "^6.0.3",
     "source-map-loader": "^0.2.4",
-    "typescript": "^3.7.2"
+    "typescript": "^3.7.2",
+    "scroll-page": "*"
   }
 }
