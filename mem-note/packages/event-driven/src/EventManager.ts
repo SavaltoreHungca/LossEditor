@@ -1,3 +1,5 @@
+import uuid from 'uuid';
+
 // 事件函数
 export interface Event {
     (): [Boolean, number?] | void; // 是否重试 延迟执行, 单位 ms
@@ -67,7 +69,9 @@ export class EventManager {
     }
 
     // 注册依赖事件触发链
-    registryEventDpendsOn(dependsOn: Array<String>, id: String, event: Event) {
+    // 仅当所有所有事件 dependsOn 都都至少执行一次后才会触发
+    registryEventDpendsOn(dependsOn: Array<String>, event: Event, id?: String) {
+        if(!id) id = uuid.v1();
         let dependencies = this.eventDependencies.get(id);
         if (!dependencies) {
             dependencies = new Set<String>();
@@ -79,7 +83,8 @@ export class EventManager {
                 relyons = new Set<String>();
                 this.eventRelyOn.set(item, relyons);
             }
-            relyons.add(id);
+            if(id) relyons.add(id);
+            else throw new Error("System error");
 
             dependencies?.add(item)
         });
@@ -88,6 +93,7 @@ export class EventManager {
 
     // 触发事件
     triggleEvent(id: String) {
+        console.log("触发事件: ", id);
         let eventList = this.eventMap.get(id);
         if(!eventList){
             eventList = [];

@@ -84,7 +84,7 @@ export class Element {
     addEventListener(
         name: string,
         callback: Function,
-        option: boolean | AddEventListenerOptions
+        option?: boolean | AddEventListenerOptions
     ) {
         if (name === 'drag') {
             this.dragState.pressed = false;
@@ -144,7 +144,7 @@ export class Element {
     }
 
     private disappearIds: Array<number> = [];
-    disappear(delay: number) {
+    disappear(delay?: number) {
         if (delay) {
             this.cancelDisappear();
             let id = window.setTimeout(() => { this.setStyle({ visibility: 'hidden' }) }, delay);

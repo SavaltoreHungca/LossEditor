@@ -81,8 +81,8 @@
     "rollup-plugin-terser": "^5.1.2",
     "rollup-plugin-typescript2": "^0.25.2",
     "rollup-plugin-uglify": "^6.0.3",
+    "scroll-page": "*",
     "source-map-loader": "^0.2.4",
-    "typescript": "^3.7.2",
-    "scroll-page": "*"
+    "typescript": "^3.7.2"
   }
 }

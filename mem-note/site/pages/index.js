@@ -7,7 +7,7 @@ const Home = () => {
     new ScrollPage(document.getElementById('container'));
   })
 
-  return (<div id="container">shit</div>)
+  return (<div id="container" />)
 }
 
 export default Home
