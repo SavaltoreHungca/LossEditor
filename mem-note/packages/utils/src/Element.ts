@@ -12,7 +12,8 @@ export interface DragState {
 }
 
 export class Global {
-    private globalElement: Map<String, Element> = new Map();
+    protected globalElement: Map<string, Element> = new Map();
+    protected globalData: Map<string, any> = new Map();
 
     get(id: string): Element | undefined{
         return this.globalElement.get(id);
@@ -21,10 +22,25 @@ export class Global {
     set(id: string, elemt: Element){
         this.globalElement.set(id, elemt);
     }
+
+    setData(id: string, data: any){
+        this.globalData.set(id, data);
+    }
+
+    getData(id: string){
+        this.globalData.get(id);
+    }
+
+    getAll(){
+        let ans: {[index: string]: Element} = {};
+        this.globalElement.forEach((value, key)=>{
+            ans[key] = value;
+        })
+        return ans;
+    }
 }
 
 export class Element {
-    private proxy: HTMLElement;
     private dragState: DragState = {
         startX: 0,
         startY: 0,
@@ -34,11 +50,16 @@ export class Element {
         registered: false,
         event: undefined
     }
-    private global?: Global = undefined;
+    protected proxy: HTMLElement;
+    protected global: Global;
     
     constructor(element: HTMLElement, global: Global) {
         this.proxy = element;
         this.global = global;
+        this.setAttribute("data-ele-type", this.getType());
+    }
+    getType(): string{
+        return Object.getPrototypeOf(this).constructor.name;
     }
     append(element: Element) {
         this.proxy.append(element.proxy);
@@ -161,5 +182,10 @@ export class Element {
 
     setHeight(height: string){
         this.setStyle({height: height});
+    }
+
+    setAttribute(name: string, value?: string){
+        if(!value) value = "";
+        this.proxy.setAttribute(name, value);
     }
 }

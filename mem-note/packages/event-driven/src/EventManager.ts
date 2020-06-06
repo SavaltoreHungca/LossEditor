@@ -1,6 +1,6 @@
 // 事件函数
 export interface Event {
-    (): [Boolean, number?] | undefined; // 是否重试 延迟执行, 单位 ms
+    (): [Boolean, number?] | void; // 是否重试 延迟执行, 单位 ms
 }
 
 // 事件管理器
@@ -14,7 +14,7 @@ export class EventManager {
     private execEvent = (event: Event) => {
         try {
             let result = event();
-            if(result){
+            if (result) {
                 let [retry, delayTime] = result;
                 if (retry) {
                     if (!delayTime) delayTime = 0;
@@ -23,6 +23,7 @@ export class EventManager {
             }
         } catch (e) {
             // pass
+            console.log("----------事件流错误------------------\n", e);
         }
     }
 
@@ -66,7 +67,7 @@ export class EventManager {
     }
 
     // 注册依赖事件触发链
-    registryEventDpendsOn(id: String, event: Event, dependsOn: Array<String>) {
+    registryEventDpendsOn(dependsOn: Array<String>, id: String, event: Event) {
         let dependencies = this.eventDependencies.get(id);
         if (!dependencies) {
             dependencies = new Set<String>();
@@ -88,17 +89,19 @@ export class EventManager {
     // 触发事件
     triggleEvent(id: String) {
         let eventList = this.eventMap.get(id);
-        if (eventList) {
-            let times = this.eventTriggleTimes.get(id) || 0;
-            times += 1;
-            if(times > 1000){
-                times = 1000;
-            }
-            this.eventTriggleTimes.set(id, times);
-            for (let event of eventList) {
-                this.execEvent(event);
-            }
-            this.triggleRelyEvent(id);
+        if(!eventList){
+            eventList = [];
+            this.eventMap.set(id, eventList);
         }
+        let times = this.eventTriggleTimes.get(id) || 0;
+        times += 1;
+        if (times > 1000) {
+            times = 1000; // 事件的最大执行次数只记录到1000次
+        }
+        this.eventTriggleTimes.set(id, times);
+        for (let event of eventList) {
+            this.execEvent(event);
+        }
+        this.triggleRelyEvent(id);
     }
 }
