@@ -3,6 +3,10 @@ import { Element } from "./other/Element";
 import { DragState, Utils } from "utils";
 
 export default class extends Element {
+    getType(){
+        return "ButtomSlider";
+    }
+
     __init__() {
         // 拖动底部 slider 的拖动事件
         this.addEventListener('drag', (e: DragState) => {

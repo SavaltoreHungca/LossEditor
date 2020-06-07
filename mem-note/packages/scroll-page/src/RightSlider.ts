@@ -3,7 +3,9 @@ import Constants from "./Constants";
 import { DragState } from "utils";
 
 export default class extends Element {
-
+    getType(){
+        return "RightSlider";
+    }
     __init__() {
         // 拖动底部 slider 的拖动事件
         this.addEventListener('drag', (e: DragState) => {

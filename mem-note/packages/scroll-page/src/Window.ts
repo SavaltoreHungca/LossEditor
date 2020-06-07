@@ -4,6 +4,10 @@ import { Utils } from 'utils';
 
 export default class extends Element {
 
+    getType(){
+        return "Window";
+    }
+
     __init__() {
 
         // 水平滚动事件

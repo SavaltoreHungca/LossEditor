@@ -3,6 +3,10 @@ import Constants from "./Constants";
 
 export default class extends Element {
 
+    getType(){
+        return "ButtomScrollBar";
+    }
+
     __init__(){
         if (this.global.settings.bottomScrollBarInner) {
             // 离开停止显示底部滚动条
