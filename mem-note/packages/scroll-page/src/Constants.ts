@@ -31,4 +31,9 @@ export default class {
         topshallow: "topshallow",
         rightshallow: "rightshallow"
     }
+
+    static timeout = {
+        BUTTOM_SLIDER_FADE_TIMEOUT: "BUTTOM_SLIDER_FADE_TIMEOUT",
+        RIGHT_SLIDER_FADE_TIMEOUT: "RIGHT_SLIDER_FADE_TIMEOUT"
+    }
 }

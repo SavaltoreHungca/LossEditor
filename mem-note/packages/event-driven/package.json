@@ -24,6 +24,5 @@
     "canvas"
   ],
   "devDependencies": {
-    "@types/uuid": "^8.0.0"
   }
 }

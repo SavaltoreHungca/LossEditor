@@ -1,5 +1,6 @@
 
 import { Utils } from './Utils';
+import uuid from 'uuid';
 
 export interface DragState {
     startX: number;
@@ -15,25 +16,27 @@ export class Global {
     protected globalElement: Map<string, Element> = new Map();
     protected globalData: Map<string, any> = new Map();
 
-    get(id: string): Element | undefined{
-        return this.globalElement.get(id);
+    get(id: string): Element {
+        const elemt = this.globalElement.get(id);
+        if (!elemt) throw new Error(`$(id) not found`);
+        return elemt;
     }
 
-    set(id: string, elemt: Element){
+    set(id: string, elemt: Element) {
         this.globalElement.set(id, elemt);
     }
 
-    setData(id: string, data: any){
+    setData(id: string, data: any) {
         this.globalData.set(id, data);
     }
 
-    getData(id: string){
+    getData(id: string) {
         this.globalData.get(id);
     }
 
-    getAll(){
-        let ans: {[index: string]: Element} = {};
-        this.globalElement.forEach((value, key)=>{
+    getAll() {
+        let ans: { [index: string]: Element } = {};
+        this.globalElement.forEach((value, key) => {
             ans[key] = value;
         })
         return ans;
@@ -41,24 +44,16 @@ export class Global {
 }
 
 export class Element {
-    private dragState: DragState = {
-        startX: 0,
-        startY: 0,
-        pressed: false,
-        deltaX: 0,
-        deltaY: 0,
-        registered: false,
-        event: undefined
-    }
+    private dragStates: Map<string, DragState> = new Map();
     protected proxy: HTMLElement;
     protected global: Global;
-    
+
     constructor(element: HTMLElement, global: Global) {
         this.proxy = element;
         this.global = global;
         this.setAttribute("data-ele-type", this.getType());
     }
-    getType(): string{
+    getType(): string {
         return Object.getPrototypeOf(this).constructor.name;
     }
     append(element: Element) {
@@ -87,37 +82,54 @@ export class Element {
         option?: boolean | AddEventListenerOptions
     ) {
         if (name === 'drag') {
-            this.dragState.pressed = false;
-            this.dragState.registered = false;
+            const dragStateId = uuid.v1();
+            this.dragStates.set(dragStateId, {
+                startX: 0,
+                startY: 0,
+                pressed: false,
+                deltaX: 0,
+                deltaY: 0,
+                registered: false,
+                event: undefined
+            });
+
             this.proxy.addEventListener('mousedown', (event) => {
-                this.dragState.startX = event.screenX;
-                this.dragState.startY = event.screenY;
-                this.dragState.pressed = true;
+                let dragState = this.dragStates.get(dragStateId);
+                if(!dragState) throw new Error('Sys error');
+                dragState.startX = event.screenX;
+                dragState.startY = event.screenY;
+                dragState.pressed = true;
             })
 
             let resizing = (event: MouseEvent) => {
-                if (this.dragState.pressed) {
-                    this.dragState.deltaX = event.screenX - this.dragState.startX;
-                    this.dragState.deltaY = event.screenY - this.dragState.startY;
-                    this.dragState.startX += this.dragState.deltaX;
-                    this.dragState.startY += this.dragState.deltaY;
+                let dragState = this.dragStates.get(dragStateId);
+                if(!dragState) throw new Error('Sys error');
+                if (dragState.pressed) {
+                    dragState.deltaX = event.screenX - dragState.startX;
+                    dragState.deltaY = event.screenY - dragState.startY;
+                    dragState.startX += dragState.deltaX;
+                    dragState.startY += dragState.deltaY;
 
-                    this.dragState.event = event;
-                    callback(this.dragState);
+                    dragState.event = event;
+                    callback(dragState);
                 }
             };
             let resizeDone = (event: MouseEvent) => {
-                this.dragState.pressed = false;
-                this.dragState.registered = false;
+                let dragState = this.dragStates.get(dragStateId);
+                if(!dragState) throw new Error('Sys error');
+                dragState.pressed = false;
+                dragState.registered = false;
                 document.removeEventListener('mousemove', resizing);
                 document.removeEventListener('mouseup', resizeDone);
                 Utils.setStyle(document.body, { "user-select": "" });
 
-                callback(this.dragState);
+                callback(dragState);
             };
             this.proxy.addEventListener('mousemove', (event) => {
-                if (this.dragState.pressed && !this.dragState.registered) {
-                    this.dragState.registered = true;
+                let dragState = this.dragStates.get(dragStateId);
+                if(!dragState) throw new Error('Sys error');
+                if (dragState.pressed && !dragState.registered) {
+                    dragState.registered = true;
                     Utils.setStyle(document.body, { "user-select": "none" });
                     document.addEventListener('mousemove', resizing);
                     document.addEventListener('mouseup', resizeDone);
@@ -176,16 +188,19 @@ export class Element {
         this.proxy.setAttribute("data-role", roleName);
     }
 
-    setWidth(width: string){
-        this.setStyle({width: width});
+    setWidth(width: string) {
+        this.setStyle({ width: width });
     }
 
-    setHeight(height: string){
-        this.setStyle({height: height});
+    setHeight(height: string) {
+        this.setStyle({ height: height });
     }
 
-    setAttribute(name: string, value?: string){
-        if(!value) value = "";
+    setAttribute(name: string, value?: string) {
+        if (!value) value = "";
         this.proxy.setAttribute(name, value);
+    }
+    getNative(): HTMLElement {
+        return this.proxy;
     }
 }

@@ -84,5 +84,8 @@
     "scroll-page": "*",
     "source-map-loader": "^0.2.4",
     "typescript": "^3.7.2"
+  },
+  "dependencies": {
+    "@types/uuid": "^8.0.0"
   }
 }

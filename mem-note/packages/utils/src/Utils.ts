@@ -115,4 +115,7 @@ export class Utils {
         }
         return false;
     }
+    static get(obj: any, propName: string): any{
+        return obj[propName];
+    }
 }

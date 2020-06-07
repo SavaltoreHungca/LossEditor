@@ -1,6 +1,6 @@
 
 export class Settings {
-    bottomScrollBarInner: boolean = true;
+    bottomScrollBarInner: boolean = false;
     bottomScrollBarHeight: number = 14;
     rightScrollBarInner: boolean = false;
     rightScrollBarWidth: number = 14;

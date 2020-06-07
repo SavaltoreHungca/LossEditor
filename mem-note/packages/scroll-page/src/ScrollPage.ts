@@ -50,7 +50,7 @@ function registryEvents(scrollPage: ScrollPage) {
             })
             topshallow.setStyle({
                 position: 'absolute',
-                'box-shadow': '#dddddd 0 6px 6px -6px inset'
+                'box-shadow': '#dddddd 0 6px 6px -6px inset',
             })
             rightshallow.setStyle({
                 position: 'absolute',
@@ -58,12 +58,10 @@ function registryEvents(scrollPage: ScrollPage) {
             })
             buttomScrollBar.setStyle({
                 position: 'absolute',
-                visibility: 'hidden'
             })
             buttomSlider.setStyle({
                 position: 'absolute',
-                background: 'hsla(0,0%,39%,.4)',
-                height: '14px'
+                background: 'hsla(0,0%,39%,.4)'
             });
             rightScrollBar.setStyle({
                 position: 'absolute',
@@ -71,35 +69,12 @@ function registryEvents(scrollPage: ScrollPage) {
             rightSlider.setStyle({
                 position: 'absolute',
                 background: 'hsla(0,0%,39%,.4)',
-                width: '14px'
             })
             page.setStyle({
                 position: 'absolute',
-                height: '1000px', 
-                contain: 'strict', 
+                contain: 'strict',
                 overflow: 'hidden'
             })
-            page.setWidth(1000 + 'px');
-            page.setHeight(1000 + 'px');
-        },
-        Constants.events.ASSEMBLE_ELEMENTS_FINISH
-    )
-
-    // 初始化元素尺寸事件和位置
-    scrollPage.eventManager.registryEventDpendsOn(
-        [Constants.events.ASSEMBLE_ELEMENTS_FINISH],
-        () => {
-            let {
-                container,
-                window,
-                page,
-                buttomScrollBar,
-                rightScrollBar,
-                topshallow,
-                rightshallow,
-                buttomSlider,
-                rightSlider
-            } = scrollPage.global.getAll();
 
             let containerStyle = container.getCssStyle();
             if (!containerStyle.width || !containerStyle.height) {
@@ -110,14 +85,15 @@ function registryEvents(scrollPage: ScrollPage) {
                 container.setWidth(containerStyle.width);
                 container.setHeight(containerStyle.height);
             }
-
             buttomScrollBar.setHeight(scrollPage.settings.bottomScrollBarHeight + 'px');
             buttomScrollBar.setLeft('0');
             buttomScrollBar.setBottom('0');
+            buttomSlider.setHeight(scrollPage.settings.bottomScrollBarHeight + 'px')
 
             rightScrollBar.setRight('0');
             rightScrollBar.setTop('0');
             rightScrollBar.setWidth(scrollPage.settings.rightScrollBarWidth + 'px');
+            rightSlider.setWidth(scrollPage.settings.rightScrollBarWidth + 'px');
 
             topshallow.setHeight('6px');
             topshallow.setLeft('0');
@@ -126,8 +102,11 @@ function registryEvents(scrollPage: ScrollPage) {
             rightshallow.setWidth('6px');
             rightshallow.setRight(scrollPage.settings.rightScrollBarWidth + 'px');
             rightshallow.setTop('0');
+
+            page.setWidth(1000 + 'px');
+            page.setHeight(1000 + 'px');
         },
-        Constants.events.INITIAL_ELEMENTS_SIZE_POSITION
+        Constants.events.ASSEMBLE_ELEMENTS_FINISH
     )
 
     // 追踪 container 尺寸变化事件
@@ -140,13 +119,10 @@ function registryEvents(scrollPage: ScrollPage) {
             let {
                 container,
                 window,
-                page,
                 buttomScrollBar,
                 rightScrollBar,
                 topshallow,
-                rightshallow,
-                buttomSlider,
-                rightSlider
+                rightshallow
             } = scrollPage.global.getAll();
             const containerInfo = container.getInfo();
             const { bottomScrollBarInner, bottomScrollBarHeight, rightScrollBarInner, rightScrollBarWidth, showTopShallow, showRightShallow } = scrollPage.global.settings;
@@ -184,24 +160,21 @@ function registryEvents(scrollPage: ScrollPage) {
         ],
         () => {
             let {
-                container,
-                window,
                 page,
                 buttomScrollBar,
-                rightScrollBar,
-                topshallow,
-                rightshallow,
                 buttomSlider,
-                rightSlider
             } = scrollPage.global.getAll();
             const { bottomScrollBarInner, bottomScrollBarHeight, rightScrollBarInner, rightScrollBarWidth, showTopShallow, showRightShallow } = scrollPage.global.settings;
+
 
             const pageInfo = page.getInfo();
             const buttomScrollBarInfo = buttomScrollBar.getInfo();
             if (pageInfo.innerWidth <= buttomScrollBarInfo.innerWidth) {
                 buttomScrollBar.disappear();
             } else {
-                buttomScrollBar.show();
+                if (!scrollPage.settings.bottomScrollBarInner) {
+                    buttomScrollBar.show();
+                }
                 const sliderWidth = Math.pow(buttomScrollBarInfo.innerWidth, 2) / pageInfo.innerWidth;
                 buttomSlider.setWidth(sliderWidth + 'px');
             }
@@ -216,14 +189,8 @@ function registryEvents(scrollPage: ScrollPage) {
         ],
         () => {
             let {
-                container,
-                window,
                 page,
-                buttomScrollBar,
                 rightScrollBar,
-                topshallow,
-                rightshallow,
-                buttomSlider,
                 rightSlider
             } = scrollPage.global.getAll();
             const { bottomScrollBarInner, bottomScrollBarHeight, rightScrollBarInner, rightScrollBarWidth, showTopShallow, showRightShallow } = scrollPage.global.settings;
@@ -233,7 +200,9 @@ function registryEvents(scrollPage: ScrollPage) {
             if (pageInfo.innerHeight <= rightScrollBarInfo.innerHeight) {
                 rightScrollBar.disappear();
             } else {
-                rightScrollBar.show();
+                if (!scrollPage.settings.rightScrollBarInner) {
+                    rightScrollBar.show();
+                }
                 const sliderHeight = Math.pow(rightScrollBarInfo.innerHeight, 2) / pageInfo.innerHeight;
                 rightSlider.setHeight(sliderHeight + 'px');
             }
