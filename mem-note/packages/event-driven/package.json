@@ -14,15 +14,7 @@
     "dist/"
   ],
   "dependencies": {
-    "@types/esrever": "^0.2.0",
-    "esrever": "^0.2.0",
-    "immer": "^5.0.0",
-    "is-plain-object": "^3.0.0",
-    "tiny-warning": "^1.0.3"
   },
-  "keywords": [
-    "canvas"
-  ],
   "devDependencies": {
   }
 }
