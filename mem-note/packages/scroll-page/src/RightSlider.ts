@@ -3,6 +3,7 @@ import Constants from "./Constants";
 import { DragState } from "utils";
 
 export default class extends Element {
+    dragging: boolean = false;
     getType(){
         return "RightSlider";
     }
@@ -11,8 +12,10 @@ export default class extends Element {
         this.addEventListener('drag', (e: DragState) => {
             if (e.pressed === false) { // 拖动事件结束
                 this.lightenColor();
+                this.dragging = false;
                 return;
             }
+            this.dragging = true;
             this.darkenColor();
             const {
                 page,

@@ -278,6 +278,7 @@ function registryEvents(scrollPage: ScrollPage) {
     )
 
     // 自动隐藏滚动条
+    // 初始化时是否显示滚动条
     scrollPage.eventManager.registryEventDpendsOn(
         [
             Constants.events.ELEMENTS_CREATED
@@ -286,6 +287,8 @@ function registryEvents(scrollPage: ScrollPage) {
             let {
                 buttomSlider,
                 buttomScrollBar,
+                rightScrollBar,
+                rightSlider,
                 window: win
             } = scrollPage.global.getAll();
 
@@ -298,7 +301,7 @@ function registryEvents(scrollPage: ScrollPage) {
                         return;
                     }
                     buttomScrollBar.show();
-                    buttomScrollBar.fadeOut();
+                    buttomScrollBar.fadeOut(scrollPage.settings.bottomScrollBarAutoFadeTime);
                 })
                 // 移动到底部显示底部滚动条
                 window.addEventListener('mousemove', (e: MouseEvent) => {
@@ -308,13 +311,13 @@ function registryEvents(scrollPage: ScrollPage) {
                         return;
                     }
                     if(leaved){
-                        buttomScrollBar.fadeOut();
+                        buttomScrollBar.fadeOut(scrollPage.settings.bottomScrollBarAutoFadeTime);
                         return;
                     }
                     if (bottom <= buttomBarInfo.height) {
                         buttomScrollBar.show();
                     } else {
-                        buttomScrollBar.fadeOut();
+                        buttomScrollBar.fadeOut(scrollPage.settings.bottomScrollBarAutoFadeTime);
                     }
                 });
                 // 拖动 buttomslider 结束后判断是否底部滚动条是否该自动消失
@@ -323,17 +326,59 @@ function registryEvents(scrollPage: ScrollPage) {
                     const buttomBarInfo = buttomScrollBar.getInfo();
                     if(e.pressed === false){
                         if(leaved){
-                            buttomScrollBar.fadeOut();
+                            buttomScrollBar.fadeOut(scrollPage.settings.bottomScrollBarAutoFadeTime);
                             return;
                         }
                         if (bottom <= buttomBarInfo.height) {
                             buttomScrollBar.show();
                         } else {
-                            buttomScrollBar.fadeOut();
+                            buttomScrollBar.fadeOut(scrollPage.settings.bottomScrollBarAutoFadeTime);
                         }
                     }  
                 })
-                
+            }
+
+            if(scrollPage.settings.rightScrollBarInner) {
+                rightScrollBar.disappear();
+
+                win.addEventListener('wheel', (e: WheelEvent) => {
+                    if (Math.abs(e.deltaY) < 1) {
+                        return;
+                    }
+                    rightScrollBar.show();
+                    rightScrollBar.fadeOut(scrollPage.settings.rightScrollBarAutoFadeTime);
+                })
+                window.addEventListener('mousemove', (e: MouseEvent) => {
+                    let { right, leaved } = Utils.getMousePositionInElement(win.getNative(), e);
+                    const rightScrollInfo = rightScrollBar.getInfo();
+                    if((<RightSlider>rightSlider).dragging){
+                        return;
+                    }
+                    if(leaved){
+                        rightScrollBar.fadeOut(scrollPage.settings.rightScrollBarAutoFadeTime);
+                        return;
+                    }
+                    if (right <= rightScrollInfo.width) {
+                        rightScrollBar.show();
+                    } else {
+                        rightScrollBar.fadeOut(scrollPage.settings.rightScrollBarAutoFadeTime);
+                    }
+                });
+                rightSlider.addEventListener('drag', (e: DragState)=>{
+                    let { right, leaved } = Utils.getMousePositionInElement(win.getNative(), <MouseEvent>e.event);
+                    const rightScrollBarInfo = rightScrollBar.getInfo();
+                    if(e.pressed === false){
+                        if(leaved){
+                            rightScrollBar.fadeOut(scrollPage.settings.rightScrollBarAutoFadeTime);
+                            return;
+                        }
+                        if (right <= rightScrollBarInfo.width) {
+                            rightScrollBar.show();
+                        } else {
+                            rightScrollBar.fadeOut(scrollPage.settings.rightScrollBarAutoFadeTime);
+                        }
+                    }  
+                })
             }
         }
     )
