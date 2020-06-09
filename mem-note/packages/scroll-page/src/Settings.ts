@@ -1,5 +1,7 @@
 
 export class Settings {
+    containerHeight: number = 300;
+    containerWidht: number = 400;
     bottomScrollBarInner: boolean = true;
     bottomScrollBarHeight: number = 14;
     rightScrollBarInner: boolean = true;

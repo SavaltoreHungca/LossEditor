@@ -142,7 +142,9 @@ export class Element {
     getInfo() {
         return Utils.getElementInfo(this.proxy);
     }
-
+    visible(): boolean{
+        return this.getCssStyle().visibility !== 'hidden';
+    }
     show() {
         this.cancelDisappear();
         this.cancelFadeOut();

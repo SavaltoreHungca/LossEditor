@@ -1,5 +1,5 @@
 import { Utils } from 'utils';
-import { EventManager } from 'event-driven';
+import { EventManager, DataListener } from 'event-driven';
 import { Global } from './other/Element';
 import Container from './Container';
 import Constants from './Constants';
@@ -13,6 +13,7 @@ import ButtomSlider from './ButtomSlider';
 import RightSlider from './RightSlider';
 import { Settings } from './Settings';
 import { DragState } from 'utils';
+import Content from './Content';
 
 function registryEvents(scrollPage: ScrollPage) {
 
@@ -30,7 +31,8 @@ function registryEvents(scrollPage: ScrollPage) {
                 topshallow,
                 rightshallow,
                 buttomSlider,
-                rightSlider
+                rightSlider,
+                content
             } = scrollPage.global.getAll();
 
             container.append(window);
@@ -41,6 +43,7 @@ function registryEvents(scrollPage: ScrollPage) {
             container.append(rightshallow);
             buttomScrollBar.append(buttomSlider);
             rightScrollBar.append(rightSlider);
+            page.append(content);
 
             container.setStyle({
                 position: 'relative',
@@ -80,11 +83,14 @@ function registryEvents(scrollPage: ScrollPage) {
                 contain: 'strict',
                 overflow: 'hidden'
             })
+            content.setStyle({
+                position: 'relative'
+            })
 
             let containerStyle = container.getCssStyle();
             if (!containerStyle.width || !containerStyle.height) {
-                container.setWidth('300px');
-                container.setHeight('200px');
+                container.setWidth(scrollPage.settings.containerWidht + 'px');
+                container.setHeight(scrollPage.settings.containerHeight + 'px');
             } else {
                 // 这里仅仅只是为了触发事件
                 container.setWidth(containerStyle.width);
@@ -112,8 +118,6 @@ function registryEvents(scrollPage: ScrollPage) {
             }
             rightshallow.setTop('0');
 
-            page.setWidth(1000 + 'px');
-            page.setHeight(1000 + 'px');
             page.setLeft(0 + 'px');
             page.setTop(0 + 'px');
         },
@@ -240,8 +244,6 @@ function registryEvents(scrollPage: ScrollPage) {
         () => {
             let {
                 page,
-                rightScrollBar,
-                rightSlider,
                 topshallow,
                 rightshallow,
                 window
@@ -251,10 +253,7 @@ function registryEvents(scrollPage: ScrollPage) {
             const pageInfo = page.getInfo();
             const windowInfo = window.getInfo();
 
-            if (
-                pageInfo.top === 0 &&
-                pageInfo.innerHeight > windowInfo.innerHeight
-            ) {
+            if (pageInfo.innerHeight <= windowInfo.innerHeight || pageInfo.top === 0) {
                 topshallow.disappear();
             } else {
                 topshallow.show();
@@ -270,6 +269,8 @@ function registryEvents(scrollPage: ScrollPage) {
                 pageInfo.innerWidth > windowInfo.innerWidth &&
                 pageInfo.left === windowInfo.innerWidth - pageInfo.innerWidth
             ) {
+                rightshallow.disappear();
+            } else if (pageInfo.innerWidth <= windowInfo.innerWidth) {
                 rightshallow.disappear();
             } else {
                 rightshallow.show();
@@ -289,7 +290,8 @@ function registryEvents(scrollPage: ScrollPage) {
                 buttomScrollBar,
                 rightScrollBar,
                 rightSlider,
-                window: win
+                window: win,
+                page
             } = scrollPage.global.getAll();
 
             if (scrollPage.settings.bottomScrollBarInner) {
@@ -297,6 +299,11 @@ function registryEvents(scrollPage: ScrollPage) {
 
                 // 底部滚动条自动消失
                 win.addEventListener('wheel', (e: WheelEvent) => {
+                    const pageInfo = page.getInfo();
+                    const winInfo = win.getInfo();
+                    if(pageInfo.innerWidth <= winInfo.innerWidth){
+                        return;
+                    }
                     if (Math.abs(e.deltaX) < 1) {
                         return;
                     }
@@ -305,43 +312,53 @@ function registryEvents(scrollPage: ScrollPage) {
                 })
                 // 移动到底部显示底部滚动条
                 window.addEventListener('mousemove', (e: MouseEvent) => {
-                    let { bottom, leaved } = Utils.getMousePositionInElement(win.getNative(), e);
-                    const buttomBarInfo = buttomScrollBar.getInfo();
-                    if((<ButtomSlider>buttomSlider).dragging){
+                    const pageInfo = page.getInfo();
+                    const winInfo = win.getInfo();
+                    if(pageInfo.innerWidth <= winInfo.innerWidth){
                         return;
                     }
-                    if(leaved){
+                    let { bottom, leaved } = Utils.getMousePositionInElement(win.getNative(), e);
+                    const buttomBarInfo = buttomScrollBar.getInfo();
+                    if ((<ButtomSlider>buttomSlider).dragging) {
+                        return;
+                    }
+                    if (leaved && buttomScrollBar.visible()) {
                         buttomScrollBar.fadeOut(scrollPage.settings.bottomScrollBarAutoFadeTime);
                         return;
                     }
-                    if (bottom <= buttomBarInfo.height) {
+                    if (!leaved && bottom <= buttomBarInfo.height) {
                         buttomScrollBar.show();
-                    } else {
+                    } else if (buttomScrollBar.visible()) {
                         buttomScrollBar.fadeOut(scrollPage.settings.bottomScrollBarAutoFadeTime);
                     }
                 });
                 // 拖动 buttomslider 结束后判断是否底部滚动条是否该自动消失
-                buttomSlider.addEventListener('drag', (e: DragState)=>{
+                buttomSlider.addEventListener('drag', (e: DragState) => {
                     let { bottom, leaved } = Utils.getMousePositionInElement(win.getNative(), <MouseEvent>e.event);
                     const buttomBarInfo = buttomScrollBar.getInfo();
-                    if(e.pressed === false){
-                        if(leaved){
+                    if (e.pressed === false) {
+                        if (leaved && buttomScrollBar.visible()) {
                             buttomScrollBar.fadeOut(scrollPage.settings.bottomScrollBarAutoFadeTime);
                             return;
                         }
                         if (bottom <= buttomBarInfo.height) {
                             buttomScrollBar.show();
-                        } else {
+                        } else if (buttomScrollBar.visible()) {
                             buttomScrollBar.fadeOut(scrollPage.settings.bottomScrollBarAutoFadeTime);
                         }
-                    }  
+                    }
                 })
             }
 
-            if(scrollPage.settings.rightScrollBarInner) {
+            if (scrollPage.settings.rightScrollBarInner) {
                 rightScrollBar.disappear();
 
                 win.addEventListener('wheel', (e: WheelEvent) => {
+                    const pageInfo = page.getInfo();
+                    const winInfo = win.getInfo();
+                    if(pageInfo.innerHeight <= winInfo.innerHeight){
+                        return;
+                    }
                     if (Math.abs(e.deltaY) < 1) {
                         return;
                     }
@@ -349,58 +366,108 @@ function registryEvents(scrollPage: ScrollPage) {
                     rightScrollBar.fadeOut(scrollPage.settings.rightScrollBarAutoFadeTime);
                 })
                 window.addEventListener('mousemove', (e: MouseEvent) => {
-                    let { right, leaved } = Utils.getMousePositionInElement(win.getNative(), e);
-                    const rightScrollInfo = rightScrollBar.getInfo();
-                    if((<RightSlider>rightSlider).dragging){
+                    const pageInfo = page.getInfo();
+                    const winInfo = win.getInfo();
+                    if(pageInfo.innerHeight <= winInfo.innerHeight){
                         return;
                     }
-                    if(leaved){
+                    let { right, leaved } = Utils.getMousePositionInElement(win.getNative(), e);
+                    const rightScrollInfo = rightScrollBar.getInfo();
+                    if ((<RightSlider>rightSlider).dragging) {
+                        return;
+                    }
+                    if (leaved && rightScrollBar.visible()) {
                         rightScrollBar.fadeOut(scrollPage.settings.rightScrollBarAutoFadeTime);
                         return;
                     }
-                    if (right <= rightScrollInfo.width) {
+                    if (!leaved && right <= rightScrollInfo.width) {
                         rightScrollBar.show();
-                    } else {
+                    } else if (rightScrollBar.visible()) {
                         rightScrollBar.fadeOut(scrollPage.settings.rightScrollBarAutoFadeTime);
                     }
                 });
-                rightSlider.addEventListener('drag', (e: DragState)=>{
+                rightSlider.addEventListener('drag', (e: DragState) => {
                     let { right, leaved } = Utils.getMousePositionInElement(win.getNative(), <MouseEvent>e.event);
                     const rightScrollBarInfo = rightScrollBar.getInfo();
-                    if(e.pressed === false){
-                        if(leaved){
+                    if (e.pressed === false) {
+                        if (leaved && rightScrollBar.visible()) {
                             rightScrollBar.fadeOut(scrollPage.settings.rightScrollBarAutoFadeTime);
                             return;
                         }
                         if (right <= rightScrollBarInfo.width) {
                             rightScrollBar.show();
-                        } else {
+                        } else if (rightScrollBar.visible()) {
                             rightScrollBar.fadeOut(scrollPage.settings.rightScrollBarAutoFadeTime);
                         }
-                    }  
+                    }
                 })
             }
         }
     )
 }
 
+function addListener(scrollPage: ScrollPage) {
+
+    // 监听 context 尺寸变化
+    scrollPage.dataListener.addListener(() => {
+        const { content } = scrollPage.global.getAll();
+        if (content) {
+            const contentInfo = content.getInfo();
+            return [contentInfo.width, contentInfo.height];
+        } else {
+            return false
+        }
+    }, (context: any) => {
+        if (context) {
+            const [width, height] = context;
+            const { page } = scrollPage.global.getAll();
+            page.setWidth(width + 'px');
+            page.setHeight(height + 'px');
+        }
+    }, false);
+
+    // 监听 container 尺寸变化
+    scrollPage.dataListener.addListener(() => {
+        const { container } = scrollPage.global.getAll();
+        if (container) {
+            const containerInfo = container.getInfo();
+            return [containerInfo.width, containerInfo.height];
+        } else {
+            return false
+        }
+    }, (context: any) => {
+        if (context) {
+            scrollPage.eventManager.triggleEvent(Constants.events.CONTAINER_WIDTH_CHANGE);
+            scrollPage.eventManager.triggleEvent(Constants.events.CONTAINER_HEIGHT_CHANGE)
+        }
+    }, false);
+}
 
 export class ScrollPage {
     eventManager: EventManager;
+    dataListener: DataListener;
     settings: Settings = new Settings();
     global: Global;
 
-    constructor(container: HTMLElement, settings?: Settings) {
-        if (settings) this.settings = settings;
+    constructor(content: HTMLElement, settings?: {[index: string]: any}) {
+        if (settings) {
+            let st = new Settings();
+            for(let index in settings){
+                st[index] = settings[index];
+            }
+            this.settings = st;
+        };
         this.eventManager = new EventManager();
+        this.dataListener = new DataListener(200);
         this.global = new Global(this.eventManager, this.settings);
         registryEvents(this);
-        this.buildElements(container);
+        addListener(this);
+        this.buildElements(content);
     }
 
     // 构建html结构
-    private buildElements = (container: HTMLElement) => {
-        this.global.set("container", new Container(container, this.global));
+    private buildElements = (content: HTMLElement) => {
+        this.global.set("container", new Container(document.createElement('div'), this.global));
         this.global.set("window", new Window(document.createElement('div'), this.global));
         this.global.set("page", new Page(document.createElement('div'), this.global));
         this.global.set("buttomScrollBar", new ButtomScrollBar(document.createElement('div'), this.global));
@@ -409,6 +476,14 @@ export class ScrollPage {
         this.global.set("rightshallow", new RightShallow(document.createElement('div'), this.global));
         this.global.set("buttomSlider", new ButtomSlider(document.createElement('div'), this.global));
         this.global.set("rightSlider", new RightSlider(document.createElement('div'), this.global));
+        this.global.set("content", new Content(content, this.global));
+
+        if(content.parentElement){
+            const parent = content.parentElement;
+            const {container} = this.global.getAll();
+            parent.insertBefore(container.getNative(), content);
+            parent.removeChild(content);
+        }
 
         this.eventManager.triggleEvent(Constants.events.ELEMENTS_CREATED);
     }
