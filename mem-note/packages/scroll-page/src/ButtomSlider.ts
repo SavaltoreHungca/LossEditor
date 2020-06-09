@@ -3,6 +3,8 @@ import { Element } from "./other/Element";
 import { DragState, Utils } from "utils";
 
 export default class extends Element {
+    dragging: boolean = false;
+
     getType(){
         return "ButtomSlider";
     }
@@ -18,8 +20,10 @@ export default class extends Element {
             } = this.global.getAll();
             if (e.pressed === false) { // 拖动事件结束
                 this.lightenColor();
+                this.dragging = false;
                 return;
             }
+            this.dragging = true;
             this.darkenColor();
             const buttomSliderInfo = buttomSlider.getInfo();
             let buttomScrollBarInfo = buttomScrollBar.getInfo();
@@ -27,14 +31,10 @@ export default class extends Element {
 
             let offset = buttomSliderInfo.left + e.deltaX;
 
-            if (buttomScrollBarInfo.innerWidth < pageInfo.innerWidth) {
-                rightshallow.show();
-            }
             if (offset <= 0) {
                 offset = 0;
             } else if (offset >= buttomScrollBarInfo.innerWidth - buttomSliderInfo.innerWidth) {
                 offset = buttomScrollBarInfo.innerWidth - buttomSliderInfo.innerWidth;
-                rightshallow.disappear();
             }
             buttomSlider.setLeft(offset + 'px');
             page.setLeft(- pageInfo.innerWidth / buttomScrollBarInfo.innerWidth * offset + 'px');
@@ -51,21 +51,6 @@ export default class extends Element {
         this.addEventListener('mouseleave', () => {
             this.lightenColor();
         })
-
-        if (this.global.settings.bottomScrollBarInner) {
-            this.addEventListener('drag', (e: DragState) => {
-                const {
-                    buttomScrollBar,
-                } = this.global.getAll();
-
-                const path: [] = Utils.get(e.event, 'path');
-                if (e.pressed === false && !Utils.in(this.proxy, path)) { // 拖动事件结束
-                    buttomScrollBar.disappear(1500);
-                    return;
-                }
-                buttomScrollBar.show();
-            })
-        }
     }
 
     lightenColor() {

@@ -93,7 +93,7 @@ export class EventManager {
 
     // 触发事件
     triggleEvent(id: String) {
-        console.log("触发事件: ", id);
+        // console.log("触发事件: ", id);
         let eventList = this.eventMap.get(id);
         if(!eventList){
             eventList = [];

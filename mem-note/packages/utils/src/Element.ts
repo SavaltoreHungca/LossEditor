@@ -1,4 +1,3 @@
-
 import { Utils } from './Utils';
 import uuid from 'uuid';
 
@@ -95,7 +94,7 @@ export class Element {
 
             this.proxy.addEventListener('mousedown', (event) => {
                 let dragState = this.dragStates.get(dragStateId);
-                if(!dragState) throw new Error('Sys error');
+                if (!dragState) throw new Error('Sys error');
                 dragState.startX = event.screenX;
                 dragState.startY = event.screenY;
                 dragState.pressed = true;
@@ -103,7 +102,7 @@ export class Element {
 
             let resizing = (event: MouseEvent) => {
                 let dragState = this.dragStates.get(dragStateId);
-                if(!dragState) throw new Error('Sys error');
+                if (!dragState) throw new Error('Sys error');
                 if (dragState.pressed) {
                     dragState.deltaX = event.screenX - dragState.startX;
                     dragState.deltaY = event.screenY - dragState.startY;
@@ -116,7 +115,7 @@ export class Element {
             };
             let resizeDone = (event: MouseEvent) => {
                 let dragState = this.dragStates.get(dragStateId);
-                if(!dragState) throw new Error('Sys error');
+                if (!dragState) throw new Error('Sys error');
                 dragState.pressed = false;
                 dragState.registered = false;
                 document.removeEventListener('mousemove', resizing);
@@ -127,7 +126,7 @@ export class Element {
             };
             this.proxy.addEventListener('mousemove', (event) => {
                 let dragState = this.dragStates.get(dragStateId);
-                if(!dragState) throw new Error('Sys error');
+                if (!dragState) throw new Error('Sys error');
                 if (dragState.pressed && !dragState.registered) {
                     dragState.registered = true;
                     Utils.setStyle(document.body, { "user-select": "none" });
@@ -135,9 +134,9 @@ export class Element {
                     document.addEventListener('mouseup', resizeDone);
                 }
             })
-            return;
+        } else {
+            this.proxy.addEventListener(name, callback as any, option);
         }
-        this.proxy.addEventListener(name, callback as any, option);
     }
 
     getInfo() {
@@ -146,6 +145,7 @@ export class Element {
 
     show() {
         this.cancelDisappear();
+        this.cancelFadeOut();
         this.setStyle({ visibility: 'visible' });
     }
 
@@ -155,14 +155,66 @@ export class Element {
         }
     }
 
+    private opacity: number = 1;
+    private initialOpacity: number = -1;
+    private fadeGradient: number = 0.1;
+    private fadeInterval: number = 100;
+    private fadeoutGoing: boolean = false;
+    private FADE_OUT_TIME_ID = "FADE_OUT_TIME_ID";
+    fadeOut(duration?: number) {
+        if(this.fadeoutGoing) return;
+        if (!duration) duration = 1500;
+        if (this.getCssStyle().opacity === "") {
+            this.initialOpacity = 1;
+        } else {
+            this.initialOpacity = parseFloat(this.getCssStyle().opacity);
+        }
+        this.opacity = this.initialOpacity;
+        this.fadeInterval = duration / 10 < 100 ? 100 : duration / 10;
+        this.fadeGradient = this.initialOpacity / (duration / this.fadeInterval);
+
+        const fadeFunc = () => {
+            let newopacity = this.opacity - this.fadeGradient;
+            if (newopacity <= 0) {
+                this.disappear();
+                this.cancelFadeOut();
+                return;
+            }
+            this.setStyle({
+                opacity: newopacity
+            })
+            this.opacity = newopacity;
+            this.setLastTimeout(this.FADE_OUT_TIME_ID, fadeFunc, this.fadeInterval);
+        }
+        this.fadeoutGoing = true;
+        this.setLastTimeout(this.FADE_OUT_TIME_ID, fadeFunc, this.fadeInterval);
+    }
+
+    cancelFadeOut() {
+        if (this.fadeoutGoing) {
+            this.cancelLastTimeout(this.FADE_OUT_TIME_ID);
+            if (this.initialOpacity !== -1) {
+                this.setStyle({
+                    opacity: this.initialOpacity
+                })
+            }
+        }
+        this.fadeoutGoing = false;
+    }
+
     private disappearIds: Array<number> = [];
-    disappear(delay?: number) {
+    disappear(delay?: number, callback?: Function) {
+        this.cancelDisappear();
+        this.cancelFadeOut();
         if (delay) {
-            this.cancelDisappear();
-            let id = window.setTimeout(() => { this.setStyle({ visibility: 'hidden' }) }, delay);
+            let id = window.setTimeout(() => {
+                this.setStyle({ visibility: 'hidden' });
+                if (callback) callback();
+            }, delay);
             this.disappearIds.push(id);
         } else {
             this.setStyle({ visibility: 'hidden' });
+            if (callback) callback();
         }
     }
 

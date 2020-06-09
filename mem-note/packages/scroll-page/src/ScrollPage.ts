@@ -1,3 +1,4 @@
+import { Utils } from 'utils';
 import { EventManager } from 'event-driven';
 import { Global } from './other/Element';
 import Container from './Container';
@@ -11,10 +12,12 @@ import RightScrollBar from './RightScrollBar';
 import ButtomSlider from './ButtomSlider';
 import RightSlider from './RightSlider';
 import { Settings } from './Settings';
+import { DragState } from 'utils';
 
 function registryEvents(scrollPage: ScrollPage) {
 
     // 组装元素事件
+    // 初始化样式, 位置, 尺寸
     scrollPage.eventManager.registryEventDpendsOn(
         [Constants.events.ELEMENTS_CREATED],
         () => {
@@ -58,6 +61,7 @@ function registryEvents(scrollPage: ScrollPage) {
             })
             buttomScrollBar.setStyle({
                 position: 'absolute',
+                'z-index': '9999'
             })
             buttomSlider.setStyle({
                 position: 'absolute',
@@ -65,6 +69,7 @@ function registryEvents(scrollPage: ScrollPage) {
             });
             rightScrollBar.setStyle({
                 position: 'absolute',
+                'z-index': '9999'
             })
             rightSlider.setStyle({
                 position: 'absolute',
@@ -100,16 +105,23 @@ function registryEvents(scrollPage: ScrollPage) {
             topshallow.setTop('0');
 
             rightshallow.setWidth('6px');
-            rightshallow.setRight(scrollPage.settings.rightScrollBarWidth + 'px');
+            if (scrollPage.settings.rightScrollBarInner) {
+                rightshallow.setRight('0');
+            } else {
+                rightshallow.setRight(scrollPage.settings.rightScrollBarWidth + 'px');
+            }
             rightshallow.setTop('0');
 
             page.setWidth(1000 + 'px');
             page.setHeight(1000 + 'px');
+            page.setLeft(0 + 'px');
+            page.setTop(0 + 'px');
         },
         Constants.events.ASSEMBLE_ELEMENTS_FINISH
     )
 
     // 追踪 container 尺寸变化事件
+    // 设置 window buttomScrollBar rightScrollBar topshallow rightshallow 的尺寸
     scrollPage.eventManager.registryEventDpendsOn(
         [
             Constants.events.CONTAINER_HEIGHT_CHANGE,
@@ -143,8 +155,8 @@ function registryEvents(scrollPage: ScrollPage) {
 
             const windowInfo = window.getInfo();
             if (rightScrollBarInner) {
-                buttomScrollBar.setWidth(windowInfo.innerWidth - rightScrollBarWidth + 'px');
-                topshallow.setWidth(windowInfo.innerWidth - rightScrollBarWidth + 'px');
+                buttomScrollBar.setWidth(windowInfo.innerWidth + 'px');
+                topshallow.setWidth(windowInfo.innerWidth + 'px');
             } else {
                 buttomScrollBar.setWidth(windowInfo.innerWidth + 'px');
                 topshallow.setWidth(windowInfo.innerWidth + 'px');
@@ -153,6 +165,7 @@ function registryEvents(scrollPage: ScrollPage) {
     )
 
     // 设定底部滚动条 slider 的宽度
+    // 是否显示底部滚动条
     scrollPage.eventManager.registryEventDpendsOn(
         [
             Constants.events.BUTTOMSCROLLBAR_WIDTH_CHANGE,
@@ -163,13 +176,15 @@ function registryEvents(scrollPage: ScrollPage) {
                 page,
                 buttomScrollBar,
                 buttomSlider,
+                window
             } = scrollPage.global.getAll();
             const { bottomScrollBarInner, bottomScrollBarHeight, rightScrollBarInner, rightScrollBarWidth, showTopShallow, showRightShallow } = scrollPage.global.settings;
 
 
             const pageInfo = page.getInfo();
             const buttomScrollBarInfo = buttomScrollBar.getInfo();
-            if (pageInfo.innerWidth <= buttomScrollBarInfo.innerWidth) {
+            const windowInfo = window.getInfo();
+            if (pageInfo.innerWidth <= windowInfo.innerWidth) {
                 buttomScrollBar.disappear();
             } else {
                 if (!scrollPage.settings.bottomScrollBarInner) {
@@ -182,6 +197,7 @@ function registryEvents(scrollPage: ScrollPage) {
     )
 
     // 设定右部滚动条 slider 的高度
+    // 是否显示右部滚动条
     scrollPage.eventManager.registryEventDpendsOn(
         [
             Constants.events.RIGHTSCROLLBAR_WIDTH_CHANGE,
@@ -191,13 +207,15 @@ function registryEvents(scrollPage: ScrollPage) {
             let {
                 page,
                 rightScrollBar,
-                rightSlider
+                rightSlider,
+                window
             } = scrollPage.global.getAll();
             const { bottomScrollBarInner, bottomScrollBarHeight, rightScrollBarInner, rightScrollBarWidth, showTopShallow, showRightShallow } = scrollPage.global.settings;
 
             const pageInfo = page.getInfo();
+            const windowInfo = window.getInfo();
             const rightScrollBarInfo = rightScrollBar.getInfo();
-            if (pageInfo.innerHeight <= rightScrollBarInfo.innerHeight) {
+            if (pageInfo.innerHeight <= windowInfo.innerHeight) {
                 rightScrollBar.disappear();
             } else {
                 if (!scrollPage.settings.rightScrollBarInner) {
@@ -205,6 +223,117 @@ function registryEvents(scrollPage: ScrollPage) {
                 }
                 const sliderHeight = Math.pow(rightScrollBarInfo.innerHeight, 2) / pageInfo.innerHeight;
                 rightSlider.setHeight(sliderHeight + 'px');
+            }
+        }
+    )
+
+    // 阴影条是否显示
+    scrollPage.eventManager.registryEventDpendsOn(
+        [
+            Constants.events.PAGE_LEFT_CHANGE,
+            Constants.events.PAGE_TOP_CHANGE,
+            Constants.events.WINDOW_WIDTH_CHANGE,
+            Constants.events.WINDOW_HEIGHT_CHANGE,
+            Constants.events.PAGE_HEIGHT_CHANGE,
+            Constants.events.PAGE_WIDTH_CHANGE
+        ],
+        () => {
+            let {
+                page,
+                rightScrollBar,
+                rightSlider,
+                topshallow,
+                rightshallow,
+                window
+            } = scrollPage.global.getAll();
+            const { bottomScrollBarInner, bottomScrollBarHeight, rightScrollBarInner, rightScrollBarWidth, showTopShallow, showRightShallow } = scrollPage.global.settings;
+
+            const pageInfo = page.getInfo();
+            const windowInfo = window.getInfo();
+
+            if (
+                pageInfo.top === 0 &&
+                pageInfo.innerHeight > windowInfo.innerHeight
+            ) {
+                topshallow.disappear();
+            } else {
+                topshallow.show();
+            }
+
+            if (
+                scrollPage.settings.rightScrollBarInner &&
+                pageInfo.innerWidth > windowInfo.innerWidth &&
+                pageInfo.left === windowInfo.innerWidth - pageInfo.innerWidth - scrollPage.settings.rightScrollBarWidth
+            ) {
+                rightshallow.disappear();
+            } else if (
+                pageInfo.innerWidth > windowInfo.innerWidth &&
+                pageInfo.left === windowInfo.innerWidth - pageInfo.innerWidth
+            ) {
+                rightshallow.disappear();
+            } else {
+                rightshallow.show();
+            }
+        }
+    )
+
+    // 自动隐藏滚动条
+    scrollPage.eventManager.registryEventDpendsOn(
+        [
+            Constants.events.ELEMENTS_CREATED
+        ],
+        () => {
+            let {
+                buttomSlider,
+                buttomScrollBar,
+                window: win
+            } = scrollPage.global.getAll();
+
+            if (scrollPage.settings.bottomScrollBarInner) {
+                buttomScrollBar.disappear();
+
+                // 底部滚动条自动消失
+                win.addEventListener('wheel', (e: WheelEvent) => {
+                    if (Math.abs(e.deltaX) < 1) {
+                        return;
+                    }
+                    buttomScrollBar.show();
+                    buttomScrollBar.fadeOut();
+                })
+                // 移动到底部显示底部滚动条
+                window.addEventListener('mousemove', (e: MouseEvent) => {
+                    let { bottom, leaved } = Utils.getMousePositionInElement(win.getNative(), e);
+                    const buttomBarInfo = buttomScrollBar.getInfo();
+                    if((<ButtomSlider>buttomSlider).dragging){
+                        return;
+                    }
+                    if(leaved){
+                        buttomScrollBar.fadeOut();
+                        return;
+                    }
+                    if (bottom <= buttomBarInfo.height) {
+                        buttomScrollBar.show();
+                    } else {
+                        buttomScrollBar.fadeOut();
+                    }
+                });
+                // 拖动 buttomslider 结束后判断是否底部滚动条是否该自动消失
+                buttomSlider.addEventListener('drag', (e: DragState)=>{
+                    let { bottom, leaved } = Utils.getMousePositionInElement(win.getNative(), <MouseEvent>e.event);
+                    const buttomBarInfo = buttomScrollBar.getInfo();
+                    if(e.pressed === false){
+                        if(leaved){
+                            buttomScrollBar.fadeOut();
+                            return;
+                        }
+                        if (bottom <= buttomBarInfo.height) {
+                            buttomScrollBar.show();
+                        } else {
+                            buttomScrollBar.fadeOut();
+                        }
+                    }  
+                })
+                
             }
         }
     )

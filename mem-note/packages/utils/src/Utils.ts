@@ -115,7 +115,30 @@ export class Utils {
         }
         return false;
     }
-    static get(obj: any, propName: string): any{
+    static get(obj: any, propName: string): any {
         return obj[propName];
+    }
+    static getMousePositionInElement(elemt: HTMLElement, event: MouseEvent): {
+        left: number,
+        top: number,
+        bottom: number,
+        right: number,
+        leaved: boolean
+    }{
+        const { clientX, clientY } = event;
+        const eleInfo = this.getElementInfo(elemt);
+        const position = elemt.getBoundingClientRect();
+        const left = clientX - position.x;
+        const top = clientY - position.y;
+        const bottom = eleInfo.innerHeight - top;
+        const right = eleInfo.innerWidth - left;
+        let leaved = left < 0 || top < 0 || bottom < 0 || right < 0;
+        return {
+            left: left,
+            top: top,
+            bottom: bottom,
+            right: right,
+            leaved: leaved
+        }
     }
 }

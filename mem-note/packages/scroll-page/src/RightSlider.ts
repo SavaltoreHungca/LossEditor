@@ -24,12 +24,8 @@ export default class extends Element {
             const pageInfo = page.getInfo();
 
             let offset = rightSliderInfo.top + e.deltaY;
-            if(rightScrollBarInfo.innerHeight < pageInfo.innerHeight){
-                topshallow.show();
-            }
             if (offset <= 0) {
                 offset = 0;
-                topshallow.disappear();
             } else if (offset >= rightScrollBarInfo.innerHeight - rightSliderInfo.innerHeight) {
                 offset = rightScrollBarInfo.innerHeight - rightSliderInfo.innerHeight;
             }
