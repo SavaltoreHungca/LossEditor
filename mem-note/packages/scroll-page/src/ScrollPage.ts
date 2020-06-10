@@ -89,8 +89,8 @@ function registryEvents(scrollPage: ScrollPage) {
 
             let containerStyle = container.getCssStyle();
             if (!containerStyle.width || !containerStyle.height) {
-                container.setWidth(scrollPage.settings.containerWidht + 'px');
-                container.setHeight(scrollPage.settings.containerHeight + 'px');
+                container.setWidth(scrollPage.settings.containerWidth);
+                container.setHeight(scrollPage.settings.containerHeight);
             } else {
                 // 这里仅仅只是为了触发事件
                 container.setWidth(containerStyle.width);

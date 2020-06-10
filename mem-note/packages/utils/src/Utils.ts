@@ -141,4 +141,7 @@ export class Utils {
             leaved: leaved
         }
     }
+    static isVerticalForwardScrllable(elemt: HTMLElement){
+        if()
+    }
 }

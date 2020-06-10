@@ -12,8 +12,8 @@ export default class extends Element {
 
         // 水平滚动事件
         this.addEventListener('wheel', (e: WheelEvent) => {
-            e.stopPropagation();
-            e.preventDefault();
+            // e.stopPropagation();
+            // e.preventDefault();
 
             if(e.deltaX === 0) return;
 
@@ -36,11 +36,12 @@ export default class extends Element {
 
             page.setLeft(offset + 'px');
             buttomSlider.setLeft(-offset * buttomScrollBarInfo.innerWidth / pageInfo.innerWidth + 'px');
-        })
+        });
         // 垂直滚动事件
         this.addEventListener('wheel', (e: WheelEvent)=>{
-            e.stopPropagation();
-            e.preventDefault();
+            // e.stopPropagation();
+            // e.preventDefault();
+            console.log(e.target);
             if(e.deltaY === 0) return;
             let {
                 page,
