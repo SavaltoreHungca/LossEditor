@@ -4,5 +4,6 @@
     { "path": "./packages/event-driven" },
     { "path": "./packages/utils" },
     { "path": "./packages/scroll-page" },
+    { "path": "./packages/editor" },
   ]
 }

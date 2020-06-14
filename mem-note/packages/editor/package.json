@@ -1,5 +1,5 @@
 {
-    "name": "scroll-page",
+    "name": "editor",
     "description": "",
     "version": "0.58.3",
     "license": "MIT",
@@ -16,6 +16,7 @@
     },
     "devDependencies": {
       "event-driven": "*",
+      "scroll-page": "*",
       "utils": "*"
     },
     "keywords": [
