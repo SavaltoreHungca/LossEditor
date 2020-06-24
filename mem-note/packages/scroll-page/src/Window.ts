@@ -39,9 +39,8 @@ export default class extends Element {
         });
         // 垂直滚动事件
         this.addEventListener('wheel', (e: WheelEvent)=>{
-            // e.stopPropagation();
-            // e.preventDefault();
-            console.log(e.target);
+            e.stopPropagation();
+            e.preventDefault();
             if(e.deltaY === 0) return;
             let {
                 page,

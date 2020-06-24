@@ -124,7 +124,7 @@ export class Utils {
         bottom: number,
         right: number,
         leaved: boolean
-    }{
+    } {
         const { clientX, clientY } = event;
         const eleInfo = this.getElementInfo(elemt);
         const position = elemt.getBoundingClientRect();
@@ -141,7 +141,38 @@ export class Utils {
             leaved: leaved
         }
     }
-    static isVerticalForwardScrllable(elemt: HTMLElement){
-        if()
+    static getComputedStyle(node: HTMLElement, attr: string) {
+        if (typeof getComputedStyle != 'undefined') {
+            let value: any = getComputedStyle(node, null).getPropertyValue(attr);
+            return attr == 'opacity' ? value * 100 : value; //兼容不透明度，如果是不透明度，则返回整数方便计算
+        } else if (typeof this.get(node, "currentStyle") != 'undefined') {
+            if (attr == 'opacity') { //兼容不透明度
+                return Number(this.get(node, "currentStyle").getAttribute('filter').match(/(?:opacity[=:])(\d+)/)[1]);
+            } else {
+                return this.get(node, "currentStyle").getAttribute(attr);
+            }
+        }
+    }
+    static getStrPx(str: string, container: HTMLElement) {
+        const span = window.document.createElement("span");
+        span.innerText = str;
+        this.setStyle(span, { 
+            "position": "fixed",
+            "top": "0",
+            "left": "0",
+            "white-space": "pre",
+            "z-index": "-9999",
+            "font": this.getComputedStyle(container, "font"), 
+            "visibility": "hidden",
+            "display": "inline-block"
+        });
+        window.document.body.append(span);
+        const textWidth = span.clientWidth;
+        const ans = {
+            width: span.clientWidth,
+            height: span.clientHeight
+        }
+        span.parentElement?.removeChild(span);
+        return ans;
     }
 }

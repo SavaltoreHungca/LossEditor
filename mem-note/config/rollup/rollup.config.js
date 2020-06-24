@@ -12,6 +12,7 @@ import { startCase } from 'lodash'
 import EventDriven from '../../packages/event-driven/package.json'
 import ScrollPage from '../../packages/scroll-page/package.json'
 import Utils from '../../packages/utils/package.json'
+import Editor from '../../packages/editor/package.json'
 
 /**
  * Return a Rollup configuration for a `pkg` with `env` and `target`.
@@ -213,4 +214,5 @@ export default [
     ...factory(EventDriven),
     ...factory(Utils),
     ...factory(ScrollPage),
+    ...factory(Editor),
 ]
