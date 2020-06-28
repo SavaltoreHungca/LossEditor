@@ -162,9 +162,15 @@ export class Utils {
             "left": "0",
             "white-space": "pre",
             "z-index": "-9999",
-            "font": this.getComputedStyle(container, "font"), 
             "visibility": "hidden",
-            "display": "inline-block"
+            "display": "inline-block",
+            "font": this.getComputedStyle(container, "font"),
+            "font-family": this.getComputedStyle(container, "font-family"),
+            "font-weight": this.getComputedStyle(container, "font-weight"),
+            "font-size": this.getComputedStyle(container, "font-size"),
+            "font-feature-settings": this.getComputedStyle(container, "font-feature-settings"),
+            "line-height": this.getComputedStyle(container, "line-height"),
+            "letter-spacing": this.getComputedStyle(container, "letter-spacing"),
         });
         window.document.body.append(span);
         const textWidth = span.clientWidth;
@@ -174,5 +180,40 @@ export class Utils {
         }
         span.parentElement?.removeChild(span);
         return ans;
+    }
+    static getRelativePosition(elemt: HTMLElement, parent: HTMLElement){
+        const ans = {
+            left: 0, top: 0,
+            right: 0, bottom: 0
+        }
+        while(elemt !== parent){
+            ans.left += elemt.offsetLeft;
+            ans.top += elemt.offsetTop;
+            elemt = <HTMLElement> elemt.offsetParent;
+        }
+        const parentInfo = this.getElementInfo(parent);
+        const elemtInfo = this.getElementInfo(elemt);
+        ans.bottom = parentInfo.innerHeight - ans.top - elemtInfo.height;
+        ans.right = parentInfo.innerWidth - ans.left - elemtInfo.width;
+        return ans;
+    }
+    static splitToSuitLength(container: HTMLElement, str: string) {
+        const containerInfo = Utils.getElementInfo(container);
+        if (str.length === 0 || Utils.getStrPx(str, container).width <= containerInfo.innerWidth) {
+            return [str, ""];
+        }
+        let critical = str.length / 2;
+        while (true) {
+            const { width } = Utils.getStrPx(str.substring(0, critical), container);
+            const accuracy = containerInfo.innerWidth - width;
+            if (accuracy >= 0 && accuracy < 10) {
+                return [str.substring(0, critical), str.substring(critical)]
+            }
+            if (width > containerInfo.innerWidth) {
+                critical -= critical / 2;
+            } else if (width < containerInfo.innerWidth) {
+                critical += critical / 2;
+            }
+        }
     }
 }

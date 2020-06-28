@@ -1,5 +1,16 @@
 import { Utils } from "utils";
 
+export function setCursorPosition(selection: Selection, cursor: HTMLTextAreaElement, container: HTMLElement){
+    
+    const posi = Utils.getRelativePosition(<HTMLElement>selection.anchorNode?.parentElement, container);
+    const offset = Utils.getStrPx(<string>selection.anchorNode?.nodeValue?.substring(0, selection.anchorOffset), container).width
+    console.log(posi);
+    Utils.setStyle(cursor, {
+        left: posi.left + offset + 'px',
+        top: posi.top + 'px'
+    })
+}
+
 export function createCursor(): HTMLTextAreaElement {
     const cursor = document.createElement("textarea");
 
@@ -37,5 +48,15 @@ export function createCursor(): HTMLTextAreaElement {
         setTimeout(blink, 700);
     }
     blink();
+
+    cursor.addEventListener("compositionstart", (event)=>{
+        console.log(event);
+    })
+    cursor.addEventListener("compositionupdate", (event)=>{
+        console.log(event);
+    })
+    cursor.addEventListener("compositionend", (event)=>{
+        console.log(event);
+    })
     return cursor;
 }
