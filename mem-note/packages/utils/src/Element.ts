@@ -91,15 +91,6 @@ export class Element {
                 registered: false,
                 event: undefined
             });
-
-            this.proxy.addEventListener('mousedown', (event) => {
-                let dragState = this.dragStates.get(dragStateId);
-                if (!dragState) throw new Error('Sys error');
-                dragState.startX = event.screenX;
-                dragState.startY = event.screenY;
-                dragState.pressed = true;
-            })
-
             let resizing = (event: MouseEvent) => {
                 let dragState = this.dragStates.get(dragStateId);
                 if (!dragState) throw new Error('Sys error');
@@ -124,6 +115,21 @@ export class Element {
 
                 callback(dragState);
             };
+            this.proxy.addEventListener('mousedown', (event) => {
+                let dragState = this.dragStates.get(dragStateId);
+                if (!dragState) throw new Error('Sys error');
+                dragState.startX = event.screenX;
+                dragState.startY = event.screenY;
+                dragState.pressed = true;
+            })
+            this.proxy.addEventListener('mouseup', (event: MouseEvent)=>{
+                let dragState = this.dragStates.get(dragStateId);
+                if (!dragState) throw new Error('Sys error');
+                document.removeEventListener('mousemove', resizing);
+                document.removeEventListener('mouseup', resizeDone);
+                dragState.pressed = false;
+                dragState.registered = false;
+            })
             this.proxy.addEventListener('mousemove', (event) => {
                 let dragState = this.dragStates.get(dragStateId);
                 if (!dragState) throw new Error('Sys error');

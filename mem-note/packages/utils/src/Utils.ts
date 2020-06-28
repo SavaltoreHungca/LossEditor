@@ -1,3 +1,6 @@
+import {DragState} from './Element';
+import uuid from 'uuid';
+
 export interface ElementInfo {
     width: number;
     height: number;
@@ -214,6 +217,95 @@ export class Utils {
             } else if (width < containerInfo.innerWidth) {
                 critical += critical / 2;
             }
+        }
+    }
+
+    static cancelLastTimeout(id: string) {
+        let ids = this.timeoutIdMap.get(id) || [];
+        for (let i of ids) {
+            clearTimeout(i);
+        }
+    }
+
+    static timeoutIdMap: Map<String, Array<number>> = new Map();
+    static setLastTimeout(id: string, func: Function, delay: number) {
+        let ids = this.timeoutIdMap.get(id);
+        if (!Utils.isArray(ids)) {
+            ids = [];
+            this.timeoutIdMap.set(id, ids);
+        }
+        this.cancelLastTimeout(id);
+        ids?.push(window.setTimeout(func, delay));
+    }
+
+
+    private static dragStates: Map<string, DragState> = new Map();
+    static addEventListener(
+        name: string,
+        element: HTMLElement,
+        callback: Function,
+        option?: boolean | AddEventListenerOptions
+    ) {
+        if (name === 'drag') {
+            const dragStateId = uuid.v1();
+            this.dragStates.set(dragStateId, {
+                startX: 0,
+                startY: 0,
+                pressed: false,
+                deltaX: 0,
+                deltaY: 0,
+                registered: false,
+                event: undefined
+            });
+            let resizing = (event: MouseEvent) => {
+                let dragState = this.dragStates.get(dragStateId);
+                if (!dragState) throw new Error('Sys error');
+                if (dragState.pressed) {
+                    dragState.deltaX = event.screenX - dragState.startX;
+                    dragState.deltaY = event.screenY - dragState.startY;
+                    dragState.startX += dragState.deltaX;
+                    dragState.startY += dragState.deltaY;
+
+                    dragState.event = event;
+                    callback(dragState);
+                }
+            };
+            let resizeDone = (event: MouseEvent) => {
+                let dragState = this.dragStates.get(dragStateId);
+                if (!dragState) throw new Error('Sys error');
+                dragState.pressed = false;
+                dragState.registered = false;
+                document.removeEventListener('mousemove', resizing);
+                document.removeEventListener('mouseup', resizeDone);
+
+                callback(dragState);
+            };
+            element.addEventListener('mousedown', (event) => {
+                let dragState = this.dragStates.get(dragStateId);
+                if (!dragState) throw new Error('Sys error');
+                dragState.startX = event.screenX;
+                dragState.startY = event.screenY;
+                dragState.pressed = true;
+            })
+            element.addEventListener('mouseup', (event: MouseEvent)=>{
+                let dragState = this.dragStates.get(dragStateId);
+                if (!dragState) throw new Error('Sys error');
+                document.removeEventListener('mousemove', resizing);
+                document.removeEventListener('mouseup', resizeDone);
+                dragState.pressed = false;
+                dragState.registered = false;
+            })
+            element.addEventListener('mousemove', (event) => {
+                let dragState = this.dragStates.get(dragStateId);
+                if (!dragState) throw new Error('Sys error');
+                if (dragState.pressed && !dragState.registered) {
+                    dragState.registered = true;
+                    document.addEventListener('mousemove', resizing);
+                    document.addEventListener('mouseup', resizeDone);
+                }
+            })
+        } else {
+            element.addEventListener(name, callback as any, option);
         }
     }
 }
