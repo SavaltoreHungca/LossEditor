@@ -286,6 +286,7 @@ export class Utils {
                 dragState.startX = event.screenX;
                 dragState.startY = event.screenY;
                 dragState.pressed = true;
+                callback(dragState);
             })
             element.addEventListener('mouseup', (event: MouseEvent)=>{
                 let dragState = this.dragStates.get(dragStateId);
@@ -294,6 +295,7 @@ export class Utils {
                 document.removeEventListener('mouseup', resizeDone);
                 dragState.pressed = false;
                 dragState.registered = false;
+                callback(dragState);
             })
             element.addEventListener('mousemove', (event) => {
                 let dragState = this.dragStates.get(dragStateId);
