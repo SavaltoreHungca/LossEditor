@@ -2,6 +2,7 @@ import { Utils } from "utils";
 import { createElement } from './utils';
 const katex = require('katex');
 
+const WIDTH_BASE_CHAR = 'a';
 
 function getContentType(content: any) {
     if (typeof content === 'string') {
@@ -23,6 +24,20 @@ function getContentType(content: any) {
     }
 }
 
+function renderAttachment(content: string, unitBlock: HTMLElement){
+    unitBlock.innerHTML = '<i class="fa fa-file-archive-o fa-2x" aria-hidden="true"></i>';
+    Utils.setStyle(unitBlock, {
+        cursor: 'pointer'
+    })
+}
+
+function renderCodeOpen(content: string, unitBlock: HTMLElement){
+    unitBlock.innerHTML = '<i class="fa fa-codepen fa-2x" aria-hidden="true"></i>';
+    Utils.setStyle(unitBlock, {
+        cursor: 'pointer'
+    })
+}
+
 function renderParagraph(content: string, viewLines: HTMLElement) {
     const paragraph = createElement('paragraph');
     viewLines.appendChild(paragraph);
@@ -40,29 +55,48 @@ function renderParagraph(content: string, viewLines: HTMLElement) {
             for (; i < content.length && i + 1 < content.length; i++) {
                 if (content[i] === ']' && content[i + 1] === ']') {
                     unitStr = content.substring(start, i + 2);
+                    break;
                 }
             }
             if (!Utils.isUndfined(unitStr)) {
-                i = i + 1;
+                i++;
                 /\[\[(\S+)\(([\S\s]+)\)\]\]/.test(<string>unitStr);
                 unit = createElement('unit-block');
                 line.appendChild(unit);
-                katex.render(RegExp.$2, unit, { throwOnError: false });
-
-
-
-                // console.log(RegExp.$1);
+                switch (RegExp.$1) {
+                    case 'formula':
+                        Utils.setStyle(unit, {cursor: 'pointer'});
+                        katex.render(RegExp.$2, unit, { throwOnError: false });
+                        break;
+                    case 'attachment':
+                        renderAttachment(RegExp.$2, unit);
+                        break;
+                    case 'code':
+                        renderCodeOpen(RegExp.$2, unit);
+                        break;
+                }
+                Utils.getElementInfoBatch((lineInfo, paragraphInfo) => {
+                    if (paragraphInfo.innerWidth - lineInfo.width <
+                        Utils.getStrPx(WIDTH_BASE_CHAR, <HTMLElement>line).width) {
+                        if (lineInfo.width > paragraphInfo.innerWidth) {
+                            line?.removeChild(<HTMLElement>unit);
+                            i = start - 1;
+                        }
+                        line = undefined;
+                    }
+                }, line, paragraph);
+                unit = undefined;
             } else {
-                i = start;
+                i = start - 1;
             }
-            continue;
         } else {
             if (typeof unit === 'undefined') {
                 unit = createElement('text');
                 line.appendChild(unit);
             }
             Utils.getElementInfoBatch((lineInfo, paragraphInfo) => {
-                if (paragraphInfo.innerWidth - lineInfo.width < 10) {
+                if (paragraphInfo.innerWidth - lineInfo.width <
+                    Utils.getStrPx(WIDTH_BASE_CHAR, <HTMLElement>unit).width) {
                     if (lineInfo.width > paragraphInfo.innerWidth) {
                         const innerText = (<HTMLElement>unit).innerText;
                         (<HTMLElement>unit).innerText = innerText.substring(0, innerText.length - 1);
