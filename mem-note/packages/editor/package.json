@@ -1,25 +1,23 @@
 {
-    "name": "editor",
-    "description": "",
-    "version": "0.58.3",
-    "license": "MIT",
-    "main": "dist/index.js",
-    "module": "dist/index.es.js",
-    "types": "dist/index.d.ts",
-    "umd": "dist/editor.js",
-    "umdMin": "dist/editor.min.js",
-    "sideEffects": false,
-    "files": [
-      "dist/"
-    ],
-    "dependencies": {
-    },
-    "devDependencies": {
-      "event-driven": "*",
-      "scroll-page": "*",
-      "utils": "*"
-    },
-    "keywords": [
-    ]
-  }
-  
+  "name": "editor",
+  "description": "",
+  "version": "0.58.3",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
+  "umd": "dist/editor.js",
+  "umdMin": "dist/editor.min.js",
+  "sideEffects": false,
+  "files": [
+    "dist/"
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "event-driven": "*",
+    "katex": "^0.11.1",
+    "scroll-page": "*",
+    "utils": "*"
+  },
+  "keywords": []
+}

@@ -1,7 +1,5 @@
-
-import { Editor } from 'editor';
 import { useEffect } from 'react'
-import { Utils } from 'utils'
+import { Editor } from 'editor';
 
 const Home = () => {
     useEffect(() => {
@@ -9,7 +7,9 @@ const Home = () => {
     })
 
     return (
-        <div id="container"/>
+        <div>
+            <div id="container"/>
+        </div>
     )
 }
 

@@ -1,5 +1,6 @@
-import {DragState} from './Element';
+import { DragState } from './Element';
 import uuid from 'uuid';
+import { info } from 'console';
 
 export interface ElementInfo {
     width: number;
@@ -8,10 +9,24 @@ export interface ElementInfo {
     left: number;
     innerWidth: number;
     innerHeight: number;
+    innerTop: number;
+    innerLeft: number
 }
 
 export class Utils {
     static setStyle(element: HTMLElement, style: Object) {
+        if (this.isObject(style)) {
+            for (let name in style) {
+                switch (name) {
+                    case 'top': case 'left': case 'bottom': case 'right': case 'width': case 'height':
+                        if (typeof style[name] === 'number') {
+                            style[name] = style[name] + 'px';
+                        }
+                        break;
+                }
+            }
+        }
+
         let getCssText = (style: Object) => {
             let ans = "";
             if (!this.isObject(style)) return "";
@@ -63,27 +78,61 @@ export class Utils {
         }
     }
 
-    static getElementInfo(element: HTMLElement) {
+    static getElementInfoBatch(consumer: (...info: ElementInfo[]) => void, ...elements: HTMLElement[]) {
+        const infos: Array<ElementInfo> = new Array<ElementInfo>();
+        for(let elemnt of elements){
+            infos.push(this.getElementInfo(elemnt));
+        }
+        consumer(...infos);
+    }
+
+    static getElementInfo(element: HTMLElement, consumer?: (info: ElementInfo) => void) {
         let ans: ElementInfo = {
             width: element.offsetWidth,
             height: element.offsetHeight,
             top: element.offsetTop,
             left: element.offsetLeft,
             innerWidth: element.offsetWidth,
-            innerHeight: element.offsetHeight
+            innerHeight: element.offsetHeight,
+            innerTop: 0,
+            innerLeft: 0
         };
 
         if (element.style.borderLeftWidth) {
-            ans.innerWidth -= parseInt(element.style.borderLeftWidth.substring(0, 1));
+            ans.innerWidth -= parseInt(element.style.borderLeftWidth);
         }
         if (element.style.borderRightWidth) {
-            ans.innerWidth -= parseInt(element.style.borderRightWidth.substring(0, 1));
+            ans.innerWidth -= parseInt(element.style.borderRightWidth);
         }
         if (element.style.borderTopWidth) {
-            ans.innerHeight -= parseInt(element.style.borderTopWidth.substring(0, 1));
+            ans.innerHeight -= parseInt(element.style.borderTopWidth);
         }
         if (element.style.borderBottomWidth) {
-            ans.innerHeight -= parseInt(element.style.borderBottomWidth.substring(0, 1));
+            ans.innerHeight -= parseInt(element.style.borderBottomWidth);
+        }
+
+        if (element.style.paddingLeft) {
+            ans.innerWidth -= parseInt(element.style.paddingLeft);
+            ans.innerLeft += parseInt(element.style.paddingLeft);
+            if (element.style.boxSizing === 'boder-box') {
+                ans.innerLeft += parseInt(element.style.borderLeftWidth);
+            }
+        }
+        if (element.style.paddingRight) {
+            ans.innerWidth -= parseInt(element.style.paddingRight);
+        }
+        if (element.style.paddingTop) {
+            ans.innerHeight -= parseInt(element.style.paddingTop);
+            ans.innerTop += parseInt(element.style.paddingTop);
+            if (element.style.boxSizing === 'boder-box') {
+                ans.innerTop += parseInt(element.style.borderTopWidth);
+            }
+        }
+        if (element.style.paddingBottom) {
+            ans.innerHeight -= parseInt(element.style.paddingBottom);
+        }
+        if (consumer) {
+            consumer(ans);
         }
         return ans;
     }
@@ -159,7 +208,7 @@ export class Utils {
     static getStrPx(str: string, container: HTMLElement) {
         const span = window.document.createElement("span");
         span.innerText = str;
-        this.setStyle(span, { 
+        this.setStyle(span, {
             "position": "fixed",
             "top": "0",
             "left": "0",
@@ -184,15 +233,15 @@ export class Utils {
         span.parentElement?.removeChild(span);
         return ans;
     }
-    static getRelativePosition(elemt: HTMLElement, parent: HTMLElement){
+    static getRelativePosition(elemt: HTMLElement, parent: HTMLElement) {
         const ans = {
             left: 0, top: 0,
             right: 0, bottom: 0
         }
-        while(elemt !== parent){
+        while (elemt !== parent) {
             ans.left += elemt.offsetLeft;
             ans.top += elemt.offsetTop;
-            elemt = <HTMLElement> elemt.offsetParent;
+            elemt = <HTMLElement>elemt.offsetParent;
         }
         const parentInfo = this.getElementInfo(parent);
         const elemtInfo = this.getElementInfo(elemt);
@@ -277,7 +326,7 @@ export class Utils {
                 dragState.registered = false;
                 document.removeEventListener('mousemove', resizing);
                 document.removeEventListener('mouseup', resizeDone);
-
+                dragState.event = event;
                 callback(dragState);
             };
             element.addEventListener('mousedown', (event) => {
@@ -286,15 +335,17 @@ export class Utils {
                 dragState.startX = event.screenX;
                 dragState.startY = event.screenY;
                 dragState.pressed = true;
+                dragState.event = event;
                 callback(dragState);
             })
-            element.addEventListener('mouseup', (event: MouseEvent)=>{
+            element.addEventListener('mouseup', (event: MouseEvent) => {
                 let dragState = this.dragStates.get(dragStateId);
                 if (!dragState) throw new Error('Sys error');
                 document.removeEventListener('mousemove', resizing);
                 document.removeEventListener('mouseup', resizeDone);
                 dragState.pressed = false;
                 dragState.registered = false;
+                dragState.event = event;
                 callback(dragState);
             })
             element.addEventListener('mousemove', (event) => {
