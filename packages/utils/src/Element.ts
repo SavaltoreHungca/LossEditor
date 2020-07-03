@@ -266,4 +266,7 @@ export class Element {
     getNative(): HTMLElement {
         return this.proxy;
     }
+    addClass(c: string){
+        Utils.addClass(this.proxy, c);
+    }
 }

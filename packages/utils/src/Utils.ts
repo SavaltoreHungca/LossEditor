@@ -363,12 +363,16 @@ export class Utils {
         }
     }
 
-    static statckPeek<T>(stack: Array<T>){
-        if(this.isArray(stack)){
-            if(stack.length > 0){
+    static statckPeek<T>(stack: Array<T>) {
+        if (this.isArray(stack)) {
+            if (stack.length > 0) {
                 return stack[stack.length - 1];
             }
         }
         return undefined;
+    }
+
+    static addClass(elemt: HTMLElement, c: string) {
+        elemt.className += " " + c;
     }
 }
