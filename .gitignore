@@ -3,3 +3,14 @@
 **/node_modules
 **/.DS_Store
 
+*.log
+.next/
+.vscode/
+.idea/
+build/
+dist/
+lib/
+node_modules/
+packages/*/yarn.lock
+site/out/
+tmp/
