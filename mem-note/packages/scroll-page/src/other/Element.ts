@@ -8,6 +8,7 @@ export class Element extends Ele {
     constructor(element: HTMLElement, global: Global) {
         super(element, global);
         this.global = global
+        this.setAttribute("data-scroll-page-type", this.getType());
         this.__init__();
     }
     protected __init__(){

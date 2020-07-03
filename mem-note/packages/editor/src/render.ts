@@ -1,60 +1,67 @@
 import { Utils } from "utils";
 import { createElement } from './utils';
+import { ScrollPage } from 'scroll-page';
+import { Constants } from "./Constants";
 const katex = require('katex');
 
-const WIDTH_BASE_CHAR = 'a';
+interface BlockType {
+    type: string,
+    indentation: number,
+    content: any
+}
+
+interface TextType extends BlockType {
+
+}
+
+interface TableType extends BlockType {
+
+}
+
+interface ImageType extends BlockType {
+
+}
 
 function getContentType(content: any) {
-    if (typeof content === 'string') {
-        return 'paragraph';
+    if (Utils.isObject(content)) {
+        return content.type;
     }
     if (Utils.isArray(content)) {
-        if (content.length > 0) {
-            let isTable = true;
-            for (let item of content) {
-                if (!Utils.isArray(item)) {
-                    isTable = false
-                    break;
-                }
-            }
-            return isTable ? 'table' : 'doc';
-        } else {
-            throw new Error("空的数组");
-        }
+        return 'doc';
     }
 }
 
-function renderAttachment(content: string, unitBlock: HTMLElement){
+function renderAttachment(content: string, unitBlock: HTMLElement) {
     unitBlock.innerHTML = '<i class="fa fa-file-archive-o fa-2x" aria-hidden="true"></i>';
     Utils.setStyle(unitBlock, {
         cursor: 'pointer'
     })
 }
 
-function renderCodeOpen(content: string, unitBlock: HTMLElement){
+function renderCodeOpen(content: string, unitBlock: HTMLElement) {
     unitBlock.innerHTML = '<i class="fa fa-codepen fa-2x" aria-hidden="true"></i>';
     Utils.setStyle(unitBlock, {
         cursor: 'pointer'
     })
 }
 
-function renderParagraph(content: string, viewLines: HTMLElement) {
+function renderParagraph(textBlock: TextType, viewLines: HTMLElement) {
     const paragraph = createElement('paragraph');
     viewLines.appendChild(paragraph);
     let line: HTMLElement | undefined = undefined;
     let unit: HTMLElement | undefined = undefined;
-    for (let i = 0; i < content.length; i++) {
-        const c = content[i];
+    for (let i = 0; i < textBlock.content.length; i++) {
+        const c = textBlock.content[i];
         if (typeof line === 'undefined') {
             line = createElement('paragraph-line');
             paragraph.appendChild(line);
         }
-        if (c === '[' && i + 1 < content.length && content[i + 1] === '[') {
+        if (c === '[' && i + 1 < textBlock.content.length && textBlock.content[i + 1] === '[') {
             let unitStr = undefined;
             const start = i;
-            for (; i < content.length && i + 1 < content.length; i++) {
-                if (content[i] === ']' && content[i + 1] === ']') {
-                    unitStr = content.substring(start, i + 2);
+            for (; i < textBlock.content.length && i + 1 < textBlock.content.length; i++) {
+                if (textBlock.content[i] === ']' && textBlock.content[i + 1] === ']') {
+                    unitStr = textBlock.content.substring(start, i + 2);
                     break;
                 }
             }
@@ -65,7 +72,7 @@ function renderParagraph(content: string, viewLines: HTMLElement) {
                 line.appendChild(unit);
                 switch (RegExp.$1) {
                     case 'formula':
-                        Utils.setStyle(unit, {cursor: 'pointer'});
+                        Utils.setStyle(unit, { cursor: 'pointer' });
                         katex.render(RegExp.$2, unit, { throwOnError: false });
                         break;
                     case 'attachment':
@@ -77,7 +84,7 @@ function renderParagraph(content: string, viewLines: HTMLElement) {
                 }
                 Utils.getElementInfoBatch((lineInfo, paragraphInfo) => {
                     if (paragraphInfo.innerWidth - lineInfo.width <
-                        Utils.getStrPx(WIDTH_BASE_CHAR, <HTMLElement>line).width) {
+                        Utils.getStrPx(Constants.WIDTH_BASE_CHAR, <HTMLElement>line).width) {
                         if (lineInfo.width > paragraphInfo.innerWidth) {
                             line?.removeChild(<HTMLElement>unit);
                             i = start - 1;
@@ -96,7 +103,7 @@ function renderParagraph(content: string, viewLines: HTMLElement) {
             }
             Utils.getElementInfoBatch((lineInfo, paragraphInfo) => {
                 if (paragraphInfo.innerWidth - lineInfo.width <
-                    Utils.getStrPx(WIDTH_BASE_CHAR, <HTMLElement>unit).width) {
+                    Utils.getStrPx(Constants.WIDTH_BASE_CHAR, <HTMLElement>unit).width) {
                     if (lineInfo.width > paragraphInfo.innerWidth) {
                         const innerText = (<HTMLElement>unit).innerText;
                         (<HTMLElement>unit).innerText = innerText.substring(0, innerText.length - 1);
@@ -113,18 +120,19 @@ function renderParagraph(content: string, viewLines: HTMLElement) {
     }
 }
 
-function renderTable(content: Array<Array<any>>, viewLines: HTMLElement) {
-    const table = createElement('table');
+function renderTable(tableBlock: TableType, viewLines: HTMLElement) {
     const viewLinesInfo = Utils.getElementInfo(viewLines);
-    Utils.setStyle(table, { width: viewLinesInfo.innerWidth })
+    const table = createElement('table');
     viewLines.appendChild(table);
+    Utils.setStyle(table, { width: viewLinesInfo.innerWidth });
 
-    for (let i = 0; i < content.length; i++) {
-        const rowdata = content[i];
+    const tableInfo = Utils.getElementInfo(table);
+    for (let i = 0; i < tableBlock.content.length; i++) {
+        const rowdata = tableBlock.content[i];
         const row = createElement('row');
-        Utils.setStyle(row, { width: '100%' })
+        Utils.setStyle(row, { width: tableInfo.width })
         table.appendChild(row);
-
+        const rowInfo = Utils.getElementInfo(row);
         let maxCellHeight = 0
         const cells = [];
         let cellLeftOffset = 0;
@@ -133,8 +141,8 @@ function renderTable(content: Array<Array<any>>, viewLines: HTMLElement) {
             const cell = createElement('cell');
             cells.push(cell);
             row.appendChild(cell);
-            Utils.setStyle(cell, { width: table.offsetWidth / rowdata.length, left: cellLeftOffset });
-            cellLeftOffset += table.offsetWidth / rowdata.length;
+            Utils.setStyle(cell, { width: rowInfo.innerWidth / rowdata.length, left: cellLeftOffset });
+            cellLeftOffset += rowInfo.innerWidth / rowdata.length;
             render(celldata, cell);
             Utils.getElementInfo(cell, info => {
                 maxCellHeight = Math.max(maxCellHeight, info.height);
@@ -142,18 +150,65 @@ function renderTable(content: Array<Array<any>>, viewLines: HTMLElement) {
         }
         for (let item of cells) Utils.setStyle(item, { height: maxCellHeight });
         Utils.setStyle(row, { height: maxCellHeight });
-        // top += maxCellHeight;
     }
 }
 
+function renderImage(imageBlock: ImageType, viewLines: HTMLElement) {
+    const image = createElement('image');
+    const img = document.createElement('img');
+    viewLines.appendChild(image);
+    image.appendChild(img);
+    img.src = imageBlock.content;
+    Utils.setStyle(image, {
+        width: 'fit-content'
+    })
+    Utils.setStyle(img, {
+        width: 1000,
+        height: 1000,
+        display: 'block',
+        position: 'relative'
+    })
+    new ScrollPage(img, {
+        containerHeight: '100px',
+        containerWidth: '100px',
+        bottomScrollBarHeight: 1,
+        rightScrollBarWidth: 1,
+        bottomScrollBarInner: false,
+        rightScrollBarInner: false,
+        showTopShallow: false,
+        showRightShallow: false
+    })
+}
+
+function indentationWrap(content: BlockType, viewLines: HTMLElement): HTMLElement {
+    const indentation = createElement('indentation');
+    const contentContainer = createElement('content-container');
+    viewLines.appendChild(indentation);
+    indentation.appendChild(contentContainer);
+
+    const viewLinesInfo = Utils.getElementInfo(viewLines);
+    const paddingLeft = Constants.INDENTATION_WIDTH * (content.indentation || 0);
+    Utils.setStyle(indentation, {
+        'padding-left': paddingLeft,
+    })
+    Utils.setStyle(contentContainer, {
+        width: viewLinesInfo.innerWidth - paddingLeft
+    })
+    return contentContainer;
+}
+
 export function render(docStructure: any, viewLines: HTMLElement) {
+    
     const renderSwitch = (content: any) => {
         switch (getContentType(content)) {
             case "paragraph":
-                renderParagraph(content, viewLines);
+                renderParagraph(content, indentationWrap(content, viewLines));
                 break;
             case "table":
-                renderTable(content, viewLines);
+                renderTable(content, indentationWrap(content, viewLines));
+                break;
+            case "image":
+                renderImage(content, indentationWrap(content, viewLines));
                 break;
         }
     }

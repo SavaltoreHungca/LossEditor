@@ -48,6 +48,7 @@
     "babel-plugin-dev-expression": "^0.2.2",
     "babel-plugin-module-resolver": "^3.1.1",
     "cross-env": "6.0.3",
+    "editor": "*",
     "emotion": "^10.0.9",
     "eslint": "^6.7.1",
     "eslint-config-prettier": "^6.7.0",
@@ -82,10 +83,9 @@
     "rollup-plugin-terser": "^5.1.2",
     "rollup-plugin-typescript2": "^0.25.2",
     "rollup-plugin-uglify": "^6.0.3",
-    "source-map-loader": "^0.2.4",
-    "typescript": "^3.7.2",
     "scroll-page": "*",
-    "editor": "*"
+    "source-map-loader": "^0.2.4",
+    "typescript": "^3.7.2"
   },
   "dependencies": {
     "@types/uuid": "^8.0.0"

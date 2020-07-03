@@ -5,9 +5,9 @@ export interface DragState {
     startX: number;
     startY: number;
     pressed: boolean;
+    registered: boolean;
     deltaX: number;
     deltaY: number;
-    registered: boolean;
     event?: Event
 }
 
@@ -50,7 +50,6 @@ export class Element {
     constructor(element: HTMLElement, global: Global) {
         this.proxy = element;
         this.global = global;
-        this.setAttribute("data-ele-type", this.getType());
     }
     getType(): string {
         return Object.getPrototypeOf(this).constructor.name;
@@ -112,7 +111,7 @@ export class Element {
                 document.removeEventListener('mousemove', resizing);
                 document.removeEventListener('mouseup', resizeDone);
                 Utils.setStyle(document.body, { "user-select": "" });
-
+                dragState.event = event;
                 callback(dragState);
             };
             this.proxy.addEventListener('mousedown', (event) => {
@@ -121,6 +120,8 @@ export class Element {
                 dragState.startX = event.screenX;
                 dragState.startY = event.screenY;
                 dragState.pressed = true;
+                dragState.event = event;
+                callback(dragState);
             })
             this.proxy.addEventListener('mouseup', (event: MouseEvent)=>{
                 let dragState = this.dragStates.get(dragStateId);
@@ -129,6 +130,8 @@ export class Element {
                 document.removeEventListener('mouseup', resizeDone);
                 dragState.pressed = false;
                 dragState.registered = false;
+                dragState.event = event;
+                callback(dragState);
             })
             this.proxy.addEventListener('mousemove', (event) => {
                 let dragState = this.dragStates.get(dragStateId);

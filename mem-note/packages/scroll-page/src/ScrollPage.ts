@@ -278,7 +278,7 @@ function registryEvents(scrollPage: ScrollPage) {
         }
     )
 
-    // 自动隐藏滚动条
+    // 自动隐藏滚动条, 鼠标移动到右底两侧自动显示滚动条
     // 初始化时是否显示滚动条
     scrollPage.eventManager.registryEventDpendsOn(
         [

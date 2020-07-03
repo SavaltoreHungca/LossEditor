@@ -9,6 +9,7 @@ const Home = () => {
     return (
         <div>
             <div id="container"/>
+            <div id="test"/>
         </div>
     )
 }

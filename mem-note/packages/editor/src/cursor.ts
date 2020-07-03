@@ -1,28 +1,24 @@
 import { Utils } from "utils";
 import { isTextNode } from "./utils";
 import { Constants } from "./Constants";
+import { Editor } from "./Editor";
 
-export function setCursorPosition(selection: Selection, cursor: HTMLTextAreaElement, container: HTMLElement) {
-
-    let node: HTMLElement;
-    if (selection.focusNode === null) return;
-    if (selection.focusNode.nodeType === 3) {
-        const textNode = selection.focusNode;
-        node = <HTMLElement>selection.focusNode.parentElement;
-        if (!isTextNode(node)) return;
-        const posi = Utils.getRelativePosition(node, container);
+export function listenSelectionToSetCursor(editor: Editor) {
+    editor.eventManager.registryEvent(Constants.events.SELECTION_CHANGE, ()=>{
+        const endPoint = editor.selection?.end;
+        if(typeof endPoint?.node === 'undefined') return;
+        if (!isTextNode(endPoint.node)) return;
+        const posi = Utils.getRelativePosition(endPoint.node, editor.viewLines);
         const offset =
-            Utils.getStrPx(<string>textNode.nodeValue?.substring(0, selection.focusOffset), node).width
+            Utils.getStrPx(endPoint.node.innerText.substring(0, endPoint.offset), endPoint.node).width
 
-        Utils.setStyle(cursor, {
-            left: posi.left + offset + 'px',
-            top: posi.top + 'px',
-            height: node.offsetHeight + 'px',
+        Utils.setStyle(editor.cursor, {
+            left: posi.left + offset,
+            top: posi.top,
+            height: endPoint.node.offsetHeight,
             visibility: 'visible'
         })
-    } else {
-        return;
-    }
+    })
 }
 
 export function createCursor(): HTMLTextAreaElement {

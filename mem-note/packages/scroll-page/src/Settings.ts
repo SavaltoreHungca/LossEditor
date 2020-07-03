@@ -10,4 +10,5 @@ export class Settings {
     showRightShallow: boolean = true;
     bottomScrollBarAutoFadeTime: number = 500;
     rightScrollBarAutoFadeTime: number = 500;
+    debug: boolean = false;
 }

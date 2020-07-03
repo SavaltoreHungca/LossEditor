@@ -4,8 +4,27 @@ export function isTextNode(node: HTMLElement) {
     return node.getAttribute("data-ele-type") === 'text';
 }
 
+export function isViewLines(node: HTMLElement) {
+    return node.getAttribute("data-ele-type") === 'view-lines';
+}
+
 export function createElement(type: string) {
     switch (type) {
+        case 'content-container':
+            const contentContainer = document.createElement("div");
+            contentContainer.setAttribute("data-ele-type", "content-container");
+            Utils.setStyle(contentContainer, { display: 'block', position: 'relative' });
+            return contentContainer;
+        case 'indentation':
+            const indentation = document.createElement("div");
+            indentation.setAttribute("data-ele-type", "indentation");
+            Utils.setStyle(indentation, { display: 'block', position: 'relative' });
+            return indentation;
+        case 'image':
+            const image = document.createElement("div");
+            image.setAttribute("data-ele-type", "image");
+            Utils.setStyle(image, { display: 'block', position: 'relative' });
+            return image;
         case 'table':
             const table = document.createElement("div");
             table.setAttribute("data-ele-type", "table");
@@ -44,7 +63,7 @@ export function createElement(type: string) {
         case 'text':
             const text = document.createElement('span');
             text.setAttribute("data-ele-type", "text");
-            Utils.setStyle(text, { display: 'inline-block', position: 'relative' });
+            Utils.setStyle(text, { display: 'inline-block', position: 'relative', cursor: 'text' });
             text.innerText = "";
             return text;
         case 'unit-block':

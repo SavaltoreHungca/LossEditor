@@ -19,6 +19,7 @@ export class Utils {
             for (let name in style) {
                 switch (name) {
                     case 'top': case 'left': case 'bottom': case 'right': case 'width': case 'height':
+                    case 'padding': case 'padding-left': case 'padding-top': case 'padding-right': case 'padding-bottom':
                         if (typeof style[name] === 'number') {
                             style[name] = style[name] + 'px';
                         }
@@ -80,7 +81,7 @@ export class Utils {
 
     static getElementInfoBatch(consumer: (...info: ElementInfo[]) => void, ...elements: HTMLElement[]) {
         const infos: Array<ElementInfo> = new Array<ElementInfo>();
-        for(let elemnt of elements){
+        for (let elemnt of elements) {
             infos.push(this.getElementInfo(elemnt));
         }
         consumer(...infos);
@@ -138,7 +139,7 @@ export class Utils {
     }
 
     static isObject(obj: any) {
-        return !this.isUndfined(obj) && typeof obj === 'object';
+        return !this.isUndfined(obj) && !this.isArray(obj) && typeof obj === 'object';
     }
 
     static isEmptyStr(str: any) {
@@ -360,5 +361,14 @@ export class Utils {
         } else {
             element.addEventListener(name, callback as any, option);
         }
+    }
+
+    static statckPeek<T>(stack: Array<T>){
+        if(this.isArray(stack)){
+            if(stack.length > 0){
+                return stack[stack.length - 1];
+            }
+        }
+        return undefined;
     }
 }
