@@ -385,4 +385,10 @@ export class Utils {
     static addClass(elemt: HTMLElement, c: string) {
         elemt.className += " " + c;
     }
+
+    static anonyFunction(func: Function): string{
+        const funcName = "_" + uuid.v1().replace(/-/g, '');
+        window[funcName] = func;
+        return funcName;
+    }
 }

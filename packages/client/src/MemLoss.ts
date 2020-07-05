@@ -2,6 +2,7 @@ import { Constants } from './Constants';
 import { EventManager } from 'event-driven';
 import { createElement, Element, wrapElement, NodeListPad, OpendPages, FunctionMenu, EditorFrame } from './Element';
 import { registryEvents } from './events';
+import { nodelist } from './testdata';
 
 export interface Elements {
     container: Element;
@@ -29,14 +30,6 @@ export class MemLoss {
             functionMenu: createElement(this, 'functionMenu', 'FunctionMenu'),
         }
         this.eventManager.triggleEvent(Constants.events.ELEMENTS_BUILD_FINISH);
-        this.elements.nodeListPad.renderList({
-            list: [
-                {
-                    img: '🍕',
-                    title: 'xixi',
-                    children: []
-                }
-            ]
-        } as any)
+        this.elements.nodeListPad.renderList(nodelist)
     }
 }

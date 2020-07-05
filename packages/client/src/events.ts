@@ -105,11 +105,29 @@ function initializeSidePad(memLoss: MemLoss) {
         Constants.events.UI_INITIALIZED_OK
     ], () => {
         const { nodeListPad } = memLoss.elements;
-        new ScrollPage(nodeListPad.nodeList, {
+        nodeListPad.setStyle({ display: 'flex', 'flex-direction': 'column' })
+        nodeListPad.addNewPageButton.addClass('background-change-selected');
+        nodeListPad.addNewPageButton.innerHTML = `
+            <div style="display: flex; align-items: center; min-height: 27px; font-size: 14px; padding: 2px 14px; width: 100%; color: rgba(55, 53, 47, 0.6); height: 45px;">
+                <div style="flex-shrink: 0; flex-grow: 0; border-radius: 3px; color: rgba(55, 53, 47, 0.6); width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; margin-right: 4px;">
+                    <i class="fa fa-plus" aria-hidden="true"></i>
+                </div>
+                <div style="flex: 1 1 auto; white-space: nowrap; min-width: 0px; overflow: hidden; text-overflow: ellipsis;">
+                    New page
+                </div>
+            </div>
+        `
+        nodeListPad.addNewPageButton.setStyle({
+            height: 45,
+            'user-select': 'none',
+            cursor: 'pointer',
+            'box-shadow': 'rgba(55, 53, 47, 0.09) 0px -1px 0px'
+        })
+        const scrollPage = new ScrollPage(nodeListPad.nodeList, {
             containerWidth: '100%',
-            containerHeight: '100%',
             rightScrollBarWidth: 5
         })
+        scrollPage.global.get('container').setStyle({ 'flex-grow': '1' })
     }, 'initialize-side-pad-ok');
 }
 

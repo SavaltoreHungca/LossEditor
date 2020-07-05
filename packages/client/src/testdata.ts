@@ -72,4 +72,214 @@ export var editorcontent = [
         ]
     }
     // "       工业和信息化部、财政部、商务部等5部门22日联合发布了修改后的乘用车企业平均燃料消耗量与新能源汽车积分并行管理办法，也就是常说的“双积分”管理办法。新办法更大力度提升了对企业节能减排方面的优惠政策，使汽车企业节能减排更“有利可图”",
-]
+];
+
+
+
+export var nodelist = {
+    list: [
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: [
+                {
+                    tag: '🍕',
+                    title: 'xixi',
+                    children: []
+                },
+            ]
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        }, {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        }, {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        }, {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        }, {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        }, {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        }, {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },{
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },{
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },{
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },{
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },{
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },{
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },{
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+        {
+            tag: '🍕',
+            title: 'xixi',
+            children: []
+        },
+    ]
+} as any;

@@ -5,3 +5,11 @@
 .hover-show:hover {
     opacity: 1;
 }
+
+.background-change-selected {
+    transition: background 120ms ease-in 0s;
+}
+
+.background-change-selected:hover {
+    background: rgba(55, 53, 47, 0.08);
+}

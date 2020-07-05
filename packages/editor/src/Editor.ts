@@ -21,7 +21,6 @@ export class Editor {
             "white-space": "pre",
             position: "relative",
             padding: "2px",
-            // font: '400 14px/1.4em "Segoe UI","Open Sans",Calibri,Candara,Arial,sans-serif',
             "font-family": 'Menlo, Monaco, "Courier New", monospace',
             "font-weight": 'normal',
             "font-size": '12px',

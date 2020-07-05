@@ -1,9 +1,19 @@
 import { MemLoss } from "./MemLoss";
 import { Utils, ElementInfo } from 'utils';
 import { renderListFactory } from "./renderNodeList";
-import { Editor } from 'editor'
+import { Editor } from 'editor';
+import uuid from 'uuid';
+
+export function randomId(){
+    return "_" + uuid.v1().replace(/-/g, '');
+}
+export function $(id: string): HTMLElement {
+    return <HTMLElement>document.getElementById(id);
+}
 
 export interface Element extends HTMLElement {
+    set(name: string, data: any): void;
+    get(name: string): any;
     getType(): string;
     setWidth(width: number): void;
     setHeight(height: number): void;
@@ -20,6 +30,7 @@ export interface InlineBlock extends Element {
 
 export interface NodeListPad extends Element {
     nodeList: Element;
+    addNewPageButton: Element;
     renderList(data: NodeList): void;
 }
 
@@ -80,7 +91,15 @@ export function createElement<T extends keyof ElementTypeMap, K extends Element>
 }
 
 function extendFunctions(memloss: MemLoss, elmt: HTMLElement){
+    const bindDataSetName ="_" + uuid.v1();
+    elmt[bindDataSetName] = {};
     return {
+        set: function(name: string, data: any){
+            elmt[bindDataSetName][name] = data;
+        },
+        get: function(name: string): any{
+            return elmt[bindDataSetName][name];
+        },
         getType: function(): string{
             const type = elmt.getAttribute('data-mem-loss-type');
             if(!type) throw new Error('unset type for ' + elmt);
@@ -130,9 +149,12 @@ function extendSpecialFunctions<T extends keyof ElementTypeMap>(memloss: MemLoss
     switch (name) {
         case 'NodeListPad':
             const nodeList = createElement(memloss, 'nodeList');
+            const addNewPageButton = createElement(memloss, 'addNewPageButton');
             elmt.appendChild(nodeList);
+            elmt.appendChild(addNewPageButton);
             elmt['nodeList'] = nodeList;
             elmt['renderList'] = renderListFactory(memloss, elmt);
+            elmt['addNewPageButton'] = addNewPageButton;
             break;
         case 'InlineBlock':
             Utils.setStyle(elmt, { display: 'inline-block', position: 'relative' })
