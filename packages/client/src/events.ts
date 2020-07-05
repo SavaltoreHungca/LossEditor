@@ -2,11 +2,15 @@ import { MemLoss } from "./MemLoss";
 import { Constants } from "./Constants";
 import { ScrollPage } from 'scroll-page';
 import { Utils } from "utils";
+import { createElement } from "./Element";
+import { Editor } from "editor";
+import { editorcontent } from "./testdata";
 
 export function registryEvents(memLoss: MemLoss) {
     assembleElements(memLoss);
     initializeUi(memLoss);
     initializeSidePad(memLoss);
+    initializeEditors(memLoss);
 }
 
 function assembleElements(memLoss: MemLoss) {
@@ -38,8 +42,8 @@ function initializeUi(memLoss: MemLoss) {
             height: containerInfo.innerHeight,
             background: 'rgb(247, 246, 243)'
         });
-        
-        sidePad.getInfo(sidePadInfo=>{
+
+        sidePad.getInfo(sidePadInfo => {
             sidePadResizingBar.addClass('hover-show');
             sidePadResizingBar.setStyle({
                 position: 'absolute',
@@ -62,12 +66,12 @@ function initializeUi(memLoss: MemLoss) {
                 height: 300
             })
 
-            Utils.getElementInfoBatch((opendPagesInfo, functionMenuInfo)=>{
+            Utils.getElementInfoBatch((opendPagesInfo, functionMenuInfo) => {
                 nodeListPad.setStyle({
                     width: "100%",
                     height: sidePadInfo.innerHeight - opendPagesInfo.height - functionMenuInfo.height
                 })
-                nodeListPad.getNodeList().setStyle({
+                nodeListPad.nodeList.setStyle({
                     width: sidePadInfo.innerWidth
                 })
             }, opendPages, functionMenu)
@@ -79,6 +83,19 @@ function initializeUi(memLoss: MemLoss) {
                 width: containerInfo.width - sidePadInfo.width,
                 height: containerInfo.innerHeight
             })
+            editorFrame.topBar.setStyle({
+                height: 45,
+                width: '100%'
+            });
+            editorFrame.bottomPad.setStyle({
+                width: '100%'
+            })
+            Utils.getElementInfoBatch((frameinfo, topinof, bottominfo) => {
+                editorFrame.editorWindowsContainer.setStyle({
+                    height: frameinfo.innerHeight - topinof.height - bottominfo.height,
+                    width: '100%'
+                })
+            }, editorFrame, editorFrame.topBar, editorFrame.bottomPad)
         });
     }, Constants.events.UI_INITIALIZED_OK)
 }
@@ -88,10 +105,31 @@ function initializeSidePad(memLoss: MemLoss) {
         Constants.events.UI_INITIALIZED_OK
     ], () => {
         const { nodeListPad } = memLoss.elements;
-        new ScrollPage(nodeListPad.getNodeList(), {
+        new ScrollPage(nodeListPad.nodeList, {
             containerWidth: '100%',
             containerHeight: '100%',
             rightScrollBarWidth: 5
         })
-    });
+    }, 'initialize-side-pad-ok');
+}
+
+function initializeEditors(memLoss: MemLoss) {
+    memLoss.eventManager.registryEventDpendsOn([
+        Constants.events.UI_INITIALIZED_OK
+    ], () => {
+        const { editorFrame } = memLoss.elements;
+        const e = createElement(memLoss, 'ceshinimabi');
+        let editor;
+        editorFrame.editorWindowsContainer.appendChild(e);
+        e.setWidth(3000);
+        e.setHeight(3000);
+        editor = new Editor(e);
+        editor.render(editorcontent);
+        editorFrame.editorWindowsContainer.getInfo(info => {
+            new ScrollPage(e, {
+                containerHeight: info.innerHeight + 'px',
+                containerWidth: info.innerWidth + 'px'
+            })
+        });
+    }, 'initialize-editors-ok');
 }

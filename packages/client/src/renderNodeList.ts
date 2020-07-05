@@ -14,7 +14,6 @@ export interface NodeList {
 export function renderListFactory(memloss: MemLoss, elmt: HTMLElement):  (data: NodeList) => void{
     return (data: NodeList) => {
         const self = <NodeListPad> elmt;
-        const nodeList = self.getNodeList();
 
         if(data.list){
             for(let node of data.list){
@@ -23,7 +22,7 @@ export function renderListFactory(memloss: MemLoss, elmt: HTMLElement):  (data: 
                 const title = createElement(memloss, 'item-title', 'InlineBlock');
                 const img = createElement(memloss, 'item-img', 'InlineBlock');
 
-                nodeList.appendChild(item);
+                self.nodeList.appendChild(item);
                 item.appendChild(foldbutton);
                 item.appendChild(img);
                 item.appendChild(title);

@@ -1,23 +1,25 @@
 import { MemLoss } from "./MemLoss";
 import { Utils, ElementInfo } from 'utils';
 import { renderListFactory } from "./renderNodeList";
+import { Editor } from 'editor'
 
 export interface Element extends HTMLElement {
-    setWidth(): void;
-    setHeight(): void;
-    setTop(): void;
-    setLeft(): void;
+    getType(): string;
+    setWidth(width: number): void;
+    setHeight(height: number): void;
+    setTop(top: number): void;
+    setLeft(left: number): void;
     setStyle(style: Object): void;
     getInfo(consumer?: (info: ElementInfo) => void): ElementInfo;
     addClass(c: string): void;
 }
 
 export interface InlineBlock extends Element {
-    
+
 }
 
 export interface NodeListPad extends Element {
-    getNodeList(): Element;
+    nodeList: Element;
     renderList(data: NodeList): void;
 }
 
@@ -29,18 +31,33 @@ export interface OpendPages extends Element {
 
 }
 
+export interface EditorFrame extends Element {
+    topBar: Element;
+    editorWindowsContainer: Element;
+    editorWindows: Array<EditorWindow>;
+    bottomPad: Element;
+}
+
+export interface EditorWindow extends Element {
+    editor: Editor;
+    render(): void;
+}
+
 
 interface ElementTypeMap {
-    "NodeListPad": NodeListPad,
-    "FunctionMenu": FunctionMenu,
-    "OpendPages": OpendPages,
-    "InlineBlock": InlineBlock,
+    "NodeListPad": NodeListPad
+    "FunctionMenu": FunctionMenu
+    "OpendPages": OpendPages
+    "InlineBlock": InlineBlock
+    "EditorFrame": EditorFrame
+    "EditorWindow": EditorWindow
 }
 
 
 export function wrapElement<T extends keyof ElementTypeMap, K extends Element>(memloss: MemLoss, elmt: HTMLElement, alias: string, name?: T): K {
-    for (let key in extendFunctions) {
-        elmt[key] = extendFunctions[key];
+    const functions = extendFunctions(memloss, elmt);
+    for (let key in functions) {
+        elmt[key] = functions[key];
     }
     elmt.setAttribute("data-mem-loss-type", alias);
     if (name) {
@@ -52,7 +69,7 @@ export function wrapElement<T extends keyof ElementTypeMap, K extends Element>(m
 
 export function createElement<T extends keyof ElementTypeMap, K extends Element>(memloss: MemLoss, alias: string, name?: T, type?: string): K {
     let elmt;
-    switch(name){
+    switch (name) {
         case 'InlineBlock':
             elmt = document.createElement('span');
             break;
@@ -62,49 +79,75 @@ export function createElement<T extends keyof ElementTypeMap, K extends Element>
     return wrapElement(memloss, elmt, alias, name);
 }
 
-const extendFunctions = {
-    setWidth: function () {
-        const self = <HTMLElement><unknown>this;
-        console.log(self);
-    },
-    setHeight: function () {
-        console.log(this);
-    },
-    setTop: function () {
-        console.log(this);
-    },
-    setLeft: function () {
-        console.log(this);
-    },
-    setStyle: function (style: Object) {
-        const self = <HTMLElement><unknown>this;
-        Utils.setStyle(self, style);
-    },
-    getInfo: function (consumer?: (info: ElementInfo) => void) {
-        const self = <HTMLElement><unknown>this;
-        return Utils.getElementInfo(self, consumer);
-    },
-    addClass: function (c: string) {
-        const self = <HTMLElement><unknown>this;
-        Utils.addClass(self, c);
+function extendFunctions(memloss: MemLoss, elmt: HTMLElement){
+    return {
+        getType: function(): string{
+            const type = elmt.getAttribute('data-mem-loss-type');
+            if(!type) throw new Error('unset type for ' + elmt);
+            return type;
+        },
+        setWidth: function (width: number) {
+            Utils.setStyle(elmt, { width: width});
+            memloss.eventManager.triggleEvent(
+                `${this.getType().toUpperCase()}_WIDTH_CHANGE`,
+                `${this.getType().toUpperCase()}_SIZE_CHANGE`
+            );
+        },
+        setHeight: function (height: number) {
+            Utils.setStyle(elmt, { height: height});
+            memloss.eventManager.triggleEvent(
+                `${this.getType().toUpperCase()}_HEIGHT_CHANGE`,
+                `${this.getType().toUpperCase()}_SIZE_CHANGE`
+            );
+        },
+        setTop: function (top: number) {
+            Utils.setStyle(elmt, { top: top});
+            memloss.eventManager.triggleEvent(
+                `${this.getType().toUpperCase()}_TOP_CHANGE`,
+                `${this.getType().toUpperCase()}_POSITION_CHANGE`
+            );
+        },
+        setLeft: function (left: number) {
+            Utils.setStyle(elmt, { left: left});
+            memloss.eventManager.triggleEvent(
+                `${this.getType().toUpperCase()}_LEFT_CHANGE`,
+                `${this.getType().toUpperCase()}_POSITION_CHANGE`
+            );
+        },
+        setStyle: function (style: Object) {
+            Utils.setStyle(elmt, style);
+        },
+        getInfo: function (consumer?: (info: ElementInfo) => void) {
+            return Utils.getElementInfo(elmt, consumer);
+        },
+        addClass: function (c: string) {
+            Utils.addClass(elmt, c);
+        }
     }
 }
 
-function extendSpecialFunctions<T extends keyof ElementTypeMap>(memloss: MemLoss, elmt: HTMLElement, name: T){
-    switch(name){
+function extendSpecialFunctions<T extends keyof ElementTypeMap>(memloss: MemLoss, elmt: HTMLElement, name: T) {
+    switch (name) {
         case 'NodeListPad':
             const nodeList = createElement(memloss, 'nodeList');
             elmt.appendChild(nodeList);
-            elmt['getNodeList'] = function(): Element{
-                return nodeList;
-            }
+            elmt['nodeList'] = nodeList;
             elmt['renderList'] = renderListFactory(memloss, elmt);
             break;
         case 'InlineBlock':
-            Utils.setStyle(elmt, {
-                display: 'inline-block',
-                position: 'relative'
-            })
+            Utils.setStyle(elmt, { display: 'inline-block', position: 'relative' })
+            break;
+        case 'EditorFrame':
+            const topbar = createElement(memloss, 'topbar');
+            const editorWindowsContainer = createElement(memloss, 'editorWindowsContainer');
+            const bottomPad = createElement(memloss, 'bottomPad');
+            elmt.appendChild(topbar);
+            elmt.appendChild(editorWindowsContainer);
+            elmt.appendChild(bottomPad);
+            elmt['topBar'] = topbar;
+            elmt['editorWindowsContainer'] = editorWindowsContainer;
+            elmt['editorWindows'] = [];
+            elmt['bottomPad'] = bottomPad;
             break;
     }
 }
