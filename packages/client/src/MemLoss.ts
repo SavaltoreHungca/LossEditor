@@ -1,29 +1,42 @@
 import { Constants } from './Constants';
 import { EventManager } from 'event-driven';
-import { Global } from './other/Element';
-import { Container } from './Container';
-import { SidePad } from './SidePad';
-import { EditorFrame } from './EditorFrame';
-import { registryEvents } from './registryEvents';
-import { SidePadResizingBar } from './SidePadResizingBar';
+import { createElement, Element, wrapElement, NodeListPad, OpendPages, FunctionMenu } from './Element';
+import { registryEvents } from './events';
 
-
+export interface Elements {
+    container: Element;
+    sidePad: Element;
+    editorFrame: Element;
+    sidePadResizingBar: Element;
+    nodeListPad: NodeListPad;
+    opendPages: OpendPages;
+    functionMenu: FunctionMenu;
+}
 
 export class MemLoss {
     eventManager: EventManager = new EventManager();
-    global: Global = new Global(this.eventManager);
+    elements: Elements;
 
-    constructor(container: HTMLElement){
+    constructor(container: HTMLElement) {
         registryEvents(this);
-        this.buildElements(container);
-    }
-
-    buildElements(container: HTMLElement){
-        this.global.set('container', new Container(container, this.global));
-        this.global.set('editorFrame', new EditorFrame(document.createElement('div'), this.global));
-        this.global.set('sidePad', new SidePad(document.createElement('div'), this.global));
-        this.global.set('sidePadResizingBar', new SidePadResizingBar(document.createElement('div'), this.global));
-
+        this.elements = {
+            container: wrapElement(this, container, 'container'),
+            sidePad: createElement(this, 'sidePad'),
+            editorFrame: createElement(this, 'editorFrame'),
+            sidePadResizingBar: createElement(this, 'sidePadResizingBar'),
+            nodeListPad: createElement(this, 'nodeListPad', 'NodeListPad'),
+            opendPages: createElement(this, 'opendPages'),
+            functionMenu: createElement(this, 'functionMenu'),
+        }
         this.eventManager.triggleEvent(Constants.events.ELEMENTS_BUILD_FINISH);
+        this.elements.nodeListPad.renderList({
+            list: [
+                {
+                    img: '🍕',
+                    title: 'xixi',
+                    children: []
+                }
+            ]
+        } as any)
     }
 }

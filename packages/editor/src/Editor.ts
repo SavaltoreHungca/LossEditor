@@ -9,7 +9,6 @@ import { listenUserChangeSelection, Selection } from './Selection';
 
 
 export class Editor {
-    // selection: Selection | null = null;
     cursor: HTMLTextAreaElement = createCursor();
     container: HTMLElement;
     viewLines: HTMLElement = createElement('view-lines');
@@ -53,6 +52,7 @@ export class Editor {
         });
         this.backLayer.append(this.cursor);
         this.scrollPage = new ScrollPage(container, {
+            containerWidth: '504px',
             debug: false
         });
         this.__init__();

@@ -1,6 +1,14 @@
-import { DragState } from './Element';
 import uuid from 'uuid';
-import { info } from 'console';
+
+export interface DragState {
+    startX: number;
+    startY: number;
+    pressed: boolean;
+    registered: boolean;
+    deltaX: number;
+    deltaY: number;
+    event?: Event
+}
 
 export interface ElementInfo {
     width: number;
@@ -327,6 +335,7 @@ export class Utils {
                 dragState.registered = false;
                 document.removeEventListener('mousemove', resizing);
                 document.removeEventListener('mouseup', resizeDone);
+                Utils.setStyle(document.body, { "user-select": "" });
                 dragState.event = event;
                 callback(dragState);
             };
@@ -354,6 +363,7 @@ export class Utils {
                 if (!dragState) throw new Error('Sys error');
                 if (dragState.pressed && !dragState.registered) {
                     dragState.registered = true;
+                    Utils.setStyle(document.body, { "user-select": "none" });
                     document.addEventListener('mousemove', resizing);
                     document.addEventListener('mouseup', resizeDone);
                 }

@@ -1,5 +1,5 @@
 import Constants from "./Constants";
-import { Element } from "./other/Element";
+import { Element } from "./Element";
 import { Utils } from 'utils';
 
 export default class extends Element {

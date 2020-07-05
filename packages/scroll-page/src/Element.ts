@@ -1,19 +1,19 @@
-import { Utils } from './Utils';
+import {EventManager} from 'event-driven';
+import { Settings } from "./Settings";
+import { Utils, DragState } from 'utils';
 import uuid from 'uuid';
-
-export interface DragState {
-    startX: number;
-    startY: number;
-    pressed: boolean;
-    registered: boolean;
-    deltaX: number;
-    deltaY: number;
-    event?: Event
-}
 
 export class Global {
     protected globalElement: Map<string, Element> = new Map();
     protected globalData: Map<string, any> = new Map();
+    settings: Settings;
+    eventManager: EventManager;
+
+
+    constructor(eventManager: EventManager, settings: Settings){
+        this.eventManager = eventManager;
+        this.settings = settings;
+    }
 
     get(id: string): Element {
         const elemt = this.globalElement.get(id);
@@ -42,7 +42,9 @@ export class Global {
     }
 }
 
+
 export class Element {
+ 
     private dragStates: Map<string, DragState> = new Map();
     protected proxy: HTMLElement;
     protected global: Global;
@@ -50,6 +52,40 @@ export class Element {
     constructor(element: HTMLElement, global: Global) {
         this.proxy = element;
         this.global = global;
+        this.setAttribute("data-scroll-page-type", this.getType());
+        this.__init__();
+    }
+    protected __init__(){
+
+    }
+    setWidth(wdith: string){
+        this.setStyle({width: wdith});
+        this.global.eventManager.triggleEvent(`${this.getType().toUpperCase()}_WIDTH_CHANGE`);
+    }
+
+    setHeight(height: string){
+        this.setStyle({height: height});
+        this.global.eventManager.triggleEvent(`${this.getType().toUpperCase()}_HEIGHT_CHANGE`);
+    }
+
+    setLeft(left: string){
+        this.setStyle({left: left});
+        this.global.eventManager.triggleEvent(`${this.getType().toUpperCase()}_LEFT_CHANGE`);
+    }
+
+    setRight(right: string){
+        this.setStyle({right: right});
+        this.global.eventManager.triggleEvent(`${this.getType().toUpperCase()}_RIGHT_CHANGE`);
+    }
+
+    setTop(top: string){
+        this.setStyle({top: top});
+        this.global.eventManager.triggleEvent(`${this.getType().toUpperCase()}_TOP_CHANGE`);
+    }
+
+    setBottom(bottom: string){
+        this.setStyle({bottom: bottom});
+        this.global.eventManager.triggleEvent(`${this.getType().toUpperCase()}_BUTTOM_CHANGE`);
     }
     getType(): string {
         return Object.getPrototypeOf(this).constructor.name;
@@ -70,6 +106,7 @@ export class Element {
     getInlineCssStyle() {
         return Utils.getInlineCssStyle(this.proxy);
     }
+    
     getCssStyle(): CSSStyleDeclaration {
         return this.proxy.style;
     }
@@ -79,73 +116,7 @@ export class Element {
         callback: Function,
         option?: boolean | AddEventListenerOptions
     ) {
-        if (name === 'drag') {
-            const dragStateId = uuid.v1();
-            this.dragStates.set(dragStateId, {
-                startX: 0,
-                startY: 0,
-                pressed: false,
-                deltaX: 0,
-                deltaY: 0,
-                registered: false,
-                event: undefined
-            });
-            let resizing = (event: MouseEvent) => {
-                let dragState = this.dragStates.get(dragStateId);
-                if (!dragState) throw new Error('Sys error');
-                if (dragState.pressed) {
-                    dragState.deltaX = event.screenX - dragState.startX;
-                    dragState.deltaY = event.screenY - dragState.startY;
-                    dragState.startX += dragState.deltaX;
-                    dragState.startY += dragState.deltaY;
-
-                    dragState.event = event;
-                    callback(dragState);
-                }
-            };
-            let resizeDone = (event: MouseEvent) => {
-                let dragState = this.dragStates.get(dragStateId);
-                if (!dragState) throw new Error('Sys error');
-                dragState.pressed = false;
-                dragState.registered = false;
-                document.removeEventListener('mousemove', resizing);
-                document.removeEventListener('mouseup', resizeDone);
-                Utils.setStyle(document.body, { "user-select": "" });
-                dragState.event = event;
-                callback(dragState);
-            };
-            this.proxy.addEventListener('mousedown', (event) => {
-                let dragState = this.dragStates.get(dragStateId);
-                if (!dragState) throw new Error('Sys error');
-                dragState.startX = event.screenX;
-                dragState.startY = event.screenY;
-                dragState.pressed = true;
-                dragState.event = event;
-                callback(dragState);
-            })
-            this.proxy.addEventListener('mouseup', (event: MouseEvent)=>{
-                let dragState = this.dragStates.get(dragStateId);
-                if (!dragState) throw new Error('Sys error');
-                document.removeEventListener('mousemove', resizing);
-                document.removeEventListener('mouseup', resizeDone);
-                dragState.pressed = false;
-                dragState.registered = false;
-                dragState.event = event;
-                callback(dragState);
-            })
-            this.proxy.addEventListener('mousemove', (event) => {
-                let dragState = this.dragStates.get(dragStateId);
-                if (!dragState) throw new Error('Sys error');
-                if (dragState.pressed && !dragState.registered) {
-                    dragState.registered = true;
-                    Utils.setStyle(document.body, { "user-select": "none" });
-                    document.addEventListener('mousemove', resizing);
-                    document.addEventListener('mouseup', resizeDone);
-                }
-            })
-        } else {
-            this.proxy.addEventListener(name, callback as any, option);
-        }
+        Utils.addEventListener(name, this.proxy, callback, option);
     }
 
     getInfo() {
@@ -251,14 +222,6 @@ export class Element {
         this.proxy.setAttribute("data-role", roleName);
     }
 
-    setWidth(width: string) {
-        this.setStyle({ width: width });
-    }
-
-    setHeight(height: string) {
-        this.setStyle({ height: height });
-    }
-
     setAttribute(name: string, value?: string) {
         if (!value) value = "";
         this.proxy.setAttribute(name, value);
@@ -270,3 +233,4 @@ export class Element {
         Utils.addClass(this.proxy, c);
     }
 }
+

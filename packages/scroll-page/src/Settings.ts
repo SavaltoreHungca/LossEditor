@@ -12,3 +12,17 @@ export class Settings {
     rightScrollBarAutoFadeTime: number = 500;
     debug: boolean = false;
 }
+
+export class SettingReceiver {
+    containerHeight?: string;
+    containerWidth?: string;
+    bottomScrollBarInner?: boolean;
+    bottomScrollBarHeight?: number;
+    rightScrollBarInner?: boolean;
+    rightScrollBarWidth?: number;
+    showTopShallow?: boolean;
+    showRightShallow?: boolean;
+    bottomScrollBarAutoFadeTime?: number;
+    rightScrollBarAutoFadeTime?: number;
+    debug?: boolean;
+}

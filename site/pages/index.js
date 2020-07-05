@@ -10,7 +10,7 @@ const Home = () => {
 
     return (
         <div>
-            <div id="container"/>
+            {/* <div id="container"/> */}
             <div id="test" style={{width: '80vw', height: '80vh'}}/>
         </div>
     )
