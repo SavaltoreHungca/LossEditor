@@ -21,7 +21,7 @@ export default class extends Element {
                 page,
                 rightScrollBar,
                 topshallow
-            } = this.global.getAll();
+            } = this.global.elements;
             const rightSliderInfo = this.getInfo();
             const rightScrollBarInfo = rightScrollBar.getInfo();
             const pageInfo = page.getInfo();

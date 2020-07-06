@@ -6,4 +6,6 @@ export default class extends Element {
     getType(){
         return "Content";
     }
+
+    __init__(){}
 }

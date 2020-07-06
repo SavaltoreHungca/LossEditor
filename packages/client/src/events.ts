@@ -124,10 +124,9 @@ function initializeSidePad(memLoss: MemLoss) {
             'box-shadow': 'rgba(55, 53, 47, 0.09) 0px -1px 0px'
         })
         const scrollPage = new ScrollPage(nodeListPad.nodeList, {
-            containerWidth: '100%',
             rightScrollBarWidth: 5
         })
-        scrollPage.global.get('container').setStyle({ 'flex-grow': '1' })
+        scrollPage.setContainerStyle({ 'flex-grow': '1' })
     }, 'initialize-side-pad-ok');
 }
 
@@ -144,10 +143,7 @@ function initializeEditors(memLoss: MemLoss) {
         editor = new Editor(e);
         editor.render(editorcontent);
         editorFrame.editorWindowsContainer.getInfo(info => {
-            new ScrollPage(e, {
-                containerHeight: info.innerHeight + 'px',
-                containerWidth: info.innerWidth + 'px'
-            })
+            new ScrollPage(e)
         });
     }, 'initialize-editors-ok');
 }

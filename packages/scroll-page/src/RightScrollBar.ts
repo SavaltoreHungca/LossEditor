@@ -5,4 +5,6 @@ export default class extends Element {
     getType(){
         return "RightScrollBar";
     }
+
+    __init__(){}
 }

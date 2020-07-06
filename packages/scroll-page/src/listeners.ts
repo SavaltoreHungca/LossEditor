@@ -1,40 +1,44 @@
+import { Utils } from 'utils';
 import { ScrollPage } from "./ScrollPage";
 import Constants from "./Constants";
 
 export function registryListeners(scrollPage: ScrollPage) {
-
     // 监听 context 尺寸变化
-    scrollPage.dataListener.addListener(() => {
-        const { content } = scrollPage.global.getAll();
-        if (content) {
-            const contentInfo = content.getInfo();
-            return [contentInfo.width, contentInfo.height];
-        } else {
-            return false
-        }
-    }, (context: any) => {
-        if (context) {
-            const [width, height] = context;
-            const { page } = scrollPage.global.getAll();
-            page.setWidth(width + 'px');
-            page.setHeight(height + 'px');
-        }
-    }, false);
+    if (scrollPage.settings.autoUpdatePageSize) {
+        scrollPage.dataListener.addListener(() => {
+            const { content, page } = scrollPage.elements;
+            if (content) {
+                const contentInfo = content.getInfo();
+                const pageInfo = page.getInfo();
+                if (contentInfo.width !== pageInfo.innerWidth || contentInfo.height !== pageInfo.innerHeight) {
+                    return [contentInfo.width, contentInfo.height];
+                }
+            }
+            return false;
+        }, (context: any) => {
+            if (context) {
+                scrollPage.updatePageSize();
+            }
+        }, false);
+    }
 
     // 监听 container 尺寸变化
-    scrollPage.dataListener.addListener(() => {
-        const { container } = scrollPage.global.getAll();
-        if (container) {
-            const containerInfo = container.getInfo();
-            return [containerInfo.width, containerInfo.height];
-        } else {
+    if (scrollPage.settings.autoUpdateContainerSize) {
+        scrollPage.dataListener.addListener(() => {
+            const { container } = scrollPage.elements;
+            const containerParent = container.getNative().parentElement;
+            if (containerParent) {
+                const containerInfo = container.getInfo();
+                const parentInfo = Utils.getElementInfo(containerParent);
+                if (containerInfo.width !== parentInfo.innerWidth || containerInfo.height !== parentInfo.innerHeight) {
+                    return containerInfo;
+                }
+            }
             return false
-        }
-    }, (context: any) => {
-        if (context) {
-            scrollPage.eventManager.triggleEvent(Constants.events.CONTAINER_WIDTH_CHANGE);
-            scrollPage.eventManager.triggleEvent(Constants.events.CONTAINER_HEIGHT_CHANGE)
-        }
-    }, false);
-
+        }, (context: any) => {
+            if (context) {
+                scrollPage.updateContainerSize();
+            }
+        }, false);
+    }
 }

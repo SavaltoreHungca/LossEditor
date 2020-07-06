@@ -1,90 +1,51 @@
-import {EventManager} from 'event-driven';
+import { EventManager } from 'event-driven';
 import { Settings } from "./Settings";
 import { Utils, DragState } from 'utils';
 import uuid from 'uuid';
+import { ScrollPage } from './ScrollPage';
 
-export class Global {
-    protected globalElement: Map<string, Element> = new Map();
-    protected globalData: Map<string, any> = new Map();
-    settings: Settings;
-    eventManager: EventManager;
+export abstract class Element {
 
-
-    constructor(eventManager: EventManager, settings: Settings){
-        this.eventManager = eventManager;
-        this.settings = settings;
-    }
-
-    get(id: string): Element {
-        const elemt = this.globalElement.get(id);
-        if (!elemt) throw new Error(`$(id) not found`);
-        return elemt;
-    }
-
-    set(id: string, elemt: Element) {
-        this.globalElement.set(id, elemt);
-    }
-
-    setData(id: string, data: any) {
-        this.globalData.set(id, data);
-    }
-
-    getData(id: string) {
-        this.globalData.get(id);
-    }
-
-    getAll() {
-        let ans: { [index: string]: Element } = {};
-        this.globalElement.forEach((value, key) => {
-            ans[key] = value;
-        })
-        return ans;
-    }
-}
-
-
-export class Element {
- 
     private dragStates: Map<string, DragState> = new Map();
     protected proxy: HTMLElement;
-    protected global: Global;
+    protected global: ScrollPage;
 
-    constructor(element: HTMLElement, global: Global) {
+    constructor(element: HTMLElement, global: ScrollPage) {
         this.proxy = element;
         this.global = global;
         this.setAttribute("data-scroll-page-type", this.getType());
         this.__init__();
     }
-    protected __init__(){
 
-    }
-    setWidth(wdith: string){
-        this.setStyle({width: wdith});
+    abstract __init__(): void;
+
+    setWidth(wdith: string) {
+        this.setStyle({ width: wdith });
         this.global.eventManager.triggleEvent(`${this.getType().toUpperCase()}_WIDTH_CHANGE`);
     }
 
-    setHeight(height: string){
-        this.setStyle({height: height});
+    setHeight(height: string) {
+        this.setStyle({ height: height });
         this.global.eventManager.triggleEvent(`${this.getType().toUpperCase()}_HEIGHT_CHANGE`);
     }
 
-    setLeft(left: string){
-        this.setStyle({left: left});
+    setLeft(left: string) {
+        this.setStyle({ left: left });
         this.global.eventManager.triggleEvent(`${this.getType().toUpperCase()}_LEFT_CHANGE`);
     }
 
-    setRight(right: string){
-        this.setStyle({right: right});
+    setRight(right: string) {
+        this.setStyle({ right: right });
         this.global.eventManager.triggleEvent(`${this.getType().toUpperCase()}_RIGHT_CHANGE`);
     }
 
-    setTop(top: string){
-        this.setStyle({top: top});
+    setTop(top: string) {
+        this.setStyle({ top: top });
         this.global.eventManager.triggleEvent(`${this.getType().toUpperCase()}_TOP_CHANGE`);
     }
 
-    setBottom(bottom: string){
-        this.setStyle({bottom: bottom});
+    setBottom(bottom: string) {
+        this.setStyle({ bottom: bottom });
         this.global.eventManager.triggleEvent(`${this.getType().toUpperCase()}_BUTTOM_CHANGE`);
     }
     getType(): string {
@@ -106,7 +67,7 @@ export class Element {
     getInlineCssStyle() {
         return Utils.getInlineCssStyle(this.proxy);
     }
-    
+
     getCssStyle(): CSSStyleDeclaration {
         return this.proxy.style;
     }
@@ -122,7 +83,7 @@ export class Element {
     getInfo() {
         return Utils.getElementInfo(this.proxy);
     }
-    visible(): boolean{
+    visible(): boolean {
         return this.getCssStyle().visibility !== 'hidden';
     }
     show() {
@@ -144,7 +105,7 @@ export class Element {
     private fadeoutGoing: boolean = false;
     private FADE_OUT_TIME_ID = "FADE_OUT_TIME_ID";
     fadeOut(duration?: number) {
-        if(this.fadeoutGoing) return;
+        if (this.fadeoutGoing) return;
         if (!duration) duration = 1500;
         if (this.getCssStyle().opacity === "") {
             this.initialOpacity = 1;
@@ -229,7 +190,7 @@ export class Element {
     getNative(): HTMLElement {
         return this.proxy;
     }
-    addClass(c: string){
+    addClass(c: string) {
         Utils.addClass(this.proxy, c);
     }
 }

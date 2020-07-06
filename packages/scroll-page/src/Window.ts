@@ -22,7 +22,7 @@ export default class extends Element {
                 buttomScrollBar,
                 rightshallow,
                 buttomSlider,
-            } = this.global.getAll();
+            } = this.global.elements;
 
             const pageInfo = page.getInfo();
             const buttomScrollBarInfo = buttomScrollBar.getInfo();
@@ -47,7 +47,7 @@ export default class extends Element {
                 rightScrollBar,
                 topshallow,
                 rightSlider
-            } = this.global.getAll();
+            } = this.global.elements;
             const pageInfo = page.getInfo();
             const rightScrollBarInfo = rightScrollBar.getInfo();
 

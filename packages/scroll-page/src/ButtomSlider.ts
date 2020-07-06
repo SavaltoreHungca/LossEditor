@@ -17,7 +17,7 @@ export default class extends Element {
                 buttomScrollBar,
                 rightshallow,
                 buttomSlider
-            } = this.global.getAll();
+            } = this.global.elements;
             if (e.pressed === false) { // 拖动事件结束
                 this.lightenColor();
                 this.dragging = false;

@@ -160,7 +160,8 @@ function renderImage(imageBlock: ImageType, viewLines: HTMLElement) {
     image.appendChild(img);
     img.src = imageBlock.content;
     Utils.setStyle(image, {
-        width: 'fit-content'
+        width: 100,
+        height: 100
     })
     Utils.setStyle(img, {
         width: 1000,
@@ -169,8 +170,6 @@ function renderImage(imageBlock: ImageType, viewLines: HTMLElement) {
         position: 'relative'
     })
     new ScrollPage(img, {
-        containerHeight: '100px',
-        containerWidth: '100px',
         bottomScrollBarHeight: 1,
         rightScrollBarWidth: 1,
         bottomScrollBarInner: false,

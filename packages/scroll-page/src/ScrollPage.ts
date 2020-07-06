@@ -1,5 +1,4 @@
 import { EventManager, DataListener } from 'event-driven';
-import { Global } from './Element';
 import Container from './Container';
 import Constants from './Constants';
 import Window from './Window';
@@ -14,49 +13,82 @@ import { Settings, SettingReceiver } from './Settings';
 import Content from './Content';
 import { registryEvents } from './events';
 import { registryListeners } from './listeners';
+import { Utils } from 'utils';
 
 export class ScrollPage {
     eventManager: EventManager;
     dataListener: DataListener;
     settings: Settings = new Settings();
-    global: Global;
+    elements: {
+        container: Container,
+        window: Window,
+        page: Page,
+        buttomScrollBar: ButtomScrollBar,
+        rightScrollBar: RightScrollBar,
+        topshallow: TopShallow,
+        rightshallow: RightShallow,
+        buttomSlider: ButtomSlider,
+        rightSlider: RightSlider,
+        content: Content,
+    };
 
     constructor(content: HTMLElement, settings?: SettingReceiver) {
         if (settings) {
-            let st = new Settings();
-            for(let index in settings){
-                st[index] = settings[index];
-            }
-            this.settings = st;
-        };
+            for (let k in settings)
+                this.settings[k] = settings[k];
+        }
+
         this.eventManager = new EventManager();
         this.dataListener = new DataListener(200);
-        this.global = new Global(this.eventManager, this.settings);
+
+
+        this.elements = {
+            container: new Container(document.createElement('div'), this),
+            window: new Window(document.createElement('div'), this),
+            page: new Page(document.createElement('div'), this),
+            buttomScrollBar: new ButtomScrollBar(document.createElement('div'), this),
+            rightScrollBar: new RightScrollBar(document.createElement('div'), this),
+            topshallow: new TopShallow(document.createElement('div'), this),
+            rightshallow: new RightShallow(document.createElement('div'), this),
+            buttomSlider: new ButtomSlider(document.createElement('div'), this),
+            rightSlider: new RightSlider(document.createElement('div'), this),
+            content: new Content(content, this),
+        }
+
         registryEvents(this);
         registryListeners(this);
-        this.buildElements(content);
-    }
 
-    // 构建html结构
-    private buildElements = (content: HTMLElement) => {
-        this.global.set("container", new Container(document.createElement('div'), this.global));
-        this.global.set("window", new Window(document.createElement('div'), this.global));
-        this.global.set("page", new Page(document.createElement('div'), this.global));
-        this.global.set("buttomScrollBar", new ButtomScrollBar(document.createElement('div'), this.global));
-        this.global.set("rightScrollBar", new RightScrollBar(document.createElement('div'), this.global));
-        this.global.set("topshallow", new TopShallow(document.createElement('div'), this.global));
-        this.global.set("rightshallow", new RightShallow(document.createElement('div'), this.global));
-        this.global.set("buttomSlider", new ButtomSlider(document.createElement('div'), this.global));
-        this.global.set("rightSlider", new RightSlider(document.createElement('div'), this.global));
-        this.global.set("content", new Content(content, this.global));
-
-        if(content.parentElement){
+        if (content.parentElement) {
             const parent = content.parentElement;
-            const {container} = this.global.getAll();
+            const { container } = this.elements;
             parent.insertBefore(container.getNative(), content);
             parent.removeChild(content);
         }
-
         this.eventManager.triggleEvent(Constants.events.ELEMENTS_CREATED);
     }
+
+    updateContainerSize() {
+        console.log('shit')
+        const { container } = this.elements;
+        const containerParent = container.getNative().parentElement;
+        if (containerParent) {
+            const containerInfo = container.getInfo();
+            const parentInfo = Utils.getElementInfo(containerParent);
+            container.setWidth(parentInfo.innerWidth + 'px');
+            container.setHeight(parentInfo.innerHeight + 'px');
+        }
+    }
+
+    updatePageSize() {
+        console.log('shitbug')
+        const { content, page } = this.elements;
+        const contentInfo = content.getInfo();
+        page.setWidth(contentInfo.width + 'px');
+        page.setHeight(contentInfo.height + 'px');
+    }
+
+    setContainerStyle(obj: Object) {
+        this.elements.container.setStyle(obj);
+    }
+
 }
