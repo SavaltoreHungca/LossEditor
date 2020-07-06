@@ -68,7 +68,6 @@ export class ScrollPage {
     }
 
     updateContainerSize() {
-        console.log('shit')
         const { container } = this.elements;
         const containerParent = container.getNative().parentElement;
         if (containerParent) {
@@ -80,7 +79,6 @@ export class ScrollPage {
     }
 
     updatePageSize() {
-        console.log('shitbug')
         const { content, page } = this.elements;
         const contentInfo = content.getInfo();
         page.setWidth(contentInfo.width + 'px');
@@ -91,4 +89,25 @@ export class ScrollPage {
         this.elements.container.setStyle(obj);
     }
 
+    contentWidthFollowContainer() {
+        const { content, container } = this.elements;
+        const containerInfo = container.getInfo();
+        if(content){
+            content.setWidth(containerInfo.innerWidth + 'px');
+            if(containerInfo.innerWidth !== content.getInfo().width){
+                throw new Error("cant't set content width follow container");
+            }
+        }
+    }
+
+    contentHeightFollowContainer() {
+        const { content, container } = this.elements;
+        const containerInfo = container.getInfo();
+        if(content){
+            content.setHeight(containerInfo.innerHeight + 'px');
+            if(containerInfo.innerHeight !== content.getInfo().height){
+                throw new Error("cant't set content height follow container");
+            }
+        }
+    }
 }

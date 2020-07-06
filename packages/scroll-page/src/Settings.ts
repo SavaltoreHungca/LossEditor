@@ -1,7 +1,7 @@
 
 export class Settings {
-    containerHeight: string = '300px'
-    containerWidth: string = '400px'
+    containerHeight: string = ''
+    containerWidth: string = ''
     bottomScrollBarInner: boolean = true
     bottomScrollBarHeight: number = 14
     rightScrollBarInner: boolean = true
@@ -12,6 +12,10 @@ export class Settings {
     rightScrollBarAutoFadeTime: number = 500
     autoUpdateContainerSize: boolean = true
     autoUpdatePageSize: boolean = true
+    contentFollowContainerWidth: boolean = false
+    contentFollowContainerHeight: boolean = false
+    hiddenRightScrollBar: boolean = false
+    hiddenBottomScrollBar: boolean = false
     debug: boolean = false
 }
 
@@ -28,5 +32,9 @@ export interface SettingReceiver {
     rightScrollBarAutoFadeTime?: number
     autoUpdateContainerSize?: boolean
     autoUpdatePageSize?: boolean
+    contentFollowContainerWidth?: boolean 
+    contentFollowContainerHeight?: boolean
+    hiddenRightScrollBar?: boolean 
+    hiddenBottomScrollBar?: boolean
     debug?: boolean
 }

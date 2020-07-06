@@ -1,5 +1,6 @@
 export class DataListener {
     private contextList: Array<[any, Function, Function]> = new Array();
+    private loops: Array<Function> = new Array();
 
     constructor(interval: number) {
         setInterval(() => {
@@ -11,10 +12,13 @@ export class DataListener {
                     this.exectCallback(callback, newcontext);
                 }
             }
+            for(const item of this.loops){
+                this.exectCallback(item);
+            }
         }, interval);
     }
 
-    private exectCallback(callback: Function, context: any) {
+    private exectCallback(callback: Function, context?: any) {
         try {
             callback(context);
         } catch (e) {
@@ -53,5 +57,9 @@ export class DataListener {
             callBack
         ])
         if (firstExecCallback) this.exectCallback(callBack, context);
+    }
+
+    addLoop(loop: Function){
+        this.loops.push(loop);
     }
 }

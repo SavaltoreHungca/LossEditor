@@ -141,7 +141,7 @@ export class Selection {
 let selection: Selection;
 export function listenUserChangeSelection(editor: Editor) {
     Utils.addEventListener('drag', editor.viewLines, (e: DragState) => {
-        console.log(e.event?.target);
+        console.log(e.pressed, e.registered, e.event);
         if (e.event?.target) {
             const srcElement = <HTMLElement>e.event.target;
 

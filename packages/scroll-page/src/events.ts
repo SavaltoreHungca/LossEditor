@@ -172,23 +172,23 @@ function setScrollBar(scrollPage: ScrollPage) {
             buttomSlider,
             window
         } = scrollPage.elements;
-        const { bottomScrollBarInner, bottomScrollBarHeight, rightScrollBarInner, rightScrollBarWidth, showTopShallow, showRightShallow } = scrollPage.settings;
-
-
-        const pageInfo = page.getInfo();
-        const buttomScrollBarInfo = buttomScrollBar.getInfo();
-        const windowInfo = window.getInfo();
-        if (pageInfo.innerWidth <= windowInfo.innerWidth) {
-            buttomScrollBar.disappear();
-        } else {
-            if (!scrollPage.settings.bottomScrollBarInner) {
-                buttomScrollBar.show();
+        if (!scrollPage.settings.hiddenBottomScrollBar) {
+            const pageInfo = page.getInfo();
+            const buttomScrollBarInfo = buttomScrollBar.getInfo();
+            const windowInfo = window.getInfo();
+            if (pageInfo.innerWidth <= windowInfo.innerWidth) {
+                buttomScrollBar.disappear();
+            } else {
+                if (!scrollPage.settings.bottomScrollBarInner) {
+                    buttomScrollBar.show();
+                }
+                const sliderWidth = Math.pow(buttomScrollBarInfo.innerWidth, 2) / pageInfo.innerWidth;
+                buttomSlider.setWidth(sliderWidth + 'px');
             }
-            const sliderWidth = Math.pow(buttomScrollBarInfo.innerWidth, 2) / pageInfo.innerWidth;
-            buttomSlider.setWidth(sliderWidth + 'px');
+        }else{
+            buttomScrollBar.disappear();
         }
-    }
-    )
+    })
 
     // 设定右部滚动条 slider 的高度
     // 是否显示右部滚动条
@@ -202,22 +202,23 @@ function setScrollBar(scrollPage: ScrollPage) {
             rightSlider,
             window
         } = scrollPage.elements;
-        const { bottomScrollBarInner, bottomScrollBarHeight, rightScrollBarInner, rightScrollBarWidth, showTopShallow, showRightShallow } = scrollPage.settings;
-
-        const pageInfo = page.getInfo();
-        const windowInfo = window.getInfo();
-        const rightScrollBarInfo = rightScrollBar.getInfo();
-        if (pageInfo.innerHeight <= windowInfo.innerHeight) {
-            rightScrollBar.disappear();
-        } else {
-            if (!scrollPage.settings.rightScrollBarInner) {
-                rightScrollBar.show();
+        if (!scrollPage.settings.hiddenRightScrollBar) {
+            const pageInfo = page.getInfo();
+            const windowInfo = window.getInfo();
+            const rightScrollBarInfo = rightScrollBar.getInfo();
+            if (pageInfo.innerHeight <= windowInfo.innerHeight) {
+                rightScrollBar.disappear();
+            } else {
+                if (!scrollPage.settings.rightScrollBarInner) {
+                    rightScrollBar.show();
+                }
+                const sliderHeight = Math.pow(rightScrollBarInfo.innerHeight, 2) / pageInfo.innerHeight;
+                rightSlider.setHeight(sliderHeight + 'px');
             }
-            const sliderHeight = Math.pow(rightScrollBarInfo.innerHeight, 2) / pageInfo.innerHeight;
-            rightSlider.setHeight(sliderHeight + 'px');
+        }else{
+            rightScrollBar.disappear();
         }
-    }
-    )
+    })
 }
 
 function autoHideScrollBar(scrollPage: ScrollPage) {
@@ -234,7 +235,7 @@ function autoHideScrollBar(scrollPage: ScrollPage) {
             page
         } = scrollPage.elements;
 
-        if (scrollPage.settings.bottomScrollBarInner) {
+        if (scrollPage.settings.bottomScrollBarInner && !scrollPage.settings.hiddenBottomScrollBar) {
             buttomScrollBar.disappear();
 
             // 底部滚动条自动消失
@@ -290,7 +291,7 @@ function autoHideScrollBar(scrollPage: ScrollPage) {
             })
         }
 
-        if (scrollPage.settings.rightScrollBarInner) {
+        if (scrollPage.settings.rightScrollBarInner && !scrollPage.settings.hiddenRightScrollBar) {
             rightScrollBar.disappear();
 
             win.addEventListener('wheel', (e: WheelEvent) => {
@@ -342,9 +343,7 @@ function autoHideScrollBar(scrollPage: ScrollPage) {
                 }
             })
         }
-    }
-    )
-
+    })
 }
 
 function setShallow(scrollPage: ScrollPage) {
@@ -357,23 +356,27 @@ function setShallow(scrollPage: ScrollPage) {
         Constants.events.PAGE_HEIGHT_CHANGE,
         Constants.events.PAGE_WIDTH_CHANGE
     ], () => {
-            let {
-                page,
-                topshallow,
-                rightshallow,
-                window
-            } = scrollPage.elements;
-            const { bottomScrollBarInner, bottomScrollBarHeight, rightScrollBarInner, rightScrollBarWidth, showTopShallow, showRightShallow } = scrollPage.settings;
+        let {
+            page,
+            topshallow,
+            rightshallow,
+            window
+        } = scrollPage.elements;
 
-            const pageInfo = page.getInfo();
-            const windowInfo = window.getInfo();
+        const pageInfo = page.getInfo();
+        const windowInfo = window.getInfo();
 
+        if (scrollPage.settings.showTopShallow) {
             if (pageInfo.innerHeight <= windowInfo.innerHeight || pageInfo.top === 0) {
                 topshallow.disappear();
             } else {
                 topshallow.show();
             }
+        } else {
+            topshallow.disappear();
+        }
 
+        if (scrollPage.settings.showRightShallow) {
             if (
                 scrollPage.settings.rightScrollBarInner &&
                 pageInfo.innerWidth > windowInfo.innerWidth &&
@@ -390,6 +393,8 @@ function setShallow(scrollPage: ScrollPage) {
             } else {
                 rightshallow.show();
             }
+        } else {
+            rightshallow.disappear();
         }
-    )
+    })
 }

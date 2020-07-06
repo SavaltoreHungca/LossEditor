@@ -318,7 +318,7 @@ export class Utils {
             let resizing = (event: MouseEvent) => {
                 let dragState = this.dragStates.get(dragStateId);
                 if (!dragState) throw new Error('Sys error');
-                if (dragState.pressed) {
+                if (dragState.pressed && dragState.registered) {
                     dragState.deltaX = event.screenX - dragState.startX;
                     dragState.deltaY = event.screenY - dragState.startY;
                     dragState.startX += dragState.deltaX;
@@ -331,13 +331,16 @@ export class Utils {
             let resizeDone = (event: MouseEvent) => {
                 let dragState = this.dragStates.get(dragStateId);
                 if (!dragState) throw new Error('Sys error');
-                dragState.pressed = false;
-                dragState.registered = false;
-                document.removeEventListener('mousemove', resizing);
-                document.removeEventListener('mouseup', resizeDone);
-                Utils.setStyle(document.body, { "user-select": "" });
-                dragState.event = event;
-                callback(dragState);
+                if (dragState.pressed) {
+                    dragState.pressed = false;
+                    dragState.registered = false;
+                    Utils.setStyle(document.body, { "user-select": "" });
+                    window.getSelection()?.removeAllRanges();
+                    dragState.event = event;
+                    callback(dragState);
+                    document.removeEventListener('mousemove', resizing);
+                    document.removeEventListener('mouseup', resizeDone);
+                }
             };
             element.addEventListener('mousedown', (event) => {
                 let dragState = this.dragStates.get(dragStateId);
@@ -348,22 +351,14 @@ export class Utils {
                 dragState.event = event;
                 callback(dragState);
             })
-            element.addEventListener('mouseup', (event: MouseEvent) => {
-                let dragState = this.dragStates.get(dragStateId);
-                if (!dragState) throw new Error('Sys error');
-                document.removeEventListener('mousemove', resizing);
-                document.removeEventListener('mouseup', resizeDone);
-                dragState.pressed = false;
-                dragState.registered = false;
-                dragState.event = event;
-                callback(dragState);
-            })
+            element.addEventListener('mouseup', resizeDone);
             element.addEventListener('mousemove', (event) => {
                 let dragState = this.dragStates.get(dragStateId);
                 if (!dragState) throw new Error('Sys error');
                 if (dragState.pressed && !dragState.registered) {
                     dragState.registered = true;
                     Utils.setStyle(document.body, { "user-select": "none" });
+                    window.getSelection()?.removeAllRanges();
                     document.addEventListener('mousemove', resizing);
                     document.addEventListener('mouseup', resizeDone);
                 }
@@ -386,7 +381,7 @@ export class Utils {
         elemt.className += " " + c;
     }
 
-    static anonyFunction(func: Function): string{
+    static anonyFunction(func: Function): string {
         const funcName = "_" + uuid.v1().replace(/-/g, '');
         window[funcName] = func;
         return funcName;
