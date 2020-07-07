@@ -109,6 +109,10 @@ export interface EditorFrameElement extends Element{
     editorWindowsContainer: Element
 }
 
+export interface EditorWindowCon extends Element {
+    
+}
+
 export interface SidePadElement extends Element{
     sidePadResizingBar: Element;
 }

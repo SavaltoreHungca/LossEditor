@@ -75,10 +75,28 @@ function initializeUi(memLoss: MemLoss) {
                 </div>
             </div>
             <div data-mem-loss-type="editorFrame" id="${idSet.editorFrame}"
-                style="display: flex; flex-direction: column; flex-grow: 1; position: relative; height: 100%;">
-                <div data-mem-loss-type="topbar" style="flex-grow: 1; width: 100%;"></div>
-                <div data-mem-loss-type="editorWindowsContainer" id="${idSet.editorWindowsContainer}" style="flex-grow: 0; height: 300px; width: 100%; overflow: hidden"></div>
-                <div data-mem-loss-type="bottomPad" style="flex-grow: 1; width: 100%;"></div>
+                style="display: flex; flex-direction: column; flex-grow: 1; position: relative; width: auto; height: 100%; overflow: hidden">
+                <div data-mem-loss-type="editorWindowsContainer" id="${idSet.editorWindowsContainer}" 
+                    style="display: block; position: relative; flex-grow: 1; height: 300px; overflow: hidden">
+                    <div data-mem-loss-type="window" style="overflow: hidden; display: flex; flex-direction: column; height: 300px">
+                        <div data-mem-loss-type="tabsContainer">
+                            <div data-mem-loss-type="tabs">
+                                <span class="background-change-selected" style="display: inline-block; position: relative; box-sizing: border-box; cursor: pointer">
+                                    <span style="display: flex; flex-direction: column; justify-content: center;overflow: hidden; height: 35px; width: 125px; text-align: center;">
+                                        <div>🍕tab1</div>
+                                    </span>
+                                </span>
+                                <span>tab2</span>
+                            </div>
+                        </div>
+                        <div data-mem-loss-type="crumbs">
+                            /package/client
+                        </div>
+                        <div data-mem-loss-type="editorContainer" style="flex-grow: 1; overflow: hidden">
+                            <div data-mem-loss-type="editor" style="width: 3000px; height: 3000px">
+                        </div>
+                    </div>
+                </div>
             </div>
         `
 
@@ -122,16 +140,6 @@ function initializeEditors(memLoss: MemLoss) {
         const { editorFrame } = memLoss.elements;
         if (!editorFrame) throw new Error();
 
-        const e = createElement(memLoss, 'ceshinimabi');
-        let editor;
-        editorFrame.editorWindowsContainer.appendChild(e);
-        e.setWidth(3000);
-        e.setHeight(3000);
-        editor = new Editor(e);
-        editor.render(editorcontent);
-        editorFrame.editorWindowsContainer.getInfo(info => {
-            new ScrollPage(e)
-        });
     }, 'initialize-editors-ok');
 }
 

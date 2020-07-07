@@ -323,7 +323,7 @@ export class Utils {
                     dragState.deltaY = event.screenY - dragState.startY;
                     dragState.startX += dragState.deltaX;
                     dragState.startY += dragState.deltaY;
-
+                    window.getSelection()?.removeAllRanges();
                     dragState.event = event;
                     callback(dragState);
                 }
@@ -355,6 +355,7 @@ export class Utils {
             element.addEventListener('mousemove', (event) => {
                 let dragState = this.dragStates.get(dragStateId);
                 if (!dragState) throw new Error('Sys error');
+                window.getSelection()?.removeAllRanges();
                 if (dragState.pressed && !dragState.registered) {
                     dragState.registered = true;
                     Utils.setStyle(document.body, { "user-select": "none" });
