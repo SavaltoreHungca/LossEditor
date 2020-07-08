@@ -315,7 +315,20 @@ export class Utils {
                 registered: false,
                 event: undefined
             });
-            let resizing = (event: MouseEvent) => {
+            const startResize = (event: MouseEvent) => {
+                let dragState = this.dragStates.get(dragStateId);
+                if (!dragState) throw new Error('Sys error');
+                window.getSelection()?.removeAllRanges();
+                if (dragState.pressed && !dragState.registered) {
+                    dragState.registered = true;
+                    Utils.setStyle(document.body, { "user-select": "none" });
+                    window.getSelection()?.removeAllRanges();
+                    document.addEventListener('mousemove', resizing);
+                    document.addEventListener('mouseup', resizeDone);
+                    document.removeEventListener('mousemove', startResize);
+                }
+            }
+            const resizing = (event: MouseEvent) => {
                 let dragState = this.dragStates.get(dragStateId);
                 if (!dragState) throw new Error('Sys error');
                 if (dragState.pressed && dragState.registered) {
@@ -328,7 +341,7 @@ export class Utils {
                     callback(dragState);
                 }
             };
-            let resizeDone = (event: MouseEvent) => {
+            const resizeDone = (event: MouseEvent) => {
                 let dragState = this.dragStates.get(dragStateId);
                 if (!dragState) throw new Error('Sys error');
                 if (dragState.pressed) {
@@ -340,6 +353,7 @@ export class Utils {
                     callback(dragState);
                     document.removeEventListener('mousemove', resizing);
                     document.removeEventListener('mouseup', resizeDone);
+                    element.removeEventListener('mouseup', resizeDone);
                 }
             };
             element.addEventListener('mousedown', (event) => {
@@ -348,21 +362,11 @@ export class Utils {
                 dragState.startX = event.screenX;
                 dragState.startY = event.screenY;
                 dragState.pressed = true;
+                dragState.registered = false;
                 dragState.event = event;
                 callback(dragState);
-            })
-            element.addEventListener('mouseup', resizeDone);
-            element.addEventListener('mousemove', (event) => {
-                let dragState = this.dragStates.get(dragStateId);
-                if (!dragState) throw new Error('Sys error');
-                window.getSelection()?.removeAllRanges();
-                if (dragState.pressed && !dragState.registered) {
-                    dragState.registered = true;
-                    Utils.setStyle(document.body, { "user-select": "none" });
-                    window.getSelection()?.removeAllRanges();
-                    document.addEventListener('mousemove', resizing);
-                    document.addEventListener('mouseup', resizeDone);
-                }
+                document.addEventListener('mousemove', startResize);
+                element.addEventListener('mouseup', resizeDone);
             })
         } else {
             element.addEventListener(name, callback as any, option);

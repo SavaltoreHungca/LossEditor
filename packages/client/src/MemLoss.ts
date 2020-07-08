@@ -2,7 +2,6 @@ import { Constants } from './Constants';
 import { EventManager } from 'event-driven';
 import { createElement, Element, wrapElement, NodeListElement, EditorFrameElement, SidePadElement } from './Element';
 import { registryEvents } from './events';
-import { nodelist } from './testdata';
 
 export interface Elements {
     container?: Element;
@@ -22,6 +21,5 @@ export class MemLoss {
             container: wrapElement(this, container, 'container'),
         }
         this.eventManager.triggleEvent(Constants.events.ELEMENTS_BUILD_FINISH);
-        // this.elements.nodeListPad.renderList(nodelist)
     }
 }

@@ -1,11 +1,12 @@
+import { repository } from './repository/Request';
 import { MemLoss } from "./MemLoss";
 import { Constants } from "./Constants";
 import { ScrollPage } from 'scroll-page';
-import { createElement, randomId, $, wrapElement, NodeListElement, EditorFrameElement, SidePadElement } from "./Element";
+import { createElement, randomId, $, wrapElement, NodeListElement, EditorFrameElement, SidePadElement, WindowElement } from "./Element";
 import { Editor } from "editor";
-import { editorcontent, nodelist } from "./testdata";
 import { renderNodeList } from "./renderNodeList";
 import { DragState, Utils } from "utils";
+import { renderWindow } from './renderWindows';
 
 export function registryEvents(memLoss: MemLoss) {
     initializeUi(memLoss);
@@ -77,29 +78,11 @@ function initializeUi(memLoss: MemLoss) {
             <div data-mem-loss-type="editorFrame" id="${idSet.editorFrame}"
                 style="display: flex; flex-direction: column; flex-grow: 1; position: relative; width: auto; height: 100%; overflow: hidden">
                 <div data-mem-loss-type="editorWindowsContainer" id="${idSet.editorWindowsContainer}" 
-                    style="display: block; position: relative; flex-grow: 1; height: 300px; overflow: hidden">
-                    <div data-mem-loss-type="window" style="overflow: hidden; display: flex; flex-direction: column; height: 300px">
-                        <div data-mem-loss-type="tabsContainer">
-                            <div data-mem-loss-type="tabs">
-                                <span class="background-change-selected" style="display: inline-block; position: relative; box-sizing: border-box; cursor: pointer">
-                                    <span style="display: flex; flex-direction: column; justify-content: center;overflow: hidden; height: 35px; width: 125px; text-align: center;">
-                                        <div>🍕tab1</div>
-                                    </span>
-                                </span>
-                                <span>tab2</span>
-                            </div>
-                        </div>
-                        <div data-mem-loss-type="crumbs">
-                            /package/client
-                        </div>
-                        <div data-mem-loss-type="editorContainer" style="flex-grow: 1; overflow: hidden">
-                            <div data-mem-loss-type="editor" style="width: 3000px; height: 3000px">
-                        </div>
-                    </div>
-                </div>
+                    style="display: block; position: relative; flex-grow: 1; height: 300px; overflow: hidden"></div>
             </div>
         `
 
+        $(idSet.editorWindowsContainer)['opendWindow'] = new Array<WindowElement>();
         $(idSet.nodeListId)['content'] = wrapElement(memLoss, $(idSet.content), 'nodeListContent');
         $(idSet.editorFrame)['editorWindowsContainer'] = wrapElement(memLoss, $(idSet.editorWindowsContainer), 'editorWindowsContainer');
         $(idSet.sidePadId)['sidePadResizingBar'] = wrapElement(memLoss, $(idSet.resizeBar), 'sidePadResizingBar');
@@ -118,17 +101,24 @@ function initializeSidePad(memLoss: MemLoss) {
         const { nodeList } = memLoss.elements;
         if (!nodeList) throw new Error();
 
-        renderNodeList(memLoss, nodelist.list, 1, item => nodeList.content.appendChild(item));
+        repository.getNodeList((status, data) => {
+            switch (status) {
+                case 'ok':
+                    if (!data) throw Error();
+                    renderNodeList(memLoss, [], data.list, 1, item => nodeList.content.appendChild(item));
 
-        const scrollPage = new ScrollPage(nodeList.content, {
-            rightScrollBarWidth: 5,
-            contentFollowContainerWidth: true,
-            showRightShallow: false,
-            hiddenRightScrollBar: true,
-            hiddenBottomScrollBar: true
+                    const scrollPage = new ScrollPage(nodeList.content, {
+                        rightScrollBarWidth: 5,
+                        contentFollowContainerWidth: true,
+                        showRightShallow: false,
+                        hiddenRightScrollBar: true,
+                        hiddenBottomScrollBar: true
+                    })
+
+                    nodeList.scrollPage = scrollPage;
+                    break;
+            }
         })
-
-        nodeList.scrollPage = scrollPage;
 
     }, 'initialize-side-pad-ok');
 }

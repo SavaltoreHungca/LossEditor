@@ -2,8 +2,9 @@ import { MemLoss } from "./MemLoss";
 import { Utils, ElementInfo } from 'utils';
 import { ScrollPage } from 'scroll-page';
 import uuid from 'uuid';
+import { Editor } from "editor";
 
-export function randomId(){
+export function randomId() {
     return "_" + uuid.v1().replace(/-/g, '');
 }
 export function $(id: string): HTMLElement {
@@ -32,57 +33,55 @@ export function wrapElement(memloss: MemLoss, elmt: HTMLElement, alias: string):
     return <Element>elmt;
 }
 
-export function createElement(memloss: MemLoss, alias: string, type?: 'inline'): Element {
-    let elmt;
-    switch (name) {
-        case 'InlineBlock':
+export function createElement(memloss: MemLoss, alias: string, type?: 'span'): Element {
+    let elmt = document.createElement(type || 'div');
+    switch (type) {
+        case 'span':
             elmt = document.createElement('span');
-            Utils.setStyle(elmt, {display: 'inline-block', position: 'relative'});
+            Utils.setStyle(elmt, { display: 'inline-block', position: 'relative' });
             break;
-        default:
-            elmt = document.createElement(type || 'div');
     }
     return wrapElement(memloss, elmt, alias);
 }
 
-function extendFunctions(memloss: MemLoss, elmt: HTMLElement){
-    const bindDataSetName ="_" + uuid.v1();
+function extendFunctions(memloss: MemLoss, elmt: HTMLElement) {
+    const bindDataSetName = "_" + uuid.v1();
     elmt[bindDataSetName] = {};
     return {
-        set: function(name: string, data: any){
+        set: function (name: string, data: any) {
             elmt[bindDataSetName][name] = data;
         },
-        get: function(name: string): any{
+        get: function (name: string): any {
             return elmt[bindDataSetName][name];
         },
-        getType: function(): string{
+        getType: function (): string {
             const type = elmt.getAttribute('data-mem-loss-type');
-            if(!type) throw new Error('unset type for ' + elmt);
+            if (!type) throw new Error('unset type for ' + elmt);
             return type;
         },
         setWidth: function (width: number) {
-            Utils.setStyle(elmt, { width: width});
+            Utils.setStyle(elmt, { width: width });
             memloss.eventManager.triggleEvent(
                 `${this.getType().toUpperCase()}_WIDTH_CHANGE`,
                 `${this.getType().toUpperCase()}_SIZE_CHANGE`
             );
         },
         setHeight: function (height: number) {
-            Utils.setStyle(elmt, { height: height});
+            Utils.setStyle(elmt, { height: height });
             memloss.eventManager.triggleEvent(
                 `${this.getType().toUpperCase()}_HEIGHT_CHANGE`,
                 `${this.getType().toUpperCase()}_SIZE_CHANGE`
             );
         },
         setTop: function (top: number) {
-            Utils.setStyle(elmt, { top: top});
+            Utils.setStyle(elmt, { top: top });
             memloss.eventManager.triggleEvent(
                 `${this.getType().toUpperCase()}_TOP_CHANGE`,
                 `${this.getType().toUpperCase()}_POSITION_CHANGE`
             );
         },
         setLeft: function (left: number) {
-            Utils.setStyle(elmt, { left: left});
+            Utils.setStyle(elmt, { left: left });
             memloss.eventManager.triggleEvent(
                 `${this.getType().toUpperCase()}_LEFT_CHANGE`,
                 `${this.getType().toUpperCase()}_POSITION_CHANGE`
@@ -100,19 +99,24 @@ function extendFunctions(memloss: MemLoss, elmt: HTMLElement){
     }
 }
 
-export interface NodeListElement extends Element{
+export interface NodeListElement extends Element {
     content: Element
     scrollPage: ScrollPage
 }
 
-export interface EditorFrameElement extends Element{
-    editorWindowsContainer: Element
+export interface EditorFrameElement extends Element {
+    editorWindowsContainer: EditorWindowCon
 }
 
 export interface EditorWindowCon extends Element {
-    
+    opendWindow: Array<WindowElement>
 }
 
-export interface SidePadElement extends Element{
+export interface WindowElement extends Element {
+    editor: Editor
+    scrollPage: ScrollPage
+}
+
+export interface SidePadElement extends Element {
     sidePadResizingBar: Element;
 }
