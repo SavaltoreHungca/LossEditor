@@ -1,14 +1,45 @@
 import { Utils } from "utils";
 
-export function isTextNode(node: HTMLElement) {
-    return node.getAttribute("data-ele-type") === 'text';
+declare type EleType = 'content-container'
+| 'indentation'
+| 'image'
+| 'table'
+| 'row'
+| 'cell'
+| 'view-lines'
+| 'back-layer'
+| 'paragraph'
+| 'paragraph-line'
+| 'text'
+| 'unit-block';
+
+export function getType(node: HTMLElement): EleType | undefined{
+    const type = node.getAttribute("data-ele-type")
+    if (type) {
+        return <any>type;
+    } else {
+        return undefined;
+    }
 }
 
-export function isViewLines(node: HTMLElement) {
-    return node.getAttribute("data-ele-type") === 'view-lines';
+export function getUnitBlockFromChild(node: HTMLElement): HTMLElement | undefined {
+    let cur = node;
+    while (true) {
+        const type = getType(cur);
+        if(type && type !== 'unit-block'){
+            return undefined;
+        }
+        if (type === 'unit-block') return cur;
+        if (type === 'view-lines') return undefined;
+        if(cur.parentElement){
+            cur = cur.parentElement;
+        }else{
+            return undefined;
+        }
+    }
 }
 
-export function createElement(type: string) {
+export function createElement(type: EleType) {
     switch (type) {
         case 'content-container':
             const contentContainer = document.createElement("div");

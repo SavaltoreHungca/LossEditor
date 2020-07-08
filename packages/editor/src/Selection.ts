@@ -1,8 +1,7 @@
 import { Editor } from "./Editor";
 import { DragState, Utils } from "utils";
-import { isTextNode, isViewLines } from "./utils";
+import { getType, getUnitBlockFromChild } from "./utils";
 import { Constants } from "./Constants";
-import { runInThisContext } from "vm";
 
 export interface Point {
     offset: number;
@@ -71,7 +70,7 @@ export class Selection {
         while (true) {
             if (parent) {
                 startParents.push(parent);
-                if (isViewLines(parent)) {
+                if (getType(parent) === 'view-lines') {
                     break;
                 }
                 parent = parent.parentElement;
@@ -141,14 +140,13 @@ export class Selection {
 let selection: Selection;
 export function listenUserChangeSelection(editor: Editor) {
     Utils.addEventListener('drag', editor.viewLines, (e: DragState) => {
-        console.log(e.pressed, e.registered, e.event);
         if (e.event?.target) {
             const srcElement = <HTMLElement>e.event.target;
 
             if (e.pressed === true && e.registered === false)
                 selection = new Selection();
 
-            if (isTextNode(srcElement)) {
+            if (getType(srcElement) === 'text') {
                 const mousePosi = Utils.getMousePositionInElement(srcElement, <MouseEvent>e.event);
                 const accuracyWidth = Utils.getStrPx(Constants.WIDTH_BASE_CHAR, srcElement).width;
                 let critical = srcElement.innerText.length / 2 + 1;
@@ -197,6 +195,25 @@ export function listenUserChangeSelection(editor: Editor) {
                         critical += critical / 2 + 1;
                         continue;
                     }
+                }
+            }
+
+            const unitBlock = getUnitBlockFromChild(srcElement);
+            if(unitBlock){
+                const mousePosi = Utils.getMousePositionInElement(unitBlock, <MouseEvent>e.event);
+                const unitBlockInfo = Utils.getElementInfo(unitBlock);
+                console.log(mousePosi)
+                console.log(unitBlockInfo);
+                let offset = 0;
+                if(mousePosi.left > unitBlockInfo.width/2){
+                    offset = 1;
+                }
+                if (e.pressed && e.registered === false) {
+                    selection.start = { offset: offset, node: unitBlock }
+                } else if (!Utils.isUndfined(selection)) {
+                    selection.end = { offset: offset, node: unitBlock }
+                    editor.selection = selection;
+                    editor.eventManager.triggleEvent(Constants.events.SELECTION_CHANGE);
                 }
             }
         }

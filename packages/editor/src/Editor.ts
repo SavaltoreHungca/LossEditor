@@ -2,7 +2,7 @@ import { EventManager, DataListener } from 'event-driven';
 import { Utils } from 'utils';
 import { render } from './render';
 import { createCursor, listenSelectionToSetCursor } from './cursor';
-import { createElement, isTextNode } from './utils';
+import { createElement } from './utils';
 import { DragState } from 'utils';
 import { listenUserChangeSelection, Selection } from './Selection';
 import { listenContainerSizeChange } from './autoResize';

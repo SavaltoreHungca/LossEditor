@@ -1,23 +1,49 @@
 import { Utils } from "utils";
-import { isTextNode } from "./utils";
+import { getType } from "./utils";
 import { Constants } from "./Constants";
 import { Editor } from "./Editor";
 
 export function listenSelectionToSetCursor(editor: Editor) {
     editor.eventManager.registryEvent(Constants.events.SELECTION_CHANGE, ()=>{
+        console.log(editor.selection);
+
         const endPoint = editor.selection?.end;
         if(typeof endPoint?.node === 'undefined') return;
-        if (!isTextNode(endPoint.node)) return;
-        const posi = Utils.getRelativePosition(endPoint.node, editor.viewLines);
-        const offset =
-            Utils.getStrPx(endPoint.node.innerText.substring(0, endPoint.offset), endPoint.node).width
+        
+        const type = getType(endPoint.node);
 
-        Utils.setStyle(editor.cursor, {
-            left: posi.left + offset,
-            top: posi.top,
-            height: endPoint.node.offsetHeight,
-            visibility: 'visible'
-        })
+        if (type === 'text') {
+            const posi = Utils.getRelativePosition(endPoint.node, editor.viewLines);
+            const offset =
+                Utils.getStrPx(endPoint.node.innerText.substring(0, endPoint.offset), endPoint.node).width
+    
+            Utils.setStyle(editor.cursor, {
+                left: posi.left + offset,
+                top: posi.top,
+                height: endPoint.node.offsetHeight,
+                visibility: 'visible'
+            })
+
+            return;
+        }
+
+        if(type === 'unit-block'){
+            const posi = Utils.getRelativePosition(endPoint.node, editor.viewLines);
+            let offset = 0;
+            if(endPoint.offset === 1){
+                offset = Utils.getElementInfo(endPoint.node).width;
+            }
+
+            Utils.setStyle(editor.cursor, {
+                left: posi.left + offset,
+                top: posi.top,
+                height: endPoint.node.offsetHeight,
+                visibility: 'visible'
+            })
+
+            return;
+        }
+        
     })
 }
 
