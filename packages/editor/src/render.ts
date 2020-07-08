@@ -197,7 +197,7 @@ function indentationWrap(content: BlockType, viewLines: HTMLElement): HTMLElemen
 }
 
 export function render(docStructure: any, viewLines: HTMLElement) {
-    
+    viewLines.innerHTML = '';
     const renderSwitch = (content: any) => {
         switch (getContentType(content)) {
             case "paragraph":

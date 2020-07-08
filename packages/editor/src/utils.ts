@@ -43,7 +43,7 @@ export function createElement(type: string) {
         case 'view-lines':
             const viewLines = document.createElement("div");
             viewLines.setAttribute("data-ele-type", "view-lines");
-            Utils.setStyle(viewLines, { display: 'block', position: 'absolute' });
+            Utils.setStyle(viewLines, { display: 'block', position: 'relative' });
             return viewLines;
         case 'back-layer':
             const backLayer = document.createElement("div");
