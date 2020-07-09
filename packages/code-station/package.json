@@ -1,0 +1,24 @@
+{
+  "name": "code-station",
+  "description": "",
+  "version": "0.58.3",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
+  "umd": "dist/code-station.js",
+  "umdMin": "dist/code-station.min.js",
+  "sideEffects": false,
+  "files": [
+    "dist/"
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "event-driven": "*",
+    "katex": "^0.11.1",
+    "monaco-editor": "^0.20.0",
+    "scroll-page": "*",
+    "utils": "*"
+  },
+  "keywords": []
+}

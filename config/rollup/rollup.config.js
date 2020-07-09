@@ -14,6 +14,7 @@ import ScrollPage from '../../packages/scroll-page/package.json'
 import Utils from '../../packages/utils/package.json'
 import Editor from '../../packages/editor/package.json'
 import Client from '../../packages/client/package.json'
+import CodeStation from '../../packages/code-station/package.json'
 
 /**
  * Return a Rollup configuration for a `pkg` with `env` and `target`.
@@ -217,4 +218,5 @@ export default [
     ...factory(ScrollPage),
     ...factory(Editor),
     ...factory(Client),
+    ...factory(CodeStation),
 ]

@@ -6,5 +6,6 @@
     { "path": "./packages/scroll-page" },
     { "path": "./packages/editor" },
     { "path": "./packages/client" },
+    { "path": "./packages/code-station" },
   ]
 }
