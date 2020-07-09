@@ -11,6 +11,24 @@ export class Selection {
     start: Point | undefined;
     end: Point | undefined;
 
+    get leftAndRight(): { left: Point, right: Point } {
+        if (!this.end || !this.start) throw new Error();
+        let left = this.end;
+        let right = this.start;
+        const relative = selection.relativePostionStartEnd;
+        if (relative === 'OVERLAPPING' && this.end.offset > this.start.offset) {
+            left = this.start;
+            right = this.end;
+        } else if (relative === 'START_IN_LEFT') {
+            left = this.start;
+            right = this.end;
+        }
+        return {
+            left: left,
+            right: right
+        };
+    }
+
     get isCollapsed(): boolean {
         return this.start?.node === this.end?.node
             && this.start?.offset === this.end?.offset;
@@ -27,10 +45,10 @@ export class Selection {
     get relativePostionStartEnd(): "START_IN_RIGHT" | "START_IN_LEFT" | "OVERLAPPING" {
         let startSecondParent = this.startSecondParent;
         let endSecondParent = this.endSecondParent;
-        if(startSecondParent === endSecondParent) return 'OVERLAPPING';
-        while(startSecondParent?.nextElementSibling){
+        if (startSecondParent === endSecondParent) return 'OVERLAPPING';
+        while (startSecondParent?.nextElementSibling) {
             startSecondParent = <HTMLElement>startSecondParent.nextElementSibling
-            if(startSecondParent === endSecondParent){
+            if (startSecondParent === endSecondParent) {
                 return 'START_IN_LEFT';
             }
         }
