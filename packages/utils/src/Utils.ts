@@ -391,4 +391,42 @@ export class Utils {
         window[funcName] = func;
         return funcName;
     }
+
+    static getCommonAncestor<T>(n1: T, n2: T, getParent: (node: T) => T | undefined | null, root?: T): T | undefined {
+        if (!n1 || !n2) return undefined;
+        const parent = (node: T) => {
+            const p = getParent(node);
+            if (p) return p;
+        }
+        const n1Path = new Array<T>();
+        let curN1: T = n1;
+        do {
+            if (curN1) n1Path.push(curN1);
+            curN1 = <T>parent(curN1);
+        } while (curN1 !== root);
+        if (root) n1Path.push(root);
+
+
+        while (n2) {
+            for (let i = 0; i < n1Path.length; i++) {
+                if (n2 === n1Path[i]) {
+                    return n2;
+                }
+            }
+            n2 = <T>parent(n2);
+        }
+    }
+
+    static getRefStageNode<T>(node: T, root: T, stage: number, getParent: (node: T) => T | undefined | null) {
+        const path = new Array<T>();
+        while(node && node !== root){
+            path.push(node);
+            node = <T>getParent(node);
+        }
+        if(node !== root) return undefined;
+        path.push(root);
+        if(path.length > stage){
+            return path[path.length - 1 - stage];
+        }
+    }
 }

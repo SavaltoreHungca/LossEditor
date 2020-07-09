@@ -13,34 +13,66 @@ export function listenSelectionChangeToSetSelectedRegion(editor: Editor) {
         const endPoint = selection.end;
         const startPoint = selection.start;
         const ancestor = selection.ancestor;
-        if (!endPoint || !startPoint ) throw new Error();
-        // if (!endPoint || !startPoint || !ancestor) throw new Error();
+        if (!endPoint || !startPoint || !ancestor) throw new Error();
 
-        // switch (getType(ancestor)) {
-        //     case 'text': {
-        //         const position = Utils.getRelativePosition(ancestor, editor.viewLines);
-        //         const region = document.createElement('div');
-        //         editor.regionContainer.innerHTML = '';
-        //         editor.regionContainer.appendChild(region);
+        switch (getType(ancestor)) {
+            case 'text': {
+                const position = Utils.getRelativePosition(ancestor, editor.viewLines);
+                const region = document.createElement('div');
+                editor.regionContainer.innerHTML = '';
+                editor.regionContainer.appendChild(region);
 
-        //         const startwidth = Utils.getStrPx(startPoint.node.innerText.substring(0, startPoint.offset), startPoint.node).width;
-        //         const endwidth = Utils.getStrPx(endPoint.node.innerText.substring(0, endPoint.offset), endPoint.node).width;
+                const startwidth = Utils.getStrPx(startPoint.node.innerText.substring(0, startPoint.offset), startPoint.node).width;
+                const endwidth = Utils.getStrPx(endPoint.node.innerText.substring(0, endPoint.offset), endPoint.node).width;
 
-        //         Utils.setStyle(region, {
-        //             position: 'absolute',
-        //             display: 'block',
-        //             background: '#add6ff',
-        //             left: position.left + (startwidth > endwidth ? endwidth : startwidth),
-        //             top: position.top,
-        //             width: Math.abs(startwidth - endwidth),
-        //             height: ancestor.offsetHeight,
-        //             'border-radius': '3px 3px 3px 3px',
-        //             'z-index': '-1'
-        //         });
+                Utils.setStyle(region, {
+                    position: 'absolute',
+                    display: 'block',
+                    background: '#add6ff',
+                    left: position.left + (startwidth > endwidth ? endwidth : startwidth),
+                    top: position.top,
+                    width: Math.abs(startwidth - endwidth),
+                    height: ancestor.offsetHeight,
+                    'border-radius': '3px 3px 3px 3px',
+                    'z-index': '-1'
+                });
 
-        //         break;
-        //     }
-        // }
+                break;
+            }
+            case 'paragraph-line': {
+                let left = endPoint;
+                let right = startPoint;
+                if(selection.relativePostionStartEnd === 'START_IN_LEFT'){
+                    left = startPoint;
+                    right = endPoint;
+                }
+
+                const leftPosi = Utils.getRelativePosition(left.node, editor.viewLines);
+                const rightPosi = Utils.getRelativePosition(right.node, editor.viewLines);
+
+                const region = document.createElement('div');
+                editor.regionContainer.innerHTML = '';
+                editor.regionContainer.appendChild(region);
+
+                Utils.setStyle(region, {
+                    position: 'absolute',
+                    display: 'block',
+                    background: '#add6ff',
+                    left: leftPosi.left + (startwidth > endwidth ? endwidth : startwidth),
+                    top: position.top,
+                    width: Math.abs(startwidth - endwidth),
+                    height: ancestor.offsetHeight,
+                    'border-radius': '3px 3px 3px 3px',
+                    'z-index': '-1'
+                });
+
+                break;
+            }
+            case 'paragraph': {
+
+                break;
+            }
+        }
     });
 }
 
