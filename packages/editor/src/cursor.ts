@@ -4,52 +4,46 @@ import { Constants } from "./Constants";
 import { Editor } from "./Editor";
 
 export function listenSelectionToSetCursor(editor: Editor) {
-    editor.eventManager.registryEvent(Constants.events.SELECTION_CHANGE, ()=>{
-        console.log(editor.selection);
-
+    editor.eventManager.registryEvent(Constants.events.SELECTION_CHANGE, () => {
         const endPoint = editor.selection?.end;
-        if(typeof endPoint?.node === 'undefined') return;
-        
-        const type = getType(endPoint.node);
+        if (!endPoint?.node) return;
 
-        if (type === 'text') {
-            const posi = Utils.getRelativePosition(endPoint.node, editor.viewLines);
-            const offset =
-                Utils.getStrPx(endPoint.node.innerText.substring(0, endPoint.offset), endPoint.node).width
-    
-            Utils.setStyle(editor.cursor, {
-                left: posi.left + offset,
-                top: posi.top,
-                height: endPoint.node.offsetHeight,
-                visibility: 'visible'
-            })
+        switch (getType(endPoint.node)) {
+            case 'text': {
+                const posi = Utils.getRelativePosition(endPoint.node, editor.viewLines);
+                const offset =
+                    Utils.getStrPx(endPoint.node.innerText.substring(0, endPoint.offset), endPoint.node).width
 
-            return;
-        }
-
-        if(type === 'unit-block'){
-            const posi = Utils.getRelativePosition(endPoint.node, editor.viewLines);
-            let offset = 0;
-            if(endPoint.offset === 1){
-                offset = Utils.getElementInfo(endPoint.node).width;
+                Utils.setStyle(editor.cursor, {
+                    left: posi.left + offset,
+                    top: posi.top,
+                    height: endPoint.node.offsetHeight,
+                    visibility: 'visible'
+                })
+                break;
             }
+            case 'unit-block': case 'image': {
+                const posi = Utils.getRelativePosition(endPoint.node, editor.viewLines);
+                let offset = -Utils.getElementInfo(editor.cursor).width;
+                if (endPoint.offset === 1) {
+                    offset = Utils.getElementInfo(endPoint.node).width;
+                }
 
-            Utils.setStyle(editor.cursor, {
-                left: posi.left + offset,
-                top: posi.top,
-                height: endPoint.node.offsetHeight,
-                visibility: 'visible'
-            })
-
-            return;
+                Utils.setStyle(editor.cursor, {
+                    left: posi.left + offset,
+                    top: posi.top,
+                    height: endPoint.node.offsetHeight,
+                    visibility: 'visible'
+                })
+                break;
+            }
         }
-        
     })
 }
 
 export function createCursor(): HTMLTextAreaElement {
     const cursor = document.createElement("textarea");
-    cursor.addEventListener("blur", ()=>{
+    cursor.addEventListener("blur", () => {
         // Utils.setStyle(cursor, {visibility: "hidden"});
     })
 
@@ -76,7 +70,7 @@ export function createCursor(): HTMLTextAreaElement {
         "left": "91px",
         "width": "1px",
         "height": "18px",
-        "z-index": "-1",
+        "z-index": "1",
         "user-select": "none",
         // "visibility": "hidden"
     })

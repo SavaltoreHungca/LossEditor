@@ -22,21 +22,35 @@ export function getType(node: HTMLElement): EleType | undefined{
     }
 }
 
-export function getUnitBlockFromChild(node: HTMLElement): HTMLElement | undefined {
+export function getNodeFromChild(node: HTMLElement): HTMLElement | undefined{
     let cur = node;
     while (true) {
         const type = getType(cur);
-        if(type && type !== 'unit-block'){
-            return undefined;
+        if(type){
+            return cur;
         }
-        if (type === 'unit-block') return cur;
-        if (type === 'view-lines') return undefined;
         if(cur.parentElement){
             cur = cur.parentElement;
         }else{
             return undefined;
         }
     }
+}
+
+export function getImageBlockFromChild(node: HTMLElement): HTMLElement | undefined{
+    const ans = getNodeFromChild(node);
+    if(ans && getType(ans) === 'image'){
+        return ans;
+    }
+    return undefined;
+}
+
+export function getUnitBlockFromChild(node: HTMLElement): HTMLElement | undefined {
+    const ans = getNodeFromChild(node);
+    if(ans && getType(ans) === 'unit-block'){
+        return ans;
+    }
+    return undefined;
 }
 
 export function createElement(type: EleType) {
@@ -54,7 +68,7 @@ export function createElement(type: EleType) {
         case 'image':
             const image = document.createElement("div");
             image.setAttribute("data-ele-type", "image");
-            Utils.setStyle(image, { display: 'block', position: 'relative' });
+            Utils.setStyle(image, { display: 'block', position: 'relative', cursor: 'pointer' });
             return image;
         case 'table':
             const table = document.createElement("div");
@@ -84,12 +98,12 @@ export function createElement(type: EleType) {
         case 'paragraph':
             const paragraph = document.createElement("div");
             paragraph.setAttribute("data-ele-type", "paragraph");
-            Utils.setStyle(paragraph, { display: 'block', position: 'relative' });
+            Utils.setStyle(paragraph, { display: 'block', position: 'relative', cursor: 'text' });
             return paragraph;
         case 'paragraph-line':
             const line = document.createElement("div");
             line.setAttribute("data-ele-type", "paragraph-line");
-            Utils.setStyle(line, { display: 'block', position: 'relative', width: 'fit-content' });
+            Utils.setStyle(line, { display: 'block', position: 'relative', width: 'fit-content', cursor: 'text' });
             return line;
         case 'text':
             const text = document.createElement('span');

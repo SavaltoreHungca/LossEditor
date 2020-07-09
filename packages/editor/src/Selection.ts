@@ -1,6 +1,6 @@
 import { Editor } from "./Editor";
 import { DragState, Utils } from "utils";
-import { getType, getUnitBlockFromChild } from "./utils";
+import { getType, getUnitBlockFromChild, getImageBlockFromChild } from "./utils";
 import { Constants } from "./Constants";
 
 export interface Point {
@@ -64,6 +64,8 @@ export class Selection {
             this._ancestor = this.end.node;
             return this._ancestor;
         }
+
+
         const startParents = [];
         const endParents = [];
         let parent: HTMLElement | null = this.start.node;
@@ -96,6 +98,8 @@ export class Selection {
             }
         }
 
+
+        /** 计算start和end的相对位置 */
         while (Utils.statckPeek(startParents) !== this._ancestor) {
             startParents.pop();
         }
@@ -140,82 +144,129 @@ export class Selection {
 let selection: Selection;
 export function listenUserChangeSelection(editor: Editor) {
     Utils.addEventListener('drag', editor.viewLines, (e: DragState) => {
-        if (e.event?.target) {
-            const srcElement = <HTMLElement>e.event.target;
+        if (!e.event?.target) return;
 
-            if (e.pressed === true && e.registered === false)
-                selection = new Selection();
 
-            if (getType(srcElement) === 'text') {
-                const mousePosi = Utils.getMousePositionInElement(srcElement, <MouseEvent>e.event);
-                const accuracyWidth = Utils.getStrPx(Constants.WIDTH_BASE_CHAR, srcElement).width;
-                let critical = srcElement.innerText.length / 2 + 1;
-                while (true) {
-                    let text = srcElement.innerText.substring(0, critical);
-                    let textLen = Utils.getStrPx(text, srcElement).width;
-                    let accuracy = Math.abs(mousePosi.left - textLen);
-                    if (accuracy < accuracyWidth) {
-                        let nextText;
-                        let nextTextLen;
-                        let nextAccuracy;
-                        let nextCritical;
-                        while(true){
-                            if(mousePosi.left > textLen){
-                                nextCritical = critical + 1;
-                            }else{
-                                nextCritical =  critical - 1;
-                            }
-                            nextText = srcElement.innerText.substring(0, nextCritical);
-                            nextTextLen = Utils.getStrPx(nextText, srcElement).width;
-                            nextAccuracy = Math.abs(mousePosi.left - nextTextLen);
-                            if(nextAccuracy >= accuracy){
-                                break;
-                            }else{
-                                text = nextText;
-                                textLen = nextTextLen;
-                                accuracy = nextAccuracy;
-                                critical = nextCritical;
-                            }
-                        }
-                        
-                        if (e.pressed && e.registered === false) {
-                            selection.start = { offset: text.length, node: srcElement }
-                        } else if (!Utils.isUndfined(selection)) {
-                            selection.end = { offset: text.length, node: srcElement }
-                            editor.selection = selection;
-                            editor.eventManager.triggleEvent(Constants.events.SELECTION_CHANGE);
-                        }
-                        break;
-                    }
-                    if (textLen > mousePosi.left) {
-                        critical -= critical / 2 + 1;
-                        continue;
-                    }
-                    if (textLen < mousePosi.left) {
-                        critical += critical / 2 + 1;
-                        continue;
-                    }
-                }
-            }
+        const srcElement = <HTMLElement>e.event.target;
 
-            const unitBlock = getUnitBlockFromChild(srcElement);
-            if(unitBlock){
-                const mousePosi = Utils.getMousePositionInElement(unitBlock, <MouseEvent>e.event);
-                const unitBlockInfo = Utils.getElementInfo(unitBlock);
-                console.log(mousePosi)
-                console.log(unitBlockInfo);
-                let offset = 0;
-                if(mousePosi.left > unitBlockInfo.width/2){
-                    offset = 1;
-                }
-                if (e.pressed && e.registered === false) {
-                    selection.start = { offset: offset, node: unitBlock }
-                } else if (!Utils.isUndfined(selection)) {
-                    selection.end = { offset: offset, node: unitBlock }
-                    editor.selection = selection;
-                    editor.eventManager.triggleEvent(Constants.events.SELECTION_CHANGE);
-                }
-            }
+        if (e.pressed === true && e.registered === false) {
+            selection = new Selection();
+        }
+
+        switch (getType(srcElement)) {
+            case 'text':
+                setSelectionForText(editor, selection, e, srcElement);
+                break;
+            case 'paragraph-line':
+                setSelectionForParagraphLine(editor, selection, e, srcElement);
+                break;
+            case 'content-container':
+                setSelectionForContentContainer(editor, selection, e, srcElement);
+                break;
+        }
+
+        const unitBlock = getUnitBlockFromChild(srcElement);
+        if (unitBlock) {
+            setSelectionForBlock(editor, selection, e, unitBlock);
+        }
+
+        const imageBlock = getImageBlockFromChild(srcElement);
+        if (imageBlock) {
+            setSelectionForBlock(editor, selection, e, imageBlock);
         }
     })
+}
+
+function setSelection(editor: Editor, selection: Selection, e: DragState, offset: number, node: HTMLElement) {
+    if (e.pressed && e.registered === false) {
+        selection.start = { offset: offset, node: node }
+    } else if (!Utils.isUndfined(selection)) {
+        selection.end = { offset: offset, node: node }
+        editor.selection = selection;
+        console.log(selection);
+        editor.eventManager.triggleEvent(Constants.events.SELECTION_CHANGE);
+    }
+}
+
+function setSelectionForText(editor: Editor, selection: Selection, e: DragState, textNode: HTMLElement) {
+    const mousePosi = Utils.getMousePositionInElement(textNode, <MouseEvent>e.event);
+    const accuracyWidth = Utils.getStrPx(Constants.WIDTH_BASE_CHAR, textNode).width;
+    let critical = textNode.innerText.length / 2 + 1;
+    while (true) {
+        let text = textNode.innerText.substring(0, critical);
+        let textLen = Utils.getStrPx(text, textNode).width;
+        let accuracy = Math.abs(mousePosi.left - textLen);
+        if (accuracy < accuracyWidth) {
+            let nextText;
+            let nextTextLen;
+            let nextAccuracy;
+            let nextCritical;
+            while (true) {
+                if (mousePosi.left > textLen) {
+                    nextCritical = critical + 1;
+                } else {
+                    nextCritical = critical - 1;
+                }
+                nextText = textNode.innerText.substring(0, nextCritical);
+                nextTextLen = Utils.getStrPx(nextText, textNode).width;
+                nextAccuracy = Math.abs(mousePosi.left - nextTextLen);
+                if (nextAccuracy >= accuracy) {
+                    break;
+                } else {
+                    text = nextText;
+                    textLen = nextTextLen;
+                    accuracy = nextAccuracy;
+                    critical = nextCritical;
+                }
+            }
+
+            setSelection(editor, selection, e, text.length, textNode);
+            break;
+        }
+        if (textLen > mousePosi.left) {
+            critical -= critical / 2 + 1;
+            continue;
+        }
+        if (textLen < mousePosi.left) {
+            critical += critical / 2 + 1;
+            continue;
+        }
+    }
+}
+
+function setSelectionForBlock(editor: Editor, selection: Selection, e: DragState, blockNode: HTMLElement) {
+    const mousePosi = Utils.getMousePositionInElement(blockNode, <MouseEvent>e.event);
+    const unitBlockInfo = Utils.getElementInfo(blockNode);
+    let offset = 0;
+    if (mousePosi.left > unitBlockInfo.width / 2) {
+        offset = 1;
+    }
+    setSelection(editor, selection, e, offset, blockNode);
+}
+
+function setSelectionForParagraphLine(editor: Editor, selection: Selection, e: DragState, paragraphLine: HTMLElement) {
+    const latestElement = <HTMLElement>paragraphLine.lastElementChild;
+    switch (getType(latestElement)) {
+        case 'text': {
+            const text = latestElement.innerText;
+            setSelection(editor, selection, e, text.length, latestElement);
+            break;
+        }
+        case 'unit-block': {
+            setSelectionForBlock(editor, selection, e, latestElement);
+            break;
+        }
+    }
+}
+
+function setSelectionForContentContainer(editor: Editor, selection: Selection, e: DragState, container: HTMLElement) {
+    if (container.childElementCount !== 1) {
+        throw new Error('错误的 content-container 数量');
+    }
+    const innerElement = <HTMLElement>container.firstElementChild;
+    switch (getType(innerElement)) {
+        case 'image':
+            setSelectionForBlock(editor, selection, e, innerElement);
+            break;
+    }
 }

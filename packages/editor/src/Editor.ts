@@ -6,6 +6,7 @@ import { createElement } from './utils';
 import { DragState } from 'utils';
 import { listenUserChangeSelection, Selection } from './Selection';
 import { listenContainerSizeChange } from './autoResize';
+import { listenSelectionChangeToSetSelectedRegion } from './renderSelectedRegion';
 
 
 export class Editor {
@@ -13,6 +14,7 @@ export class Editor {
     container: HTMLElement;
     viewLines: HTMLElement = createElement('view-lines');
     backLayer: HTMLElement = createElement('back-layer');
+    regionContainer: HTMLElement = document.createElement('div');
     eventManager: EventManager = new EventManager();
     dataListener: DataListener = new DataListener(200);
     selection: Selection | undefined;
@@ -43,11 +45,17 @@ export class Editor {
         Utils.setStyle(this.backLayer, {
             top: containerInfo.innerTop,
             left: containerInfo.innerLeft,
-            width: containerInfo.innerWidth,
-            height: containerInfo.innerHeight,
             'z-index': '-1'
         });
-        this.backLayer.append(this.cursor);
+        this.backLayer.appendChild(this.cursor);
+        Utils.setStyle(this.regionContainer, {
+            display: 'block',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            'z-index': '-1'
+        })
+        this.backLayer.appendChild(this.regionContainer);
         this.__init__();
     }
 
@@ -70,6 +78,7 @@ export class Editor {
         listenUserChangeSelection(this);
         listenSelectionToSetCursor(this);
         listenContainerSizeChange(this);
+        listenSelectionChangeToSetSelectedRegion(this);
     }
 
 }

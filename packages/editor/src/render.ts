@@ -83,12 +83,15 @@ function renderParagraph(textBlock: TextType, viewLines: HTMLElement) {
                         break;
                 }
                 Utils.getElementInfoBatch((lineInfo, paragraphInfo) => {
+                    if (!line || !unit) throw new Error();
+
                     if (paragraphInfo.innerWidth - lineInfo.width <
-                        Utils.getStrPx(Constants.WIDTH_BASE_CHAR, <HTMLElement>line).width) {
+                        Utils.getStrPx(Constants.WIDTH_BASE_CHAR, line).width) {
                         if (lineInfo.width > paragraphInfo.innerWidth) {
-                            line?.removeChild(<HTMLElement>unit);
+                            line?.removeChild(unit);
                             i = start - 1;
                         }
+                        Utils.setStyle(line, { width: 'auto' });
                         line = undefined;
                     }
                 }, line, paragraph);
@@ -102,21 +105,27 @@ function renderParagraph(textBlock: TextType, viewLines: HTMLElement) {
                 line.appendChild(unit);
             }
             Utils.getElementInfoBatch((lineInfo, paragraphInfo) => {
+                if (!line || !unit) throw new Error();
+
                 if (paragraphInfo.innerWidth - lineInfo.width <
-                    Utils.getStrPx(Constants.WIDTH_BASE_CHAR, <HTMLElement>unit).width) {
+                    Utils.getStrPx(Constants.WIDTH_BASE_CHAR, unit).width) {
                     if (lineInfo.width > paragraphInfo.innerWidth) {
-                        const innerText = (<HTMLElement>unit).innerText;
-                        (<HTMLElement>unit).innerText = innerText.substring(0, innerText.length - 1);
+                        const innerText = unit.innerText;
+                        unit.innerText = innerText.substring(0, innerText.length - 1);
                         i--
                     }
                     i--;
+                    Utils.setStyle(line, { width: 'auto' });
                     line = undefined;
                     unit = undefined;
                 } else {
-                    (<HTMLElement>unit).innerText += c;
+                    unit.innerText += c;
                 }
             }, line, paragraph);
         }
+    }
+    if(line){
+        Utils.setStyle(line, { width: 'auto' });
     }
 }
 
