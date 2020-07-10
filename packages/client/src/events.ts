@@ -22,7 +22,8 @@ function initializeUi(memLoss: MemLoss) {
         const { container } = memLoss.elements;
         if (!container) throw new Error('container uninitialize');
         container.setStyle({
-            display: 'flex'
+            display: 'flex',
+            'user-select': 'none'
         });
 
         const idSet = {

@@ -7,10 +7,11 @@ import { DragState } from 'utils';
 import { listenUserChangeSelection, Selection } from './Selection';
 import { listenContainerSizeChange } from './autoResize';
 import { listenSelectionChangeToSetSelectedRegion } from './renderSelectedRegion';
+import { listenTextInput } from './textInput';
 
 
 export class Editor {
-    cursor: HTMLTextAreaElement = createCursor();
+    cursor: HTMLTextAreaElement;
     container: HTMLElement;
     viewLines: HTMLElement = createElement('view-lines');
     backLayer: HTMLElement = createElement('back-layer');
@@ -19,9 +20,11 @@ export class Editor {
     dataListener: DataListener = new DataListener(200);
     selection: Selection | undefined;
     data: any;
+    inputText: string = '';
 
     constructor(container: HTMLElement) {
         this.container = container;
+        this.cursor = createCursor(this);
         Utils.setStyle(this.container, {
             "white-space": "pre",
             position: "relative",
@@ -71,14 +74,11 @@ export class Editor {
     }
 
     private __init__() {
-
-        this.viewLines.addEventListener("click", (event: MouseEvent) => {
-            this.cursor.focus();
-        });
         listenUserChangeSelection(this);
         listenSelectionToSetCursor(this);
         listenContainerSizeChange(this);
         listenSelectionChangeToSetSelectedRegion(this);
+        listenTextInput(this);
     }
 
 }

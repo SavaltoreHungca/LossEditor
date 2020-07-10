@@ -6,7 +6,7 @@ import { Editor } from "./Editor";
 export function listenSelectionToSetCursor(editor: Editor) {
     editor.eventManager.registryEvent(Constants.events.SELECTION_CHANGE, () => {
         const endPoint = editor.selection?.end;
-        if (!endPoint?.node) return;
+        if (!endPoint) return;
 
         switch (getType(endPoint.node)) {
             case 'text': {
@@ -38,18 +38,20 @@ export function listenSelectionToSetCursor(editor: Editor) {
                 break;
             }
         }
+        editor.cursor.value = '';
+        editor.cursor.focus({preventScroll: true});
     })
 }
 
-export function createCursor(): HTMLTextAreaElement {
+
+let skipInputEvent = false;
+export function createCursor(editor: Editor): HTMLTextAreaElement {
     const cursor = document.createElement("textarea");
     cursor.addEventListener("blur", () => {
         // Utils.setStyle(cursor, {visibility: "hidden"});
     })
 
     Utils.setStyle(cursor, {
-        "min-width": "0",
-        "min-height": "0",
         "margin": "0",
         "padding": "0",
         "position": "absolute",
@@ -72,27 +74,23 @@ export function createCursor(): HTMLTextAreaElement {
         "height": "18px",
         "z-index": "1",
         "user-select": "none",
+        'white-space': 'pre',
+        animation: 'flashing-cursor 600ms infinite;'
         // "visibility": "hidden"
     })
 
-    const blink = () => {
-        if (Utils.getComputedStyle(cursor, "opacity") !== 100) {
-            Utils.setStyle(cursor, { opacity: 100 })
-        } else {
-            Utils.setStyle(cursor, { opacity: 0 })
-        }
-        setTimeout(blink, 700);
-    }
-    blink();
-
     cursor.addEventListener("compositionstart", (event) => {
-        console.log(event);
+        skipInputEvent = true;
     })
-    cursor.addEventListener("compositionupdate", (event) => {
-        console.log(event);
+    cursor.addEventListener("compositionend", (event: any) => {
+        editor.inputText = event.data;
+        skipInputEvent = false;
+        editor.eventManager.triggleEvent(Constants.events.TEXT_INPUT);
     })
-    cursor.addEventListener("compositionend", (event) => {
-        console.log(event);
+    cursor.addEventListener('input', (event: any) => {
+        if(skipInputEvent) return;
+        editor.inputText = event.data;
+        editor.eventManager.triggleEvent(Constants.events.TEXT_INPUT);
     })
     return cursor;
 }

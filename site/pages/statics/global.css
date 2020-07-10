@@ -17,3 +17,15 @@
 .text-underline-selected:hover {
     text-decoration: underline;
 }
+
+@keyframes flashing-cursor {
+    from {
+        opacity: 1.0;
+    }
+    50% {
+        opacity: 0;
+    }
+    to {
+        opacity: 1.0;
+    }
+}

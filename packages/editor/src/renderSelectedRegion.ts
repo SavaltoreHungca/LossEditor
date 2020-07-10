@@ -19,68 +19,84 @@ export function listenSelectionChangeToSetSelectedRegion(editor: Editor) {
         switch (getType(ancestor)) {
             case 'text':
             case 'unit-block':
+            case 'image':
             case 'paragraph-line': {
                 const { left, right } = selection.leftAndRight;
 
-                const leftPosi = Utils.getRelativePosition(left.node, editor.viewLines);
-                const rightPosi = Utils.getRelativePosition(right.node, editor.viewLines);
                 const linePosi = Utils.getRelativePosition(ancestor, editor.viewLines);
-                const leftPointSelectWidth = getPointSelectedWidth(left);
-                const rightPointSelectWidth = getPointSelectedWidth(right);
-
-                const region = document.createElement('div');
-                editor.regionContainer.innerHTML = '';
-                editor.regionContainer.appendChild(region);
-
-                Utils.setStyle(region, {
-                    position: 'absolute',
-                    display: 'block',
-                    background: '#add6ff',
-                    left: leftPosi.left + leftPointSelectWidth,
-                    top: linePosi.top,
-                    width: Math.abs((leftPosi.left + leftPointSelectWidth) - (rightPosi.left + rightPointSelectWidth)),
-                    height: ancestor.offsetHeight,
-                    'border-radius': '3px 3px 3px 3px',
-                    'z-index': '-1'
-                });
+                const leftInfo = getPointInfo(left, editor.viewLines);
+                const rightInfo = getPointInfo(right, editor.viewLines);
+                appendRegion(editor.regionContainer,
+                    leftInfo.selectedRightBorderLeft,
+                    linePosi.top,
+                    Math.abs(leftInfo.selectedRightBorderLeft - rightInfo.selectedRightBorderLeft),
+                    ancestor.offsetHeight,
+                    true)
 
                 break;
             }
             case 'paragraph': {
                 editor.regionContainer.innerHTML = '';
-                const { left, right } = selection.leftAndRight;
 
+                const { left, right } = selection.leftAndRight;
                 const leftLine = left.node.parentElement;
                 const rightLine = right.node.parentElement;
+                
                 let middleLine = leftLine;
                 while (middleLine?.nextElementSibling !== rightLine) {
                     middleLine = <HTMLElement>middleLine?.nextElementSibling;
-                    const region = document.createElement('div');
-                    editor.regionContainer.appendChild(region);
                     const middlePosi = Utils.getRelativePosition(middleLine, editor.viewLines);
-                    Utils.setStyle(region, {
-                        position: 'absolute',
-                        display: 'block',
-                        background: '#add6ff',
-                        left: middlePosi.left,
-                        top: middlePosi.top,
-                        width: middleLine.offsetWidth,
-                        height: middleLine.offsetHeight,
-                        'border-radius': '3px 3px 3px 3px',
-                        'z-index': '-1'
-                    });
+                    appendRegion(editor.regionContainer,
+                        middlePosi.left,
+                        middlePosi.top,
+                        middleLine.offsetWidth,
+                        middleLine.offsetHeight)
                 }
 
+                if (!leftLine || !rightLine) throw new Error();
+
+                const leftLinePosi = Utils.getRelativePosition(leftLine, editor.viewLines);
+                const rightLinePosi = Utils.getRelativePosition(rightLine, editor.viewLines);
+
+                const leftInfo = getPointInfo(left, editor.viewLines);
+                const rightInfo = getPointInfo(right, editor.viewLines);
+                appendRegion(editor.regionContainer,
+                    leftInfo.selectedRightBorderLeft,
+                    leftLinePosi.top,
+                    leftLinePosi.rightBoderLeft - leftInfo.selectedRightBorderLeft,
+                    leftLine.offsetHeight)
+                
+                appendRegion(editor.regionContainer,
+                    rightLinePosi.left,
+                    rightLinePosi.top,
+                    rightInfo.selectedRightBorderLeft - rightLinePosi.left,
+                    rightLine.offsetHeight)
+
                 break;
+            }
+            case 'view-lines': {
+                
             }
         }
     });
 }
 
+function getPointInfo(point: Point, container: HTMLElement) {
+    const posi = Utils.getRelativePosition(point.node, container);
+    const selectedWidth = getPointSelectedWidth(point);
+    return {
+        ...posi,
+        selectedWidth: selectedWidth,
+        selectedRightBorderLeft: posi.left + selectedWidth
+    }
+}
+
 function getPointSelectedWidth(point: Point): number {
     switch (getType(point.node)) {
+        case 'paragraph-line':
+        case 'image':
         case 'unit-block':
-            return getUnitBlockSelectedWidth(point);
+            return getBlockSelectedWidth(point);
         case 'text':
             return getTextSelectedWidth(point);
     }
@@ -92,7 +108,7 @@ function getTextSelectedWidth(point: Point): number {
     return Utils.getStrPx(node.innerText.substring(0, point.offset), node).width;
 }
 
-function getUnitBlockSelectedWidth(point: Point) {
+function getBlockSelectedWidth(point: Point) {
     const node = point.node;
     if (point.offset === 1) {
         return Utils.getElementInfo(node).width;
@@ -100,6 +116,20 @@ function getUnitBlockSelectedWidth(point: Point) {
     return 0;
 }
 
-function setRegionForText() {
+function appendRegion(container: HTMLElement, left: number, top: number, width: number, height: number, clearContainer?: boolean) {
+    if (clearContainer) container.innerHTML = '';
 
+    const region = document.createElement('div');
+    container.appendChild(region);
+    Utils.setStyle(region, {
+        position: 'absolute',
+        display: 'block',
+        background: '#add6ff',
+        left: left,
+        top: top,
+        width: width,
+        height: height,
+        'border-radius': '3px 3px 3px 3px',
+        'z-index': '-1'
+    });
 }

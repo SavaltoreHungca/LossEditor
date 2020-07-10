@@ -6,12 +6,12 @@ export var editorcontent = [
     },
     {
         type: 'paragraph',
-        content: "内嵌代码框笑[[code(http://baidu.com)]]嘻嘻, 我的附件[[attachment(http://baidu.com)]]在这里呢"
+        content: "内嵌代码框[[code(http://baidu.com)]], 我的附件[[attachment(http://baidu.com)]]在这里呢"
     },
     {
         type: 'paragraph',
         indentation: 1,
-        content: "       工业和信息化部、财政部、商务部等5部门22日联合发布了修改后的乘用车企业平均燃料消耗量与新能源汽车积分并行管理办法，也就是常说的“双积分”管理办法。新办法更大力度提升了对企业节能减排方面的优惠政策，使汽车企业节能减排更“有利可图”"
+        content: "[[attachment(http://baidu.com)]]工业和信息化部、财政部、商务部[[attachment(http://baidu.com)]]等5部门22日联合发布了修改后的乘用车企业平均燃料消耗量与新能源汽车[[attachment(http://baidu.com)]]积分并行管理办法，也就是常说的“双积分”管理办法。新办法更大力度提[[attachment(http://baidu.com)]]升了对企业节能减排方面的优惠政策，使汽车企业节能减排更“有利可图”[[attachment(http://baidu.com)]]"
     },
     {
         type: 'image',

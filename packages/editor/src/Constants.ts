@@ -8,7 +8,8 @@ export class Constants {
     }
 
     static events = {
-        SELECTION_CHANGE: "SELECTION_CHANGE"
+        SELECTION_CHANGE: "SELECTION_CHANGE",
+        TEXT_INPUT: "TEXT_INPUT",
     }
 
 }

@@ -243,9 +243,11 @@ export class Utils {
         return ans;
     }
     static getRelativePosition(elemt: HTMLElement, parent: HTMLElement) {
+        const originalElement = elemt;
         const ans = {
             left: 0, top: 0,
-            right: 0, bottom: 0
+            right: 0, bottom: 0,
+            rightBoderLeft: 0, bottomBorderLeft: 0,
         }
         while (elemt !== parent) {
             ans.left += elemt.offsetLeft;
@@ -256,6 +258,10 @@ export class Utils {
         const elemtInfo = this.getElementInfo(elemt);
         ans.bottom = parentInfo.innerHeight - ans.top - elemtInfo.height;
         ans.right = parentInfo.innerWidth - ans.left - elemtInfo.width;
+
+        const originalElementInfo = this.getElementInfo(originalElement);
+        ans.rightBoderLeft = ans.left + originalElementInfo.width;
+        ans.bottomBorderLeft = ans.top + originalElementInfo.height;
         return ans;
     }
     static splitToSuitLength(container: HTMLElement, str: string) {
@@ -318,11 +324,8 @@ export class Utils {
             const startResize = (event: MouseEvent) => {
                 let dragState = this.dragStates.get(dragStateId);
                 if (!dragState) throw new Error('Sys error');
-                window.getSelection()?.removeAllRanges();
                 if (dragState.pressed && !dragState.registered) {
                     dragState.registered = true;
-                    Utils.setStyle(document.body, { "user-select": "none" });
-                    window.getSelection()?.removeAllRanges();
                     document.addEventListener('mousemove', resizing);
                     document.addEventListener('mouseup', resizeDone);
                     document.removeEventListener('mousemove', startResize);
@@ -336,7 +339,6 @@ export class Utils {
                     dragState.deltaY = event.screenY - dragState.startY;
                     dragState.startX += dragState.deltaX;
                     dragState.startY += dragState.deltaY;
-                    window.getSelection()?.removeAllRanges();
                     dragState.event = event;
                     callback(dragState);
                 }
@@ -347,8 +349,6 @@ export class Utils {
                 if (dragState.pressed) {
                     dragState.pressed = false;
                     dragState.registered = false;
-                    Utils.setStyle(document.body, { "user-select": "" });
-                    window.getSelection()?.removeAllRanges();
                     dragState.event = event;
                     callback(dragState);
                     document.removeEventListener('mousemove', resizing);
