@@ -8,6 +8,9 @@ import { listenUserChangeSelection, Selection } from './Selection';
 import { listenContainerSizeChange } from './autoResize';
 import { listenSelectionChangeToSetSelectedRegion } from './renderSelectedRegion';
 import { listenTextInput } from './textInput';
+import { listenUserPressKey } from './keyboard';
+import { registryEvents } from './events';
+import { Constants } from './Constants';
 
 
 export class Editor {
@@ -25,46 +28,22 @@ export class Editor {
     constructor(container: HTMLElement) {
         this.container = container;
         this.cursor = createCursor(this);
-        Utils.setStyle(this.container, {
-            "white-space": "pre",
-            position: "relative",
-            "font-family": 'Menlo, Monaco, "Courier New", monospace',
-            "font-weight": 'normal',
-            "font-size": '12px',
-            "font-feature-settings": '"liga" 0, "calt" 0',
-            "line-height": '18px',
-            "letter-spacing": '0px',
-            height: 'fit-content'
-        });
-        this.container.appendChild(this.viewLines);
-        const containerInfo = Utils.getElementInfo(container);
-        Utils.setStyle(this.viewLines, {
-            top: containerInfo.innerTop,
-            left: containerInfo.innerLeft,
-            width: containerInfo.innerWidth,
-            'user-select': 'none'
-        });
-        this.container.appendChild(this.backLayer);
-        Utils.setStyle(this.backLayer, {
-            top: containerInfo.innerTop,
-            left: containerInfo.innerLeft,
-            'z-index': '-1'
-        });
-        this.backLayer.appendChild(this.cursor);
-        Utils.setStyle(this.regionContainer, {
-            display: 'block',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            'z-index': '-1'
-        })
-        this.backLayer.appendChild(this.regionContainer);
+        registryEvents(this);
+        this.eventManager.triggleEvent(Constants.events.ELEMENTS_CREATED);
         this.__init__();
+
+        render([
+            {
+                type: 'paragraph',
+                indentation: 0,
+                content: "none"
+            }
+        ], this.viewLines);
     }
 
     render(data: any){
-        this.data = data;
-        render(data, this.viewLines);
+        // this.data = data;
+        // render(data, this.viewLines);
     }
 
     updateSize(){
@@ -79,6 +58,7 @@ export class Editor {
         listenContainerSizeChange(this);
         listenSelectionChangeToSetSelectedRegion(this);
         listenTextInput(this);
+        listenUserPressKey(this);
     }
 
 }

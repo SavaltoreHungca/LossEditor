@@ -3,11 +3,14 @@ import { createElement, getType } from "../utils";
 import { Utils } from "utils";
 import { renderAttachment } from "./renderAttachment";
 import { renderCodeOpen } from "./renderCodeOpen";
-import uuid from 'uuid';
 const katex = require('katex');
 
-interface TextType extends BlockType {
+interface Style {
+    [index: number]: [string, number]
+}
 
+interface TextType extends BlockType {
+    style?: Style
 }
 
 export function setUnitBlockType(node: HTMLElement, type: string, value: string) {
@@ -22,26 +25,42 @@ export function getUnitBlockType(node: HTMLElement) {
     }
 }
 
-const lineValueKey = '_' + uuid.v1().replace(/-/g, '');
-export function setLineValue(node: HTMLElement, value: string){
-    if(getType(node) !== 'paragraph-line') throw new Error('错误的类型');
-    node[lineValueKey] = value;
+
+export function setLineValue(node: HTMLElement, value: string) {
+    if (getType(node) !== 'paragraph-line') throw new Error('错误的类型');
+    node['memloss-text'] = value;
 }
 
-export function getLineValue(node: HTMLElement){
-    if(getType(node) !== 'paragraph-line') throw new Error('错误的类型');
-    return node[lineValueKey];
+export function getLineValue(node: HTMLElement) {
+    if (getType(node) !== 'paragraph-line') throw new Error('错误的类型');
+    return node['memloss-text'];
+}
+
+export function setStartPosi(node: HTMLElement, startPosi: number): void {
+    switch (getType(node)) {
+        case 'text': case 'unit-block': break;
+        default: throw new Error('错误的类型');
+    }
+    node['memloss-start-posi'] = startPosi;
+}
+
+export function getStartPosi(node: HTMLElement): number {
+    switch (getType(node)) {
+        case 'text': case 'unit-block': break;
+        default: throw new Error('错误的类型');
+    }
+    return node['memloss-start-posi'];
 }
 
 export function renderParagraph(textBlock: TextType, viewLines: HTMLElement) {
     const paragraph = createElement('paragraph');
     viewLines.appendChild(paragraph);
     let line: HTMLElement | undefined = undefined;
-    
+
     const paragraphInfo = Utils.getElementInfo(paragraph);
     let lessStr = textBlock.content;
-    while(lessStr){
-        if(!line) {
+    while (lessStr) {
+        if (!line) {
             line = createElement('paragraph-line');
             paragraph.appendChild(line);
         }
@@ -52,16 +71,23 @@ export function renderParagraph(textBlock: TextType, viewLines: HTMLElement) {
 }
 
 
-function renderTextInLine(str: string, container: HTMLElement, maxWdith: number): string {
+export function renderTextInLine(str: string, style: Style, styleOffset: number, container: HTMLElement, maxWdith: number): string {
     Utils.setStyle(container, { width: 'fit-content' });
     let ans = '';
     let unit: HTMLElement | undefined = undefined;
     for (let i = 0; i < str.length; i++) {
+        if(style[i]){
+            unit = createElement('text');
+            unit.style.cssText = style[i][0];
+            
+        }
+
         const { nextPosition, unitBlock, type, value } = findUnitBlock(str, i);
         if (unitBlock) {
             unit = createElement('unit-block');
             container.appendChild(unit);
             setUnitBlockType(unit, type, value);
+            setStartPosi(unit, i);
             switch (type) {
                 case 'formula':
                     Utils.setStyle(unit, { cursor: 'pointer' });
@@ -89,6 +115,7 @@ function renderTextInLine(str: string, container: HTMLElement, maxWdith: number)
         else {
             if (!unit) {
                 unit = createElement('text');
+                setStartPosi(unit, i);
                 container.appendChild(unit);
             }
             unit.innerText += str[i];

@@ -386,8 +386,11 @@ export class Utils {
         elemt.className += " " + c;
     }
 
+    static randmonId() {
+        return "_" + uuid.v1().replace(/-/g, '');
+    }
     static anonyFunction(func: Function): string {
-        const funcName = "_" + uuid.v1().replace(/-/g, '');
+        const funcName = this.randmonId();
         window[funcName] = func;
         return funcName;
     }
@@ -419,14 +422,18 @@ export class Utils {
 
     static getRefStageNode<T>(node: T, root: T, stage: number, getParent: (node: T) => T | undefined | null) {
         const path = new Array<T>();
-        while(node && node !== root){
+        while (node && node !== root) {
             path.push(node);
             node = <T>getParent(node);
         }
-        if(node !== root) return undefined;
+        if (node !== root) return undefined;
         path.push(root);
-        if(path.length > stage){
+        if (path.length > stage) {
             return path[path.length - 1 - stage];
         }
+    }
+
+    static insertStrBefore(soure: string, start: number, newStr: string) {
+        return soure.slice(0, start) + newStr + soure.slice(start);
     }
 }

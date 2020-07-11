@@ -80,8 +80,8 @@ function createWindow(memloss: MemLoss, container: EditorWindowCon, nodeParents:
             case 'ok':
                 if (!data) throw new Error();
                 editor.render(data);
-                Utils.getElementInfo($(idset.editorElemt), editorInfo => {
-                    Utils.setStyle($(idset.scrollable), { width: editorInfo.width * 1.2, height: editorInfo.height * 1.2 });
+                Utils.getElementInfo($(idset.resizeContainer), resizeContainerInfo => {
+                    Utils.setStyle($(idset.scrollable), { width: resizeContainerInfo.width * 1.2, height: resizeContainerInfo.height * 1.2 });
                 })
                 break;
         }

@@ -15,9 +15,10 @@ export function listenTextInput(editor: Editor) {
             if (getType(ancestor) === 'text') {
                 const curLine = <HTMLElement>ancestor.parentElement;
                 const paragraph = <HTMLElement>curLine.parentElement;
-
-                Utils.setStyle(curLine, {width: 'fit-content'});
-
+                end.node.innerText = Utils.insertStrBefore(end.node.innerText, end.offset, editor.inputText);
+                end.offset += editor.inputText.length;
+                start.offset += editor.inputText.length;
+                editor.eventManager.triggleEvent(Constants.events.SELECTION_CHANGE);
             }
 
         }
