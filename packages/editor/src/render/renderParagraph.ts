@@ -5,12 +5,25 @@ import { renderAttachment } from "./renderAttachment";
 import { renderCodeOpen } from "./renderCodeOpen";
 const katex = require('katex');
 
-interface Style {
-    [index: number]: [string, number]
+declare type Style = {
+    [index: string]: string
+}
+declare type StyleMap = Array<[number, number, Style]>;
+
+declare type RenderContext = {
+    str: string,
+    strIndex: number,
+    unit: HTMLElement | undefined,
+    maxWidth: number,
+    line: HTMLElement,
+    sortedRanges: Array<[number, number]>,
+    styleMap: Map<[number, number], Style>,
+    exceed: boolean,
+    renderFinish: boolean,
 }
 
 interface TextType extends BlockType {
-    style?: Style
+    styleList?: StyleMap
 }
 
 export function setUnitBlockType(node: HTMLElement, type: string, value: string) {
@@ -25,117 +38,151 @@ export function getUnitBlockType(node: HTMLElement) {
     }
 }
 
-
-export function setLineValue(node: HTMLElement, value: string) {
-    if (getType(node) !== 'paragraph-line') throw new Error('错误的类型');
-    node['memloss-text'] = value;
-}
-
-export function getLineValue(node: HTMLElement) {
-    if (getType(node) !== 'paragraph-line') throw new Error('错误的类型');
-    return node['memloss-text'];
-}
-
-export function setStartPosi(node: HTMLElement, startPosi: number): void {
-    switch (getType(node)) {
-        case 'text': case 'unit-block': break;
-        default: throw new Error('错误的类型');
-    }
-    node['memloss-start-posi'] = startPosi;
-}
-
-export function getStartPosi(node: HTMLElement): number {
-    switch (getType(node)) {
-        case 'text': case 'unit-block': break;
-        default: throw new Error('错误的类型');
-    }
-    return node['memloss-start-posi'];
-}
-
 export function renderParagraph(textBlock: TextType, viewLines: HTMLElement) {
     const paragraph = createElement('paragraph');
     viewLines.appendChild(paragraph);
     let line: HTMLElement | undefined = undefined;
 
     const paragraphInfo = Utils.getElementInfo(paragraph);
-    let lessStr = textBlock.content;
-    while (lessStr) {
-        if (!line) {
-            line = createElement('paragraph-line');
-            paragraph.appendChild(line);
-        }
-        lessStr = renderTextInLine(lessStr, line, paragraphInfo.innerWidth);
-        line = undefined;
+    let offset = 0;
+    const sortedRanges = new Array<[number, number]>();
+    const styleMap = new Map<[number, number], Style>();
+    (textBlock.styleList || []).forEach(item => {
+        const range: [number, number] = [item[0], item[1]];
+        sortedRanges.push(range);
+        styleMap.set(range, item[2]);
+    });
+    console.log(textBlock);
+    while (offset < textBlock.content.length) {
+        line = createElement('paragraph-line');
+        paragraph.appendChild(line);
+
+        offset += renderTextInLine(
+            textBlock.content,
+            sortedRanges,
+            styleMap,
+            offset,
+            line,
+            paragraphInfo.innerWidth
+        );
     }
 
 }
 
 
-export function renderTextInLine(str: string, style: Style, styleOffset: number, container: HTMLElement, maxWdith: number): string {
-    Utils.setStyle(container, { width: 'fit-content' });
-    let ans = '';
-    let unit: HTMLElement | undefined = undefined;
-    for (let i = 0; i < str.length; i++) {
-        if(style[i]){
-            unit = createElement('text');
-            unit.style.cssText = style[i][0];
-            
-        }
+export function renderTextInLine(
+    str: string,
+    sortedRanges: Array<[number, number]>,
+    styleMap: Map<[number, number], Style>,
+    startOffset: number,
+    line: HTMLElement,
+    maxWdith: number): number {
 
-        const { nextPosition, unitBlock, type, value } = findUnitBlock(str, i);
-        if (unitBlock) {
-            unit = createElement('unit-block');
-            container.appendChild(unit);
-            setUnitBlockType(unit, type, value);
-            setStartPosi(unit, i);
-            switch (type) {
-                case 'formula':
-                    Utils.setStyle(unit, { cursor: 'pointer' });
-                    katex.render(value, unit, { throwOnError: false });
-                    break;
-                case 'attachment':
-                    renderAttachment(value, unit);
-                    break;
-                case 'code':
-                    renderCodeOpen(value, unit);
-                    break;
-            }
+    Utils.setStyle(line, { width: 'fit-content' });
 
-            const containerInfo = Utils.getElementInfo(container);
-            if (containerInfo.width > maxWdith) {
-                container.removeChild(unit);
-                ans = str.substring(i, str.length);
-                break;
-            }
-            else {
-                i = nextPosition;
-                unit = undefined;
-            }
-        }
-        else {
-            if (!unit) {
-                unit = createElement('text');
-                setStartPosi(unit, i);
-                container.appendChild(unit);
-            }
-            unit.innerText += str[i];
-
-            const containerInfo = Utils.getElementInfo(container);
-            if (containerInfo.width > maxWdith) {
-                const text = unit.innerText;
-                unit.innerText = text.substring(0, text.length - 1);
-
-                if (!unit.innerText || unit.innerText === '') {
-                    container.removeChild(unit);
-                }
-                ans = str.substring(i, str.length);
-                break;
-            }
-        }
+    const context: RenderContext = {
+        str: str,
+        strIndex: startOffset,
+        unit: undefined,
+        maxWidth: maxWdith,
+        line: line,
+        exceed: false,
+        renderFinish: false,
+        sortedRanges: sortedRanges,
+        styleMap: styleMap,
     }
-    Utils.setStyle(container, { width: 'auto' });
-    setLineValue(container, str.replace(ans, ''));
-    return ans;
+
+    while (!context.renderFinish && !context.exceed) {
+        renderUnitBlock(context);
+        renderText(context);
+    }
+
+    Utils.setStyle(line, { width: 'auto' });
+
+    return context.strIndex
+}
+
+function renderText(context: RenderContext): void {
+    if (context.renderFinish || context.exceed) return;
+
+    const range = Utils.findInWhichRange(context.sortedRanges, context.strIndex);
+    const style = range ? context.styleMap.get(range) : undefined;
+
+    context.unit = createElement('text');
+    context.line.appendChild(context.unit);
+    if (style) Utils.setStyle(context.unit, style);
+
+    while (context.strIndex < context.str.length) {
+        if (findUnitBlock(context.str, context.strIndex).unitBlock) {
+            return;
+        }
+
+        if (range && context.strIndex >= range[1]) {
+            return;
+        }
+
+        context.unit.innerText += context.str[context.strIndex];
+        const lineInfo = Utils.getElementInfo(context.line);
+
+        if (lineInfo.width > context.maxWidth) {
+            const text = context.unit.innerText;
+            context.unit.innerText = text.substring(0, text.length - 1);
+            if (!context.unit.innerText || context.unit.innerText === '') {
+                context.line.removeChild(context.unit);
+            }
+            context.exceed = true;
+            context.unit = undefined;
+            return;
+        }
+
+        context.strIndex += 1;
+    }
+
+    context.unit = undefined;
+    context.renderFinish = true;
+}
+
+function renderUnitBlock(context: RenderContext): void {
+    if (context.renderFinish || context.exceed) return;
+
+    if(context.strIndex >= context.str.length){
+        context.renderFinish = true;
+        return;
+    }
+
+    const { nextPosition, unitBlock, type, value } = findUnitBlock(context.str, context.strIndex);
+    if (!unitBlock) return;
+
+    context.unit = createElement('unit-block');
+    context.line.appendChild(context.unit);
+
+    const range = Utils.findInWhichRange(context.sortedRanges, context.strIndex);
+    const style = range ? context.styleMap.get(range) : undefined;
+
+    if (style) Utils.setStyle(context.unit, style);
+    setUnitBlockType(context.unit, type, value);
+    switch (type) {
+        case 'formula':
+            Utils.setStyle(context.unit, { cursor: 'pointer' });
+            katex.render(value, context.unit, { throwOnError: false });
+            break;
+        case 'attachment':
+            renderAttachment(value, context.unit);
+            break;
+        case 'code':
+            renderCodeOpen(value, context.unit);
+            break;
+    }
+
+    const lineInfo = Utils.getElementInfo(context.line);
+    if (lineInfo.width > context.maxWidth) {
+        context.line.removeChild(context.unit);
+        context.exceed = true;
+    }
+    else {
+        context.strIndex = nextPosition;
+    }
+    context.unit = undefined;
 }
 
 function findUnitBlock(str: string, position: number) {
@@ -158,7 +205,7 @@ function findUnitBlock(str: string, position: number) {
         value: ''
     }
     if (unitStr) {
-        ans.nextPosition = position + 1;
+        ans.nextPosition = position + 2;
         ans.unitBlock = unitStr;
         /\[\[(\S+)\(([\S\s]+)\)\]\]/.test(<string>unitStr);
         ans.type = RegExp.$1;

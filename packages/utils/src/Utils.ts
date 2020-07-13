@@ -436,4 +436,33 @@ export class Utils {
     static insertStrBefore(soure: string, start: number, newStr: string) {
         return soure.slice(0, start) + newStr + soure.slice(start);
     }
+
+    static findInWhichRange(sortedRanges: Array<[number, number]>, value: number): [number, number] | undefined {
+        if (sortedRanges.length === 0) return undefined;
+        let critical = sortedRanges.length / 2 + 1;
+        let preCritical = 0;
+
+        const inRange = (range: [number, number], value: number) => {
+            return value >= range[0] && value < range[1];
+        }
+
+        const inLeft = (range: [number, number], value: number) => {
+            return value < range[0];
+        }
+
+        while (critical !== preCritical) {
+            if (inRange(sortedRanges[critical], value)) {
+                return sortedRanges[critical];
+            }
+            const curCritical = critical;
+            if (inLeft(sortedRanges[critical], value)) {
+                critical -= Math.abs(critical - preCritical) / 2 + 1
+            } else {
+                critical += Math.abs(critical - preCritical) / 2 + 1
+            }
+            preCritical = curCritical;
+        }
+
+        return undefined;
+    }
 }

@@ -36,9 +36,9 @@ export class Editor {
             {
                 type: 'paragraph',
                 indentation: 0,
-                style: {
-                    0: ['color: red;', 4]
-                },
+                styleList: [
+                    [0, 1, {color: 'red'}]
+                ],
                 content: "none, is more than none"
             }
         ], this.viewLines);
