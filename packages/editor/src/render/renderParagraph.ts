@@ -52,7 +52,7 @@ export function renderParagraph(textBlock: TextType, viewLines: HTMLElement) {
         sortedRanges.push(range);
         styleMap.set(range, item[2]);
     });
-    console.log(textBlock);
+
     while (offset < textBlock.content.length) {
         line = createElement('paragraph-line');
         paragraph.appendChild(line);
@@ -105,8 +105,19 @@ export function renderTextInLine(
 function renderText(context: RenderContext): void {
     if (context.renderFinish || context.exceed) return;
 
-    const range = Utils.findInWhichRange(context.sortedRanges, context.strIndex);
+    if (context.strIndex >= context.str.length) {
+        context.renderFinish = true;
+        return;
+    }
+
+    const rangeIndex = Utils.findInWhichRange(context.sortedRanges, context.strIndex);
+    const range = typeof rangeIndex !== 'undefined' ? context.sortedRanges[rangeIndex] : undefined;
+    const nextRange = typeof rangeIndex !== 'undefined' && rangeIndex < context.sortedRanges.length ? context.sortedRanges[rangeIndex + 1] : undefined;
+    console.log(nextRange);
     const style = range ? context.styleMap.get(range) : undefined;
+    if (context.strIndex === 10) {
+        console.log(range);
+    }
 
     context.unit = createElement('text');
     context.line.appendChild(context.unit);
@@ -117,7 +128,13 @@ function renderText(context: RenderContext): void {
             return;
         }
 
-        if (range && context.strIndex >= range[1]) {
+        if (range && context.strIndex >= range[0] + range[1]) {
+            context.unit = undefined;
+            return;
+        }
+        if(nextRange && context.strIndex >= nextRange[0]){
+            console.log('shit');
+            context.unit = undefined;
             return;
         }
 
@@ -145,7 +162,7 @@ function renderText(context: RenderContext): void {
 function renderUnitBlock(context: RenderContext): void {
     if (context.renderFinish || context.exceed) return;
 
-    if(context.strIndex >= context.str.length){
+    if (context.strIndex >= context.str.length) {
         context.renderFinish = true;
         return;
     }
@@ -156,7 +173,8 @@ function renderUnitBlock(context: RenderContext): void {
     context.unit = createElement('unit-block');
     context.line.appendChild(context.unit);
 
-    const range = Utils.findInWhichRange(context.sortedRanges, context.strIndex);
+    const rangeIndex = Utils.findInWhichRange(context.sortedRanges, context.strIndex);
+    const range = typeof rangeIndex !== 'undefined' ? context.sortedRanges[rangeIndex] : undefined;
     const style = range ? context.styleMap.get(range) : undefined;
 
     if (style) Utils.setStyle(context.unit, style);

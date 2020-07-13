@@ -157,6 +157,7 @@ function setSelectionForBlock(editor: Editor, selection: Selection, e: DragState
     const mousePosi = Utils.getMousePositionInElement(blockNode, <MouseEvent>e.event);
     const unitBlockInfo = Utils.getElementInfo(blockNode);
     let offset = 0;
+    console.log(mousePosi);
     if (mousePosi.left > unitBlockInfo.width / 2) {
         offset = 1;
     }
@@ -165,6 +166,7 @@ function setSelectionForBlock(editor: Editor, selection: Selection, e: DragState
 
 function setSelectionForParagraphLine(editor: Editor, selection: Selection, e: DragState, paragraphLine: HTMLElement) {
     const latestElement = <HTMLElement>paragraphLine.lastElementChild;
+    console.log(latestElement);
     switch (getType(latestElement)) {
         case 'text': {
             const text = latestElement.innerText;

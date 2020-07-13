@@ -37,9 +37,11 @@ export class Editor {
                 type: 'paragraph',
                 indentation: 0,
                 styleList: [
-                    [0, 1, {color: 'red'}]
+                    [0, 1, {color: 'red'}],
+                    [10, 3, {color: 'blue'}],
+                    [25, 26, {color: 'blue'}]
                 ],
-                content: "none, is more than none"
+                content: "none, is more than none, [[code(http://baidu.com)]]"
             }
         ], this.viewLines);
     }

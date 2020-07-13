@@ -437,29 +437,56 @@ export class Utils {
         return soure.slice(0, start) + newStr + soure.slice(start);
     }
 
-    static findInWhichRange(sortedRanges: Array<[number, number]>, value: number): [number, number] | undefined {
+    /**
+     * sortedRanges 中的元素的第二位是指的偏移量
+     */
+    static findInWhichRange(sortedRanges: Array<[number, number]>, value: number): number | undefined {
         if (sortedRanges.length === 0) return undefined;
-        let critical = sortedRanges.length / 2 + 1;
-        let preCritical = 0;
 
         const inRange = (range: [number, number], value: number) => {
-            return value >= range[0] && value < range[1];
+            return value >= range[0] && value < range[0] + range[1];
         }
 
         const inLeft = (range: [number, number], value: number) => {
             return value < range[0];
         }
 
+        if (sortedRanges.length === 1) {
+            return inRange(sortedRanges[0], value) ? 0 : undefined;
+        }
+
+        let critical = Math.floor(sortedRanges.length / 2);
+        let preCritical = 0;
+
         while (critical !== preCritical) {
             if (inRange(sortedRanges[critical], value)) {
-                return sortedRanges[critical];
+                return critical;
             }
             const curCritical = critical;
+            const harf = Math.floor(Math.abs(preCritical - curCritical) / 2);
+
             if (inLeft(sortedRanges[critical], value)) {
-                critical -= Math.abs(critical - preCritical) / 2 + 1
+                if (harf === 0) {
+                    if (critical > 0 && inRange(sortedRanges[critical - 1], value)) {
+                        return critical - 1;
+                    } else {
+                        return undefined;
+                    }
+                } else {
+                    critical -= harf;
+                }
             } else {
-                critical += Math.abs(critical - preCritical) / 2 + 1
+                if (harf === 0) {
+                    if (critical < sortedRanges.length - 1 && inRange(sortedRanges[critical + 1], value)) {
+                        return critical + 1;
+                    } else {
+                        return undefined;
+                    }
+                } else {
+                    critical += harf;
+                }
             }
+
             preCritical = curCritical;
         }
 
