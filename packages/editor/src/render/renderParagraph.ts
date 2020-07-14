@@ -3,12 +3,13 @@ import { createElement, getType } from "../utils";
 import { Utils } from "utils";
 import { renderAttachment } from "./renderAttachment";
 import { renderCodeOpen } from "./renderCodeOpen";
+import { Constants } from "../Constants";
 const katex = require('katex');
 
 declare type Style = {
     [index: string]: string
 }
-declare type StyleMap = Array<[number, number, Style]>;
+declare type StyleList = Array<[number, number, Style]>;
 
 declare type RenderContext = {
     str: string,
@@ -23,24 +24,80 @@ declare type RenderContext = {
 }
 
 interface TextType extends BlockType {
-    styleList?: StyleMap
+    styleList?: StyleList
+    placeholder?: {
+        styleList?: StyleList
+        content: string
+    }
 }
 
 export function setUnitBlockType(node: HTMLElement, type: string, value: string) {
-    node.setAttribute('data-unit-block-type', type);
-    node.setAttribute('data-unit-block-value', value);
+    node.setAttribute(Constants.props.DATA_UNIT_BLOCK_TYPE, type);
+    node.setAttribute(Constants.props.DATA_UNIT_BLOCK_VALUE, value);
 }
 
 export function getUnitBlockType(node: HTMLElement) {
     return {
-        type: node.getAttribute('data-unit-block-type'),
-        value: node.getAttribute('data-unit-block-value'),
+        type: node.getAttribute(Constants.props.DATA_UNIT_BLOCK_TYPE),
+        value: node.getAttribute(Constants.props.DATA_UNIT_BLOCK_VALUE),
     }
 }
 
 export function renderParagraph(textBlock: TextType, viewLines: HTMLElement) {
     const paragraph = createElement('paragraph');
     viewLines.appendChild(paragraph);
+
+    paragraph[Constants.props.PARAGRAPH_PLACEHOLDE] = textBlock.placeholder;
+
+    appendLineToParagraph(textBlock, paragraph);
+    renderPlaceHolder(textBlock, paragraph);
+}
+
+export function renderPlaceHolder(textBlock: TextType, paragraph: HTMLElement) {
+    const paragraphInfo = Utils.getElementInfo(paragraph);
+    const placeholder = textBlock.placeholder;
+    if (paragraph.childElementCount === 0) {
+        if (!placeholder) {
+            const line = createElement('paragraph-line');
+            line[Constants.props.LINE_IS_PLACEHOLDER] = true;
+            paragraph.appendChild(line);
+            Utils.setStyle(line, { width: 'auto' });
+            const text = createElement('text');
+            line.appendChild(text);
+            Utils.setStyle(text, {
+                height: Utils.getStrPx(Constants.WIDTH_BASE_CHAR, text).height,
+                width: 1
+            })
+        }
+        else {
+            let offset = 0;
+            const sortedRanges = new Array<[number, number]>();
+            const styleMap = new Map<[number, number], Style>();
+            (placeholder.styleList || [[0, Number.MAX_VALUE, { color: 'grey' }]]).forEach(item => {
+                const range: [number, number] = [item[0], item[1]];
+                sortedRanges.push(range);
+                styleMap.set(range, item[2]);
+            });
+            while (offset < placeholder.content.length) {
+                const line = createElement('paragraph-line');
+                line[Constants.props.LINE_IS_PLACEHOLDER] = true;
+                paragraph.appendChild(line);
+
+                offset += renderElementsInLine(
+                    placeholder.content,
+                    sortedRanges,
+                    styleMap,
+                    offset,
+                    line,
+                    paragraphInfo.innerWidth,
+                    [renderText]
+                );
+            }
+        }
+    }
+}
+
+export function appendLineToParagraph(textBlock: TextType, paragraph: HTMLElement) {
     let line: HTMLElement | undefined = undefined;
 
     const paragraphInfo = Utils.getElementInfo(paragraph);
@@ -57,26 +114,26 @@ export function renderParagraph(textBlock: TextType, viewLines: HTMLElement) {
         line = createElement('paragraph-line');
         paragraph.appendChild(line);
 
-        offset += renderTextInLine(
+        offset += renderElementsInLine(
             textBlock.content,
             sortedRanges,
             styleMap,
             offset,
             line,
-            paragraphInfo.innerWidth
+            paragraphInfo.innerWidth,
+            [renderText, renderUnitBlock]
         );
     }
-
 }
 
-
-export function renderTextInLine(
+export function renderElementsInLine(
     str: string,
     sortedRanges: Array<[number, number]>,
     styleMap: Map<[number, number], Style>,
     startOffset: number,
     line: HTMLElement,
-    maxWdith: number): number {
+    maxWdith: number,
+    renders: Array<(context: RenderContext) => void>): number {
 
     Utils.setStyle(line, { width: 'fit-content' });
 
@@ -93,16 +150,17 @@ export function renderTextInLine(
     }
 
     while (!context.renderFinish && !context.exceed) {
-        renderUnitBlock(context);
-        renderText(context);
+        renders.forEach(render => {
+            startRender(context, render);
+        })
     }
 
     Utils.setStyle(line, { width: 'auto' });
 
-    return context.strIndex
+    return context.strIndex - startOffset;
 }
 
-function renderText(context: RenderContext): void {
+function startRender(context: RenderContext, render: (context: RenderContext) => void) {
     if (context.renderFinish || context.exceed) return;
 
     if (context.strIndex >= context.str.length) {
@@ -110,14 +168,13 @@ function renderText(context: RenderContext): void {
         return;
     }
 
-    const rangeIndex = Utils.findInWhichRange(context.sortedRanges, context.strIndex);
-    const range = typeof rangeIndex !== 'undefined' ? context.sortedRanges[rangeIndex] : undefined;
-    const nextRange = typeof rangeIndex !== 'undefined' && rangeIndex < context.sortedRanges.length ? context.sortedRanges[rangeIndex + 1] : undefined;
-    console.log(nextRange);
-    const style = range ? context.styleMap.get(range) : undefined;
-    if (context.strIndex === 10) {
-        console.log(range);
-    }
+    render(context);
+}
+
+function renderText(context: RenderContext): void {
+    const { foundRange, nearestNextRange } = Utils.findInWhichRange(context.sortedRanges, context.strIndex);
+
+    const style = foundRange ? context.styleMap.get(foundRange) : undefined;
 
     context.unit = createElement('text');
     context.line.appendChild(context.unit);
@@ -128,12 +185,11 @@ function renderText(context: RenderContext): void {
             return;
         }
 
-        if (range && context.strIndex >= range[0] + range[1]) {
+        if (foundRange && context.strIndex >= foundRange[0] + foundRange[1]) {
             context.unit = undefined;
             return;
         }
-        if(nextRange && context.strIndex >= nextRange[0]){
-            console.log('shit');
+        if (nearestNextRange && context.strIndex >= nearestNextRange[0]) {
             context.unit = undefined;
             return;
         }
@@ -160,22 +216,14 @@ function renderText(context: RenderContext): void {
 }
 
 function renderUnitBlock(context: RenderContext): void {
-    if (context.renderFinish || context.exceed) return;
-
-    if (context.strIndex >= context.str.length) {
-        context.renderFinish = true;
-        return;
-    }
-
     const { nextPosition, unitBlock, type, value } = findUnitBlock(context.str, context.strIndex);
     if (!unitBlock) return;
 
     context.unit = createElement('unit-block');
     context.line.appendChild(context.unit);
 
-    const rangeIndex = Utils.findInWhichRange(context.sortedRanges, context.strIndex);
-    const range = typeof rangeIndex !== 'undefined' ? context.sortedRanges[rangeIndex] : undefined;
-    const style = range ? context.styleMap.get(range) : undefined;
+    const { foundRange, nearestNextRange } = Utils.findInWhichRange(context.sortedRanges, context.strIndex);
+    const style = foundRange ? context.styleMap.get(foundRange) : undefined;
 
     if (style) Utils.setStyle(context.unit, style);
     setUnitBlockType(context.unit, type, value);

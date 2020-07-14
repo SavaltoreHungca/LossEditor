@@ -11,6 +11,16 @@ export class Selection {
     start: Point | undefined;
     end: Point | undefined;
 
+    get isOnPlaceHolder(): boolean {
+        if (!this.end) return false;
+
+        if (getType(this.end.node) === 'text') {
+            const line = <HTMLElement>this.end.node.parentElement;
+            return line[Constants.props.LINE_IS_PLACEHOLDER] ? true : false;
+        }
+        return false;
+    }
+
     get leftAndRight(): { left: Point, right: Point } {
         if (!this.end || !this.start) throw new Error();
         let left = this.end;
@@ -79,6 +89,9 @@ export function listenUserChangeSelection(editor: Editor) {
             case 'paragraph-line':
                 setSelectionForParagraphLine(editor, selection, e, srcElement);
                 break;
+            case 'paragraph':
+                setSelectionForParagraph(editor, selection, e, srcElement);
+                break;
             case 'content-container':
                 setSelectionForContentContainer(editor, selection, e, srcElement);
                 break;
@@ -94,6 +107,37 @@ export function listenUserChangeSelection(editor: Editor) {
             setSelectionForBlock(editor, selection, e, imageBlock);
         }
     })
+}
+
+export function setSelectionOnParagraphLast(paragraph: HTMLElement, editor: Editor): boolean{
+    const lastElement = <HTMLElement>paragraph.lastElementChild?.lastElementChild;
+    if(!lastElement) return false;
+
+    const selection = new Selection();
+    switch(getType(lastElement)){
+        case 'text':{
+            const point = {
+                node: lastElement,
+                offset: lastElement.innerText.length
+            }
+            selection.start = point;
+            selection.end = point;
+            break;
+        }
+        case 'unit-block':{
+            const point = {
+                node: lastElement,
+                offset: 1
+            }
+            selection.start = point;
+            selection.end = point;
+            break;
+        }
+        default: 
+            return false;
+    }
+    editor.selection = selection;
+    return true;
 }
 
 function setSelection(editor: Editor, selection: Selection, e: DragState, offset: number, node: HTMLElement) {
@@ -157,16 +201,19 @@ function setSelectionForBlock(editor: Editor, selection: Selection, e: DragState
     const mousePosi = Utils.getMousePositionInElement(blockNode, <MouseEvent>e.event);
     const unitBlockInfo = Utils.getElementInfo(blockNode);
     let offset = 0;
-    console.log(mousePosi);
     if (mousePosi.left > unitBlockInfo.width / 2) {
         offset = 1;
     }
     setSelection(editor, selection, e, offset, blockNode);
 }
 
+function setSelectionForParagraph(editor: Editor, selection: Selection, e: DragState, paragraph: HTMLElement) {
+    const latestElement = <HTMLElement>paragraph.lastElementChild;
+    setSelectionForParagraphLine(editor, selection, e, latestElement);
+}
+
 function setSelectionForParagraphLine(editor: Editor, selection: Selection, e: DragState, paragraphLine: HTMLElement) {
     const latestElement = <HTMLElement>paragraphLine.lastElementChild;
-    console.log(latestElement);
     switch (getType(latestElement)) {
         case 'text': {
             const text = latestElement.innerText;

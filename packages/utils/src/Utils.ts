@@ -440,8 +440,18 @@ export class Utils {
     /**
      * sortedRanges 中的元素的第二位是指的偏移量
      */
-    static findInWhichRange(sortedRanges: Array<[number, number]>, value: number): number | undefined {
-        if (sortedRanges.length === 0) return undefined;
+    static findInWhichRange(sortedRanges: Array<[number, number]>, value: number): {
+        foundRange: [number, number] | undefined,
+        nearestNextRange: [number, number] | undefined,
+        nearestPreRange: [number, number] | undefined
+    } {
+        const ans: any = {
+            foundRange: undefined,
+            nearestNextRange: undefined,
+            nearestPreRange: undefined
+        }
+
+        if (sortedRanges.length === 0) return ans;
 
         const inRange = (range: [number, number], value: number) => {
             return value >= range[0] && value < range[0] + range[1];
@@ -452,7 +462,10 @@ export class Utils {
         }
 
         if (sortedRanges.length === 1) {
-            return inRange(sortedRanges[0], value) ? 0 : undefined;
+            if (inRange(sortedRanges[0], value)) {
+                ans.foundRange = sortedRanges[0];
+            }
+            return ans;
         }
 
         let critical = Math.floor(sortedRanges.length / 2);
@@ -460,7 +473,10 @@ export class Utils {
 
         while (critical !== preCritical) {
             if (inRange(sortedRanges[critical], value)) {
-                return critical;
+                ans.foundRange = sortedRanges[critical];
+                ans.nearestNextRange = critical + 1 < sortedRanges.length ? sortedRanges[critical + 1] : undefined;
+                ans.nearestPreRange = critical - 1 >= 0 ? sortedRanges[critical - 1] : undefined;
+                return ans;
             }
             const curCritical = critical;
             const harf = Math.floor(Math.abs(preCritical - curCritical) / 2);
@@ -468,9 +484,18 @@ export class Utils {
             if (inLeft(sortedRanges[critical], value)) {
                 if (harf === 0) {
                     if (critical > 0 && inRange(sortedRanges[critical - 1], value)) {
-                        return critical - 1;
+                        ans.foundRange = sortedRanges[critical - 1];
+                        ans.nearestNextRange = critical < sortedRanges.length ? sortedRanges[critical] : undefined;
+                        ans.nearestPreRange = critical - 2 >= 0 ? sortedRanges[critical - 2] : undefined;
+                        return ans;
                     } else {
-                        return undefined;
+                        if (critical > 0 && value < sortedRanges[critical - 1][0]) {
+                            ans.nearestNextRange = sortedRanges[critical - 1];
+                            ans.nearestPreRange = critical - 2 >= 0 ? sortedRanges[critical - 2] : undefined;
+                        }else {
+                            ans.nearestNextRange = sortedRanges[critical];
+                            ans.nearestPreRange = critical - 1 >= 0 ? sortedRanges[critical - 1] : undefined;
+                        }
                     }
                 } else {
                     critical -= harf;
@@ -478,9 +503,13 @@ export class Utils {
             } else {
                 if (harf === 0) {
                     if (critical < sortedRanges.length - 1 && inRange(sortedRanges[critical + 1], value)) {
-                        return critical + 1;
+                        ans.foundRange = sortedRanges[critical + 1];
+                        ans.nearestNextRange = critical + 2 < sortedRanges.length ? sortedRanges[critical + 2] : undefined;
+                        ans.nearestPreRange = critical - 1 > 0 ? sortedRanges[critical - 1] : undefined;
+                        return ans;
                     } else {
-                        return undefined;
+                        ans.nearestNextRange = sortedRanges[critical + 1];
+                        ans.nearestPreRange = critical >= 0 ? sortedRanges[critical] : undefined;
                     }
                 } else {
                     critical += harf;
@@ -490,6 +519,6 @@ export class Utils {
             preCritical = curCritical;
         }
 
-        return undefined;
+        return ans;
     }
 }

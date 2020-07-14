@@ -3,7 +3,6 @@ import { Utils } from 'utils';
 import { render } from './render';
 import { createCursor, listenSelectionToSetCursor } from './cursor';
 import { createElement } from './utils';
-import { DragState } from 'utils';
 import { listenUserChangeSelection, Selection } from './Selection';
 import { listenContainerSizeChange } from './autoResize';
 import { listenSelectionChangeToSetSelectedRegion } from './renderSelectedRegion';
@@ -31,29 +30,26 @@ export class Editor {
         registryEvents(this);
         this.eventManager.triggleEvent(Constants.events.ELEMENTS_CREATED);
         this.__init__();
+    }
 
-        render([
+    render(data?: any) {
+        if (!data) this.data = [
             {
                 type: 'paragraph',
                 indentation: 0,
-                styleList: [
-                    [0, 1, {color: 'red'}],
-                    [10, 3, {color: 'blue'}],
-                    [25, 26, {color: 'blue'}]
-                ],
-                content: "none, is more than none, [[code(http://baidu.com)]]"
+                placeholder: {
+                    content: 'this is just a placeholder, you can do your best to make this line so long !!!!!!'
+                },
+                content: ''
             }
-        ], this.viewLines);
+        ]
+        else this.data = data;
+        render(this.data, this.viewLines);
     }
 
-    render(data: any){
-        // this.data = data;
-        // render(data, this.viewLines);
-    }
-
-    updateSize(){
+    updateSize() {
         const containerInfo = Utils.getElementInfo(this.container);
-        Utils.setStyle(this.viewLines, {width: containerInfo.innerWidth});
+        Utils.setStyle(this.viewLines, { width: containerInfo.innerWidth });
         this.render(this.data);
     }
 

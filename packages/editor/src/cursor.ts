@@ -1,3 +1,4 @@
+import { Selection } from './Selection';
 import { Utils } from "utils";
 import { getType } from "./utils";
 import { Constants } from "./Constants";
@@ -5,14 +6,24 @@ import { Editor } from "./Editor";
 
 export function listenSelectionToSetCursor(editor: Editor) {
     editor.eventManager.registryEvent(Constants.events.SELECTION_CHANGE, () => {
-        const endPoint = editor.selection?.end;
+        const selection = <Selection>editor.selection;
+        const endPoint = selection.end;
         if (!endPoint) return;
 
         switch (getType(endPoint.node)) {
             case 'text': {
-                const posi = Utils.getRelativePosition(endPoint.node, editor.viewLines);
-                const offset =
-                    Utils.getStrPx(endPoint.node.innerText.substring(0, endPoint.offset), endPoint.node).width
+                let posi;
+                let offset;
+                const line = <HTMLElement>endPoint.node.parentElement;
+                const paragraph = <HTMLElement>line.parentElement;
+
+                if (selection.isOnPlaceHolder) {
+                    posi = Utils.getRelativePosition(paragraph, editor.viewLines);
+                    offset = 0;
+                }else{
+                    posi = Utils.getRelativePosition(endPoint.node, editor.viewLines);
+                    offset = Utils.getStrPx(endPoint.node.innerText.substring(0, endPoint.offset), endPoint.node).width;
+                }
 
                 Utils.setStyle(editor.cursor, {
                     left: posi.left + offset,
@@ -39,7 +50,7 @@ export function listenSelectionToSetCursor(editor: Editor) {
             }
         }
         editor.cursor.value = '';
-        editor.cursor.focus({preventScroll: true});
+        editor.cursor.focus({ preventScroll: true });
     })
 }
 
@@ -87,9 +98,10 @@ export function createCursor(editor: Editor): HTMLTextAreaElement {
         skipInputEvent = false;
         editor.eventManager.triggleEvent(Constants.events.TEXT_INPUT);
     })
-    cursor.addEventListener('input', (event: any) => {
-        if(skipInputEvent) return;
-        editor.inputText = event.data;
+    cursor.addEventListener('input',(event: any) => {
+        const evt: InputEvent = event;
+        if (skipInputEvent) return;
+        editor.inputText = evt.data || '';
         editor.eventManager.triggleEvent(Constants.events.TEXT_INPUT);
     })
     return cursor;

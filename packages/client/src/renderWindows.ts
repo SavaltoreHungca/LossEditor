@@ -78,7 +78,6 @@ function createWindow(memloss: MemLoss, container: EditorWindowCon, nodeParents:
     repository.getNodeContent(node.id, (status, data) => {
         switch (status) {
             case 'ok':
-                if (!data) throw new Error();
                 editor.render(data);
                 Utils.getElementInfo($(idset.resizeContainer), resizeContainerInfo => {
                     Utils.setStyle($(idset.scrollable), { width: resizeContainerInfo.width * 1.2, height: resizeContainerInfo.height * 1.2 });
@@ -86,6 +85,7 @@ function createWindow(memloss: MemLoss, container: EditorWindowCon, nodeParents:
                 break;
         }
     });
+
     container.opendWindow.push(<WindowElement>$(idset.window))
 }
 
