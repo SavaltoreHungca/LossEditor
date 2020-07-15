@@ -14,8 +14,10 @@
   ],
   "dependencies": {},
   "devDependencies": {
+    "monaco-editor": "^0.20.0"
+  },
+  "peerDependencies": {
     "event-driven": "*",
-    "monaco-editor": "^0.20.0",
     "scroll-page": "*",
     "utils": "*"
   },

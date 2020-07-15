@@ -15,10 +15,13 @@
   "dependencies": {},
   "devDependencies": {
     "@types/is-hotkey": "^0.1.1",
-    "event-driven": "*",
-    "katex": "^0.11.1",
+    "katex": "^0.11.1"
+  },
+  "peerDependencies": {
     "scroll-page": "*",
-    "utils": "*"
+    "utils": "*",
+    "event-driven": "*",
+    "editor-core": "*"
   },
   "keywords": []
 }

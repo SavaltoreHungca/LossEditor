@@ -8,7 +8,8 @@
     "references": [
         { "path": "../event-driven" },
         { "path": "../utils" },
-        { "path": "../scroll-page" }
+        { "path": "../scroll-page" },
+        { "path": "../editor-core"},
     ]
   }
   
