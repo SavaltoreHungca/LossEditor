@@ -1,13 +1,13 @@
 {
-  "name": "code-station",
+  "name": "editor-core",
   "description": "",
   "version": "0.58.3",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
-  "umd": "dist/code-station.js",
-  "umdMin": "dist/code-station.min.js",
+  "umd": "dist/editor-core.js",
+  "umdMin": "dist/editor-core.min.js",
   "sideEffects": false,
   "files": [
     "dist/"
@@ -15,8 +15,6 @@
   "dependencies": {},
   "devDependencies": {
     "event-driven": "*",
-    "monaco-editor": "^0.20.0",
-    "scroll-page": "*",
     "utils": "*"
   },
   "keywords": []

@@ -4,7 +4,10 @@ import { Utils } from "utils";
 import { renderAttachment } from "./renderAttachment";
 import { renderCodeOpen } from "./renderCodeOpen";
 import { Constants } from "../Constants";
-const katex = require('katex');
+
+/// <reference path="./katex.d.ts"/>
+import katex from 'katex';
+
 
 declare type Style = {
     [index: string]: string

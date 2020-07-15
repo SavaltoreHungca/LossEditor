@@ -15,6 +15,7 @@ import Utils from '../../packages/utils/package.json'
 import Editor from '../../packages/editor/package.json'
 import Client from '../../packages/client/package.json'
 import CodeStation from '../../packages/code-station/package.json'
+import EditorCore from '../../packages/editor-core/package.json'
 
 /**
  * Return a Rollup configuration for a `pkg` with `env` and `target`.
@@ -145,6 +146,7 @@ function configure(pkg, env, target) {
                 exports: 'named',
                 name: startCase(pkg.name).replace(/ /g, ''),
                 globals: pkg.umdGlobals,
+                sourcemap: true,
             },
             external: Object.keys(pkg.umdGlobals || {}),
         }
@@ -201,10 +203,11 @@ function configure(pkg, env, target) {
 function factory(pkg, options = {}) {
     const isProd = process.env.NODE_ENV === 'production'
     return [
-        configure(pkg, 'development', 'cjs', options),
+        // configure(pkg, 'development', 'cjs', options),
         configure(pkg, 'development', 'module', options),
-        isProd && configure(pkg, 'development', 'umd', options),
-        isProd && configure(pkg, 'production', 'umd', options),
+        configure(pkg, 'development', 'umd', options),
+        // isProd && configure(pkg, 'development', 'umd', options),
+        // isProd && configure(pkg, 'production', 'umd', options),
     ].filter(Boolean)
 }
 
@@ -216,6 +219,7 @@ export default [
     ...factory(EventDriven),
     ...factory(Utils),
     ...factory(ScrollPage),
+    ...factory(EditorCore),
     ...factory(Editor),
     ...factory(Client),
     ...factory(CodeStation),
