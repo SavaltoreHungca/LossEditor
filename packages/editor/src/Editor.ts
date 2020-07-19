@@ -1,16 +1,23 @@
+import { data } from './testdata';
+import { DocTree, DocTreeResolver, Node } from 'editor-core';
 import { EventManager, DataListener } from 'event-driven';
-import { Utils } from 'utils';
-import { render } from './render';
-import { createCursor, listenSelectionToSetCursor } from './cursor';
+import { Utils, BidMap } from 'utils';
+import { createCursor, listenSelectionToSetCursor } from './selection/cursor';
 import { createElement } from './utils';
-import { listenUserChangeSelection, Selection } from './Selection';
 import { listenContainerSizeChange } from './autoResize';
 import { listenSelectionChangeToSetSelectedRegion } from './renderSelectedRegion';
 import { listenTextInput } from './textInput';
 import { listenUserPressKey } from './keyboard';
 import { registryEvents } from './events';
 import { Constants } from './Constants';
+import { listenUserChangeSelection } from './selection/selectionListener';
 
+
+export type SetCursorPositionResult = {
+    left: number,
+    top: number,
+    height: number,
+}
 
 export class Editor {
     cursor: HTMLTextAreaElement;
@@ -20,46 +27,50 @@ export class Editor {
     regionContainer: HTMLElement = document.createElement('div');
     eventManager: EventManager = new EventManager();
     dataListener: DataListener = new DataListener(200);
-    selection: Selection | undefined;
-    data: any;
     inputText: string = '';
+
+    setCursorPositionBehaviorSet = new Map<string, Function>();
+    docTree: DocTree = new DocTree();
+    uiMap = new BidMap<Node, HTMLElement>();
 
     constructor(container: HTMLElement) {
         this.container = container;
         this.cursor = createCursor(this);
         registryEvents(this);
         this.eventManager.triggleEvent(Constants.events.ELEMENTS_CREATED);
+        this.eventManager.triggleEvent(Constants.events.DOC_TREE_CREATED);
+
         this.__init__();
+
+        this.docTree.addEventListener('selection_change', sele => {
+            console.log(sele);
+        })
     }
 
-    render(data?: any) {
-        if (!data) this.data = [
-            {
-                type: 'paragraph',
-                indentation: 0,
-                placeholder: {
-                    content: 'this is just a placeholder, you can do your best to make this line so long !!!!!!'
-                },
-                content: ''
-            }
-        ]
-        else this.data = data;
-        render(this.data, this.viewLines);
+    render() {
+        this.docTree.setRoot(DocTreeResolver.fromObj(data));
+        this.eventManager.triggleEvent(Constants.events.DOC_TREE_ROOT_SETED);
+        this.viewLines.innerHTML = '';
+        this.docTree.render();
     }
 
     updateSize() {
-        const containerInfo = Utils.getElementInfo(this.container);
-        Utils.setStyle(this.viewLines, { width: containerInfo.innerWidth });
-        this.render(this.data);
+        // const containerInfo = Utils.getElementInfo(this.container);
+        // Utils.setStyle(this.viewLines, { width: containerInfo.innerWidth });
+        // this.render(this.data);
+    }
+
+    regisSetCursorPositionBehavior(nodeType: string, behavior: (element: HTMLElement, offset: number, editor: Editor) => SetCursorPositionResult | undefined) {
+        this.setCursorPositionBehaviorSet.set(nodeType, behavior);
     }
 
     private __init__() {
         listenUserChangeSelection(this);
         listenSelectionToSetCursor(this);
-        listenContainerSizeChange(this);
-        listenSelectionChangeToSetSelectedRegion(this);
-        listenTextInput(this);
-        listenUserPressKey(this);
+        // listenContainerSizeChange(this);
+        // listenSelectionChangeToSetSelectedRegion(this);
+        // listenTextInput(this);
+        // listenUserPressKey(this);
     }
 
 }

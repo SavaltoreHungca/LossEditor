@@ -1,2 +1,4 @@
 export * from './DocTree';
-export * from './TestEditor';
+export * from './DocTreeResolver';
+export * from './Node';
+export * from './Selection';

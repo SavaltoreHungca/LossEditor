@@ -6,6 +6,6 @@ export type Point = {
 }
 
 export interface Selection {
-    start: Point
-    end: Point
+    start?: Point
+    end?: Point
 }

@@ -21,6 +21,10 @@ export interface ElementInfo {
     innerLeft: number
 }
 
+export function $(id: string): HTMLElement {
+    return <HTMLElement>document.getElementById(id);
+}
+
 export class Utils {
     static setStyle(element: HTMLElement, style: Object) {
         if (this.isObject(style)) {

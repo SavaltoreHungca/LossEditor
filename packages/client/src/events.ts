@@ -2,10 +2,10 @@ import { repository } from './repository/Request';
 import { MemLoss } from "./MemLoss";
 import { Constants } from "./Constants";
 import { ScrollPage } from 'scroll-page';
-import { createElement, randomId, $, wrapElement, NodeListElement, EditorFrameElement, SidePadElement, WindowElement } from "./Element";
+import { createElement, randomId, wrapElement, NodeListElement, EditorFrameElement, SidePadElement, WindowElement } from "./Element";
 import { Editor } from "editor";
 import { renderNodeList } from "./renderNodeList";
-import { DragState, Utils } from "utils";
+import { DragState, Utils, $ } from "utils";
 import { renderWindow } from './renderWindows';
 
 export function registryEvents(memLoss: MemLoss) {

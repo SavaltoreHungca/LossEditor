@@ -1,12 +1,14 @@
-import { BlockType } from "../render";
-import { createElement, getType } from "../utils";
-import { Utils } from "utils";
-import { renderAttachment } from "./renderAttachment";
-import { renderCodeOpen } from "./renderCodeOpen";
-import { Constants } from "../Constants";
+import { Editor } from "../Editor";
+import { Node } from "editor-core";
 
 /// <reference path="./katex.d.ts"/>
 import katex from 'katex';
+import { createElement, paragraphProps } from "../utils";
+import { Constants } from "../Constants";
+import { Utils } from "utils";
+import { renderAttachment } from "./renderAttachment";
+import { renderCodeOpen } from "./renderCodeOpen";
+import { indentationWrap } from "./indentationWrap";
 
 
 declare type Style = {
@@ -26,99 +28,52 @@ declare type RenderContext = {
     renderFinish: boolean,
 }
 
-interface TextType extends BlockType {
+interface TextContent {
+    str: string
     styleList?: StyleList
-    placeholder?: {
-        styleList?: StyleList
-        content: string
-    }
 }
 
-export function setUnitBlockType(node: HTMLElement, type: string, value: string) {
-    node.setAttribute(Constants.props.DATA_UNIT_BLOCK_TYPE, type);
-    node.setAttribute(Constants.props.DATA_UNIT_BLOCK_VALUE, value);
-}
+export function paragraphRendererFactor(editor: Editor) {
+    return (parent: Node | undefined, node: Node) => {
+        if (!parent) throw new Error(`无法找到承载的父容器`);
+        const parentUi = <HTMLElement>editor.uiMap.getvalue(parent);
+        const nodeUi = <HTMLElement>editor.uiMap.getvalue(node);
 
-export function getUnitBlockType(node: HTMLElement) {
-    return {
-        type: node.getAttribute(Constants.props.DATA_UNIT_BLOCK_TYPE),
-        value: node.getAttribute(Constants.props.DATA_UNIT_BLOCK_VALUE),
-    }
-}
-
-export function renderParagraph(textBlock: TextType, viewLines: HTMLElement) {
-    const paragraph = createElement('paragraph');
-    viewLines.appendChild(paragraph);
-
-    paragraph[Constants.props.PARAGRAPH_PLACEHOLDE] = textBlock.placeholder;
-
-    appendLineToParagraph(textBlock, paragraph);
-    renderPlaceHolder(textBlock, paragraph);
-}
-
-export function renderPlaceHolder(textBlock: TextType, paragraph: HTMLElement) {
-    const paragraphInfo = Utils.getElementInfo(paragraph);
-    const placeholder = textBlock.placeholder;
-    if (paragraph.childElementCount === 0) {
-        if (!placeholder) {
-            const line = createElement('paragraph-line');
-            line[Constants.props.LINE_IS_PLACEHOLDER] = true;
-            paragraph.appendChild(line);
-            Utils.setStyle(line, { width: 'auto' });
-            const text = createElement('text');
-            line.appendChild(text);
-            Utils.setStyle(text, {
-                height: Utils.getStrPx(Constants.WIDTH_BASE_CHAR, text).height,
-                width: 1
-            })
+        if (nodeUi.parentElement !== parentUi) {
+            nodeUi.parentElement?.removeChild(nodeUi);
+            parentUi.appendChild(nodeUi);
         }
-        else {
-            let offset = 0;
-            const sortedRanges = new Array<[number, number]>();
-            const styleMap = new Map<[number, number], Style>();
-            (placeholder.styleList || [[0, Number.MAX_VALUE, { color: 'grey' }]]).forEach(item => {
-                const range: [number, number] = [item[0], item[1]];
-                sortedRanges.push(range);
-                styleMap.set(range, item[2]);
-            });
-            while (offset < placeholder.content.length) {
-                const line = createElement('paragraph-line');
-                line[Constants.props.LINE_IS_PLACEHOLDER] = true;
-                paragraph.appendChild(line);
 
-                offset += renderElementsInLine(
-                    placeholder.content,
-                    sortedRanges,
-                    styleMap,
-                    offset,
-                    line,
-                    paragraphInfo.innerWidth,
-                    [renderText]
-                );
-            }
-        }
+        const textContent = <TextContent>node.content;
+        const viewLines = indentationWrap(node, nodeUi);
+
+        const paragraph = createElement('paragraph');
+        viewLines.appendChild(paragraph);
+
+        appendLineToParagraph(textContent, paragraph);
     }
 }
 
-export function appendLineToParagraph(textBlock: TextType, paragraph: HTMLElement) {
+export function appendLineToParagraph(textContent: TextContent, paragraph: HTMLElement) {
     let line: HTMLElement | undefined = undefined;
 
     const paragraphInfo = Utils.getElementInfo(paragraph);
     let offset = 0;
     const sortedRanges = new Array<[number, number]>();
     const styleMap = new Map<[number, number], Style>();
-    (textBlock.styleList || []).forEach(item => {
+    (textContent.styleList || []).forEach(item => {
         const range: [number, number] = [item[0], item[1]];
         sortedRanges.push(range);
         styleMap.set(range, item[2]);
     });
 
-    while (offset < textBlock.content.length) {
+    while (offset < textContent.str.length) {
         line = createElement('paragraph-line');
+        paragraphProps.setElementStart(line, offset);
         paragraph.appendChild(line);
 
         offset += renderElementsInLine(
-            textBlock.content,
+            textContent.str,
             sortedRanges,
             styleMap,
             offset,
@@ -175,11 +130,15 @@ function startRender(context: RenderContext, render: (context: RenderContext) =>
 }
 
 function renderText(context: RenderContext): void {
+    if (findUnitBlock(context.str, context.strIndex).unitBlock) {
+        return;
+    }
     const { foundRange, nearestNextRange } = Utils.findInWhichRange(context.sortedRanges, context.strIndex);
 
     const style = foundRange ? context.styleMap.get(foundRange) : undefined;
 
     context.unit = createElement('text');
+    paragraphProps.setElementStart(context.unit, context.strIndex);
     context.line.appendChild(context.unit);
     if (style) Utils.setStyle(context.unit, style);
 
@@ -218,18 +177,20 @@ function renderText(context: RenderContext): void {
     context.renderFinish = true;
 }
 
+
 function renderUnitBlock(context: RenderContext): void {
     const { nextPosition, unitBlock, type, value } = findUnitBlock(context.str, context.strIndex);
     if (!unitBlock) return;
 
     context.unit = createElement('unit-block');
+    paragraphProps.setElementStart(context.unit, context.strIndex);
     context.line.appendChild(context.unit);
 
     const { foundRange, nearestNextRange } = Utils.findInWhichRange(context.sortedRanges, context.strIndex);
     const style = foundRange ? context.styleMap.get(foundRange) : undefined;
 
     if (style) Utils.setStyle(context.unit, style);
-    setUnitBlockType(context.unit, type, value);
+    paragraphProps.setUnitBlockType(context.unit, type, value);
     switch (type) {
         case 'formula':
             Utils.setStyle(context.unit, { cursor: 'pointer' });

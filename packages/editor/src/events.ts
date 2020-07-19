@@ -1,9 +1,20 @@
 import { Editor } from "./Editor";
 import { Constants } from "./Constants";
-import { Utils } from "utils";
+import { Utils, DragState } from "utils";
+import { paragraphRendererFactor } from "./render/paragraph";
+import { captionImageRendererFactory } from "./render/captionImage";
+import { tableRendererFactory, rowRendererFactory, cellRendererFactory } from "./render/table";
+import { Node, SetSelectionResult } from 'editor-core';
+import { getNodeFromChild, paragraphProps, getType } from "./utils";
+import { paragraphSelectionBehavior } from "./selection/paragraphSelectionBehavior";
+import { setCursorPositionForParagraph } from "./selection/cursorposition/paragraphCursorPosition";
 
 export function registryEvents(editor: Editor) {
     initializeUi(editor);
+    setNodeUiMap(editor);
+    regisNodeRenderer(editor);
+    regisSetSelectionBehavior(editor);
+    regisSetCursorPositionBehavior(editor);
 }
 
 
@@ -48,4 +59,39 @@ function initializeUi(editor: Editor) {
         })
         editor.backLayer.appendChild(editor.regionContainer);
     }, 'initialized-ui-ok')
+}
+
+function setNodeUiMap(editor: Editor) {
+    editor.eventManager.registryEventDpendsOn([Constants.events.DOC_TREE_ROOT_SETED], () => {
+        editor.docTree.walkTree(node => {
+            if (node.type === 'root') {
+                editor.uiMap.set(node, editor.viewLines);
+            } else {
+                const ui = document.createElement('div');
+                ui.setAttribute('data-node-type', node.type);
+                editor.uiMap.set(node, ui);
+            }
+        })
+    }, 'node-ui-map-seted');
+}
+
+function regisNodeRenderer(editor: Editor) {
+    editor.eventManager.registryEventDpendsOn([Constants.events.DOC_TREE_CREATED], () => {
+        editor.docTree.regisRenderer('root', (parent, node) => { })
+        editor.docTree.regisRenderer('paragraph', paragraphRendererFactor(editor));
+        editor.docTree.regisRenderer('captionImage', captionImageRendererFactory(editor));
+        editor.docTree.regisRenderer('table', tableRendererFactory(editor));
+        editor.docTree.regisRenderer('row', rowRendererFactory(editor));
+        editor.docTree.regisRenderer('cell', cellRendererFactory(editor));
+    }, 'regis-node-renderer-ok');
+}
+
+function regisSetSelectionBehavior(editor: Editor) {
+    editor.eventManager.registryEventDpendsOn([Constants.events.DOC_TREE_CREATED], () => {
+        editor.docTree.regisSetSelectionBehavior('paragraph', paragraphSelectionBehavior)
+    }, 'regis-set-selection-behavior-ok');
+}
+
+function regisSetCursorPositionBehavior(editor: Editor){
+    editor.regisSetCursorPositionBehavior('paragraph', setCursorPositionForParagraph);
 }

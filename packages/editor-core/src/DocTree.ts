@@ -11,22 +11,45 @@ export type MoveCurosorResult = {
     offset: number
 }
 
+export type SetSelectionResult = {
+    pointType: 'start' | 'end'
+    offset: number
+}
+
 export class DocTree {
     root?: Node;
     selection?: Selection;
+
+
     regisdEvents = new Map<string, Array<Function>>();
-
     cursorMoveBehaviorSet = new Map<string, Function>();
+    setSelectionBehaviorSet = new Map<string, Function>();
+    regisdRenderer = new Map<string, Function>();
 
-    setTree(root: Node) {
+    setRoot(root: Node) {
         this.root = root;
+        return this;
+    }
+
+    render(rootNode?: Node) {
+        const startRender = (node: Node) => {
+            const render = this.regisdRenderer.get(node.type);
+            if (!render) throw new Error(`${node.type}的渲染器未注册`);
+            render(node.parent, node);
+        }
+
+        const root = rootNode ? rootNode : this.root;
+
+        if (!root) return;
+
         const stack = [root];
-        this.triggleEvent('node_created', event => event(undefined, root));
+        startRender(root);
+
         while (stack.length > 0) {
             const root = <Node>stack.shift();
             if (root.children) {
                 root.children.forEach(child => {
-                    this.triggleEvent('node_created', event => event(root, child));
+                    startRender(child);
                     stack.push(child);
                 });
             }
@@ -51,6 +74,14 @@ export class DocTree {
         events.push(listener);
     }
 
+    regisSetSelectionBehavior<T>(nodeType: string, behavior: (node: Node, data: T) => SetSelectionResult | undefined) {
+        this.setSelectionBehaviorSet.set(nodeType, behavior);
+    }
+
+    regisRenderer(nodeType: string, renderer: (parent: Node | undefined, node: Node) => void) {
+        this.regisdRenderer.set(nodeType, renderer);
+    }
+
     regisCursorMoveBehavior(nodeType: string, behavior: (cursorPoint: Point, offset: number, isHorizontal: boolean) => MoveCurosorResult) {
         this.cursorMoveBehaviorSet.set(nodeType, behavior);
     }
@@ -58,6 +89,7 @@ export class DocTree {
     moveCursorPosition(offset: number, isHorizontal: boolean): void {
         if (!this.selection) return;
         const { end } = this.selection;
+        if(!end) return;
         const newEndPoint = this.moveCursor({ ...end }, offset, isHorizontal);
         if (newEndPoint) {
             this.selection.end = newEndPoint;
@@ -65,9 +97,48 @@ export class DocTree {
         }
     }
 
-    setSelection(selection: Selection){
-        this.selection = selection;
-        this.triggleEvent('selection_change', event => event(<Selection>this.selection));
+    tmpSelection?: Selection
+    setSelection<T>(node: Node, data: T) {
+        const behavior = this.setSelectionBehaviorSet.get(node.type);
+        if (!behavior) throw new Error(`${node.type}的setSelection行为未设置`);
+        const setSelectionResult = <SetSelectionResult>behavior(node, data);
+        if(!setSelectionResult) return;
+        switch(setSelectionResult.pointType){
+            case 'start': {
+                this.tmpSelection = {
+                    start: {
+                        node: node,
+                        offset: setSelectionResult.offset
+                    }
+                }
+                break;
+            }
+            case 'end': {
+                if(!this.tmpSelection) return;
+                this.tmpSelection.end = {
+                    node: node,
+                    offset: setSelectionResult.offset
+                }
+                this.selection = this.tmpSelection;
+                this.triggleEvent('selection_change', event => event(<Selection>this.selection));
+                break;
+            }
+        }
+    }
+
+    walkTree(consumer: (node: Node) => void) {
+        if (!this.root) return;
+        const stack = [this.root];
+        while (stack.length > 0) {
+            const root = <Node>stack.shift();
+            consumer(root);
+            const children = root.children;
+            if (children) {
+                children.forEach(child => {
+                    stack.push(child);
+                })
+            }
+        }
     }
 
     moveCursor(cursorPoint: Point, offset: number, isHorizontal: boolean): Point | undefined {

@@ -3,6 +3,7 @@ import { Utils } from 'utils';
 export class Node {
     type: string
     isPresenter: boolean
+    indentation?: number
     children?: Array<Node>
     parent?: Node
     content?: any

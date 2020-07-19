@@ -1,6 +1,6 @@
-import { createElement, randomId, $ } from "./Element";
+import { createElement, randomId } from "./Element";
 import { MemLoss } from "./MemLoss";
-import { Utils } from "utils";
+import { Utils, $ } from "utils";
 import { renderWindow } from "./renderWindows";
 
 export interface Node {

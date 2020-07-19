@@ -1,7 +1,7 @@
-import { Utils, DragState } from 'utils';
+import { Utils, DragState, $ } from 'utils';
 import { repository } from './repository/Request';
 import { MemLoss } from "./MemLoss";
-import { EditorFrameElement, createElement, EditorWindowCon, randomId, $, WindowElement } from "./Element";
+import { EditorFrameElement, createElement, EditorWindowCon, randomId, WindowElement } from "./Element";
 import { Node } from "./renderNodeList";
 import { Editor } from "editor";
 import { ScrollPage } from 'scroll-page';
@@ -78,7 +78,7 @@ function createWindow(memloss: MemLoss, container: EditorWindowCon, nodeParents:
     repository.getNodeContent(node.id, (status, data) => {
         switch (status) {
             case 'ok':
-                editor.render(data);
+                editor.render();
                 Utils.getElementInfo($(idset.resizeContainer), resizeContainerInfo => {
                     Utils.setStyle($(idset.scrollable), { width: resizeContainerInfo.width * 1.2, height: resizeContainerInfo.height * 1.2 });
                 })

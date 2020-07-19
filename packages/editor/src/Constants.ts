@@ -11,6 +11,8 @@ export class Constants {
         SELECTION_CHANGE: "SELECTION_CHANGE",
         TEXT_INPUT: "TEXT_INPUT",
         ELEMENTS_CREATED: "ELEMENTS_CREATED",
+        DOC_TREE_CREATED: "DOC_TREE_CREATED",
+        DOC_TREE_ROOT_SETED: "DOC_TREE_ROOT_SETED",
     }
 
     static props = {

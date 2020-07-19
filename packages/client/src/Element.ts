@@ -7,9 +7,6 @@ import { Editor } from "editor";
 export function randomId() {
     return "_" + uuid.v1().replace(/-/g, '');
 }
-export function $(id: string): HTMLElement {
-    return <HTMLElement>document.getElementById(id);
-}
 
 export interface Element extends HTMLElement {
     set(name: string, data: any): void;

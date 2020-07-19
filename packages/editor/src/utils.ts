@@ -1,19 +1,39 @@
 import { Utils } from "utils";
+import { Constants } from "./Constants";
 
 declare type EleType = 'content-container'
-| 'indentation'
-| 'image'
-| 'table'
-| 'row'
-| 'cell'
-| 'view-lines'
-| 'back-layer'
-| 'paragraph'
-| 'paragraph-line'
-| 'text'
-| 'unit-block';
+    | 'indentation'
+    | 'image'
+    | 'table'
+    | 'row'
+    | 'cell'
+    | 'view-lines'
+    | 'back-layer'
+    | 'paragraph'
+    | 'paragraph-line'
+    | 'text'
+    | 'unit-block';
 
-export function getType(node: HTMLElement): EleType | undefined{
+export var paragraphProps = {
+    setElementStart: (textNode: HTMLElement, start: number) => {
+        textNode.setAttribute('data-start-point', start + '');
+    },
+    getElementStart: (textNode: HTMLElement) => {
+        return parseInt(<string>textNode.getAttribute('data-start-point'));
+    },
+    setUnitBlockType: function (node: HTMLElement, type: string, value: string) {
+        node.setAttribute(Constants.props.DATA_UNIT_BLOCK_TYPE, type);
+        node.setAttribute(Constants.props.DATA_UNIT_BLOCK_VALUE, value);
+    },
+    getUnitBlockType: function (node: HTMLElement) {
+        return {
+            type: <string>node.getAttribute(Constants.props.DATA_UNIT_BLOCK_TYPE),
+            value: <string>node.getAttribute(Constants.props.DATA_UNIT_BLOCK_VALUE),
+        }
+    }
+}
+
+export function getType(node: HTMLElement): EleType | undefined {
     const type = node.getAttribute("data-ele-type")
     if (type) {
         return <any>type;
@@ -22,35 +42,34 @@ export function getType(node: HTMLElement): EleType | undefined{
     }
 }
 
-export function getNodeFromChild(node: HTMLElement): HTMLElement | undefined{
+export function getNodeFromChild(node: HTMLElement): HTMLElement | undefined {
     let cur = node;
     while (true) {
         const type = getType(cur);
-        if(type){
+        if (type) {
             return cur;
         }
-        if(cur.parentElement){
+        if (cur.parentElement) {
             cur = cur.parentElement;
-        }else{
+        } else {
             return undefined;
         }
     }
 }
 
-export function getImageBlockFromChild(node: HTMLElement): HTMLElement | undefined{
-    const ans = getNodeFromChild(node);
-    if(ans && getType(ans) === 'image'){
-        return ans;
+export function getDocNodeFromChild(node: HTMLElement) {
+    let cur = node;
+    while (true) {
+        const type = cur.getAttribute('data-node-type');
+        if (type) {
+            return cur;
+        }
+        if (cur.parentElement) {
+            cur = cur.parentElement;
+        } else {
+            return undefined;
+        }
     }
-    return undefined;
-}
-
-export function getUnitBlockFromChild(node: HTMLElement): HTMLElement | undefined {
-    const ans = getNodeFromChild(node);
-    if(ans && getType(ans) === 'unit-block'){
-        return ans;
-    }
-    return undefined;
 }
 
 export function createElement(type: EleType) {
@@ -89,7 +108,7 @@ export function createElement(type: EleType) {
             const viewLines = document.createElement("div");
             viewLines.setAttribute("data-ele-type", "view-lines");
             viewLines.setAttribute("tabindex", "1");
-            Utils.setStyle(viewLines, { display: 'block', position: 'relative', outline: 'none', 'user-select': 'none'});
+            Utils.setStyle(viewLines, { display: 'block', position: 'relative', outline: 'none', 'user-select': 'none' });
             return viewLines;
         case 'back-layer':
             const backLayer = document.createElement("div");
