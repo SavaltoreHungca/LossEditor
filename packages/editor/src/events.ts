@@ -4,10 +4,15 @@ import { Utils, DragState } from "utils";
 import { paragraphRendererFactor } from "./render/paragraph";
 import { captionImageRendererFactory } from "./render/captionImage";
 import { tableRendererFactory, rowRendererFactory, cellRendererFactory } from "./render/table";
-import { Node, SetSelectionResult } from 'editor-core';
+import { Node, SetSelectionResult, Point } from 'editor-core';
 import { getNodeFromChild, paragraphProps, getType } from "./utils";
 import { paragraphSelectionBehavior } from "./selection/paragraphSelectionBehavior";
 import { setCursorPositionForParagraph } from "./selection/cursorposition/paragraphCursorPosition";
+import { sentinelRendererFactory } from "./render/sentinel";
+import { setCursorPositionForSentinel } from "./selection/cursorposition/sentinelCursorPosition";
+import { sentinelSelectionBehavior } from "./selection/sentinelSelectionBehavior";
+import { paragraphTextInputBehaviorFactory } from "./textinput/paragraphTextInputBehavior";
+import { sentinelTextInputBehaviorFactory } from "./textinput/sentinelTextInputBehavior";
 
 export function registryEvents(editor: Editor) {
     initializeUi(editor);
@@ -15,6 +20,7 @@ export function registryEvents(editor: Editor) {
     regisNodeRenderer(editor);
     regisSetSelectionBehavior(editor);
     regisSetCursorPositionBehavior(editor);
+    regisTextInputBehavior(editor);
 }
 
 
@@ -65,11 +71,9 @@ function setNodeUiMap(editor: Editor) {
     editor.eventManager.registryEventDpendsOn([Constants.events.DOC_TREE_ROOT_SETED], () => {
         editor.docTree.walkTree(node => {
             if (node.type === 'root') {
-                editor.uiMap.set(node, editor.viewLines);
+                editor.uiMap.setElement(node, editor.viewLines);
             } else {
-                const ui = document.createElement('div');
-                ui.setAttribute('data-node-type', node.type);
-                editor.uiMap.set(node, ui);
+                editor.uiMap.setElement(node, document.createElement('div'));
             }
         })
     }, 'node-ui-map-seted');
@@ -78,6 +82,7 @@ function setNodeUiMap(editor: Editor) {
 function regisNodeRenderer(editor: Editor) {
     editor.eventManager.registryEventDpendsOn([Constants.events.DOC_TREE_CREATED], () => {
         editor.docTree.regisRenderer('root', (parent, node) => { })
+        editor.docTree.regisRenderer('sentinel', sentinelRendererFactory(editor));
         editor.docTree.regisRenderer('paragraph', paragraphRendererFactor(editor));
         editor.docTree.regisRenderer('captionImage', captionImageRendererFactory(editor));
         editor.docTree.regisRenderer('table', tableRendererFactory(editor));
@@ -89,9 +94,18 @@ function regisNodeRenderer(editor: Editor) {
 function regisSetSelectionBehavior(editor: Editor) {
     editor.eventManager.registryEventDpendsOn([Constants.events.DOC_TREE_CREATED], () => {
         editor.docTree.regisSetSelectionBehavior('paragraph', paragraphSelectionBehavior)
+        editor.docTree.regisSetSelectionBehavior('sentinel', sentinelSelectionBehavior)
     }, 'regis-set-selection-behavior-ok');
 }
 
-function regisSetCursorPositionBehavior(editor: Editor){
+function regisSetCursorPositionBehavior(editor: Editor) {
     editor.regisSetCursorPositionBehavior('paragraph', setCursorPositionForParagraph);
+    editor.regisSetCursorPositionBehavior('sentinel', setCursorPositionForSentinel);
+}
+
+function regisTextInputBehavior(editor: Editor) {
+    editor.eventManager.registryEventDpendsOn([Constants.events.DOC_TREE_CREATED], () => {
+        editor.docTree.regisTextInputBehavior('paragraph', paragraphTextInputBehaviorFactory(editor));
+        editor.docTree.regisTextInputBehavior('sentinel', sentinelTextInputBehaviorFactory(editor));
+    }, 'regis-textinput-behavior-ok')
 }

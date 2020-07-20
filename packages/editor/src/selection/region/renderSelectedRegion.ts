@@ -1,7 +1,7 @@
-import { Editor } from './Editor';
-import { Constants } from './Constants';
+import { Editor } from '../../Editor';
+import { Constants } from '../../Constants';
 import { Utils } from 'utils';
-import { getType } from './utils';
+import { getType } from '../../utils';
 import { Point } from './Selection';
 
 // #e5ebf1

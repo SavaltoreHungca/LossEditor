@@ -8,11 +8,12 @@ export function listenSelectionToSetCursor(editor: Editor) {
         const point = <Point>selection.end;
         const behavior = editor.setCursorPositionBehaviorSet.get(point.node.type);
         if (!behavior) return;
-        const result = <SetCursorPositionResult>behavior(editor.uiMap.getvalue(point.node), point.offset, editor);
-        if(result){
+        const result = <SetCursorPositionResult>behavior(editor.uiMap.getElement(point.node), point.offset, editor);
+        if (result) {
             setCursorPosition(editor.cursor, result.left, result.top, result.height);
         }
-    })  
+        editor.cursor.focus({ preventScroll: true });
+    })
 }
 
 function setCursorPosition(cursor: HTMLElement, left: number, top: number, height: number) {
@@ -24,7 +25,6 @@ function setCursorPosition(cursor: HTMLElement, left: number, top: number, heigh
     })
 }
 
-let skipInputEvent = false;
 export function createCursor(editor: Editor): HTMLTextAreaElement {
     const cursor = document.createElement("textarea");
     cursor.addEventListener("blur", () => {
@@ -57,21 +57,6 @@ export function createCursor(editor: Editor): HTMLTextAreaElement {
         'white-space': 'pre',
         animation: 'flashing-cursor 600ms infinite;'
         // "visibility": "hidden"
-    })
-
-    cursor.addEventListener("compositionstart", (event) => {
-        skipInputEvent = true;
-    })
-    cursor.addEventListener("compositionend", (event: any) => {
-        editor.inputText = event.data;
-        skipInputEvent = false;
-        editor.eventManager.triggleEvent(Constants.events.TEXT_INPUT);
-    })
-    cursor.addEventListener('input', (event: any) => {
-        const evt: InputEvent = event;
-        if (skipInputEvent) return;
-        editor.inputText = evt.data || '';
-        editor.eventManager.triggleEvent(Constants.events.TEXT_INPUT);
     })
     return cursor;
 }

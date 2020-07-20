@@ -37,6 +37,7 @@ export class DocTreeResolver {
     private static createNode(obj: any): Node {
         const node = new Node(obj.type, obj.isPresenter);
         node.content = obj.content;
+        node.sentinelAct = obj.sentinelAct;
         return node;
     }
 

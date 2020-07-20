@@ -9,6 +9,7 @@ import { Utils } from "utils";
 import { renderAttachment } from "./renderAttachment";
 import { renderCodeOpen } from "./renderCodeOpen";
 import { indentationWrap } from "./indentationWrap";
+import { mountChild } from "./resolveNodeRelation";
 
 
 declare type Style = {
@@ -35,23 +36,35 @@ interface TextContent {
 
 export function paragraphRendererFactor(editor: Editor) {
     return (parent: Node | undefined, node: Node) => {
-        if (!parent) throw new Error(`无法找到承载的父容器`);
-        const parentUi = <HTMLElement>editor.uiMap.getvalue(parent);
-        const nodeUi = <HTMLElement>editor.uiMap.getvalue(node);
-
-        if (nodeUi.parentElement !== parentUi) {
-            nodeUi.parentElement?.removeChild(nodeUi);
-            parentUi.appendChild(nodeUi);
-        }
+        const { parentUi, nodeUi } = mountChild(editor, parent, node);
 
         const textContent = <TextContent>node.content;
-        const viewLines = indentationWrap(node, nodeUi);
+        const viewLines = indentationWrap(nodeUi, node.indentation);
 
         const paragraph = createElement('paragraph');
         viewLines.appendChild(paragraph);
 
-        appendLineToParagraph(textContent, paragraph);
+        if (!textContent || !textContent.str) {
+            renderEmptyInParagraph(paragraph);
+        } else {
+            appendLineToParagraph(textContent, paragraph);
+        }
     }
+}
+
+function renderEmptyInParagraph(paragraph: HTMLElement) {
+    const line = createElement('paragraph-line');
+    paragraphProps.setElementStart(line, 0);
+    paragraph.appendChild(line);
+    const text = createElement('text');
+    paragraphProps.setElementStart(text, 0);
+    line.appendChild(text);
+
+    Utils.setStyle(text, {
+        'min-height': Utils.getStrPx(Constants.WIDTH_BASE_CHAR, text).height + 'px',
+        'min-width': '1px'
+    })
+    Utils.setStyle(line, { width: 'auto' });
 }
 
 export function appendLineToParagraph(textContent: TextContent, paragraph: HTMLElement) {

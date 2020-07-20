@@ -4,6 +4,7 @@ import { ScrollPage } from "scroll-page";
 import { Editor } from "../Editor";
 import { Node } from "editor-core";
 import { indentationWrap } from "./indentationWrap";
+import { mountChild } from "./resolveNodeRelation";
 
 
 interface CaptionImageContent {
@@ -13,16 +14,8 @@ interface CaptionImageContent {
 
 export function captionImageRendererFactory(editor: Editor){
     return (parent: Node | undefined, node: Node)=>{
-        if (!parent) throw new Error(`无法找到承载的父容器`);
-        const parentUi = <HTMLElement>editor.uiMap.getvalue(parent);
-        const nodeUi = <HTMLElement>editor.uiMap.getvalue(node);
-
-        if (nodeUi.parentElement !== parentUi) {
-            nodeUi.parentElement?.removeChild(nodeUi);
-            parentUi.appendChild(nodeUi);
-        }
-
-        renderImage(node.content, indentationWrap(node, nodeUi));
+        const {parentUi, nodeUi} = mountChild(editor, parent, node);
+        renderImage(node.content, indentationWrap(nodeUi, node.indentation));
     }
 }
 

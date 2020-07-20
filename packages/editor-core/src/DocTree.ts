@@ -24,6 +24,7 @@ export class DocTree {
     regisdEvents = new Map<string, Array<Function>>();
     cursorMoveBehaviorSet = new Map<string, Function>();
     setSelectionBehaviorSet = new Map<string, Function>();
+    textInputBehaviorSet = new Map<string, Function>();
     regisdRenderer = new Map<string, Function>();
 
     setRoot(root: Node) {
@@ -36,6 +37,12 @@ export class DocTree {
             const render = this.regisdRenderer.get(node.type);
             if (!render) throw new Error(`${node.type}的渲染器未注册`);
             render(node.parent, node);
+
+            if (!node.isPresenter && !node.children) {
+                const sentinel = new Node('sentinel', true);
+                node.children = [sentinel];
+                sentinel.parent = node;
+            }
         }
 
         const root = rootNode ? rootNode : this.root;
@@ -86,10 +93,14 @@ export class DocTree {
         this.cursorMoveBehaviorSet.set(nodeType, behavior);
     }
 
+    regisTextInputBehavior(nodeType: string, behavior: (point: Point, text: string) => void) {
+        this.textInputBehaviorSet.set(nodeType, behavior);
+    }
+
     moveCursorPosition(offset: number, isHorizontal: boolean): void {
         if (!this.selection) return;
         const { end } = this.selection;
-        if(!end) return;
+        if (!end) return;
         const newEndPoint = this.moveCursor({ ...end }, offset, isHorizontal);
         if (newEndPoint) {
             this.selection.end = newEndPoint;
@@ -102,19 +113,17 @@ export class DocTree {
         const behavior = this.setSelectionBehaviorSet.get(node.type);
         if (!behavior) throw new Error(`${node.type}的setSelection行为未设置`);
         const setSelectionResult = <SetSelectionResult>behavior(node, data);
-        if(!setSelectionResult) return;
-        switch(setSelectionResult.pointType){
+        if (!setSelectionResult) return;
+        switch (setSelectionResult.pointType) {
             case 'start': {
-                this.tmpSelection = {
-                    start: {
-                        node: node,
-                        offset: setSelectionResult.offset
-                    }
-                }
+                this.tmpSelection = new Selection({
+                    node: node,
+                    offset: setSelectionResult.offset
+                })
                 break;
             }
             case 'end': {
-                if(!this.tmpSelection) return;
+                if (!this.tmpSelection) return;
                 this.tmpSelection.end = {
                     node: node,
                     offset: setSelectionResult.offset
@@ -124,6 +133,22 @@ export class DocTree {
                 break;
             }
         }
+    }
+
+    changeSelection(start: Point, end: Point, pressEventTriggle?: boolean) {
+        this.selection = new Selection(start, end);
+        if (!pressEventTriggle) {
+            this.triggleEvent('selection_change', event => event(<Selection>this.selection));
+        }
+    }
+
+    textInput(text: string) {
+        if (!this.selection) return;
+        if (!this.selection.end) return;
+        const { end } = this.selection
+        const behavior = this.textInputBehaviorSet.get(end.node.type);
+        if (!behavior) throw new Error(`${end.node.type}的输入行为未定义`);
+        behavior(end, text);
     }
 
     walkTree(consumer: (node: Node) => void) {

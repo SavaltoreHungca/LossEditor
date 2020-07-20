@@ -205,7 +205,7 @@ function factory(pkg, options = {}) {
     return [
         // configure(pkg, 'development', 'cjs', options),
         configure(pkg, 'development', 'module', options),
-        configure(pkg, 'development', 'umd', options),
+        // configure(pkg, 'development', 'umd', options),
         // isProd && configure(pkg, 'development', 'umd', options),
         // isProd && configure(pkg, 'production', 'umd', options),
     ].filter(Boolean)

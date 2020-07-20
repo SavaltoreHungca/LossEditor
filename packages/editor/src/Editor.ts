@@ -1,3 +1,4 @@
+import { NodeManager } from './NodeManager';
 import { data } from './testdata';
 import { DocTree, DocTreeResolver, Node } from 'editor-core';
 import { EventManager, DataListener } from 'event-driven';
@@ -5,12 +6,10 @@ import { Utils, BidMap } from 'utils';
 import { createCursor, listenSelectionToSetCursor } from './selection/cursor';
 import { createElement } from './utils';
 import { listenContainerSizeChange } from './autoResize';
-import { listenSelectionChangeToSetSelectedRegion } from './renderSelectedRegion';
-import { listenTextInput } from './textInput';
-import { listenUserPressKey } from './keyboard';
 import { registryEvents } from './events';
 import { Constants } from './Constants';
 import { listenUserChangeSelection } from './selection/selectionListener';
+import { listenTextInput } from './textinput/listenTextInput';
 
 
 export type SetCursorPositionResult = {
@@ -27,11 +26,10 @@ export class Editor {
     regionContainer: HTMLElement = document.createElement('div');
     eventManager: EventManager = new EventManager();
     dataListener: DataListener = new DataListener(200);
-    inputText: string = '';
 
     setCursorPositionBehaviorSet = new Map<string, Function>();
     docTree: DocTree = new DocTree();
-    uiMap = new BidMap<Node, HTMLElement>();
+    uiMap = new NodeManager();
 
     constructor(container: HTMLElement) {
         this.container = container;
@@ -67,6 +65,7 @@ export class Editor {
     private __init__() {
         listenUserChangeSelection(this);
         listenSelectionToSetCursor(this);
+        listenTextInput(this);
         // listenContainerSizeChange(this);
         // listenSelectionChangeToSetSelectedRegion(this);
         // listenTextInput(this);

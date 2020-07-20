@@ -7,8 +7,22 @@ export class Node {
     children?: Array<Node>
     parent?: Node
     content?: any
+    sentinelAct?: {
+        placeholder?: string,
+        style: {
+            [index: string]: string
+        }
+    }
 
-    constructor(type: string, isPresenter: boolean){
+    delete() {
+        if (this.parent) {
+            const { children } = this.parent;
+            children?.splice(children.indexOf(this), 1);
+        }
+        this.parent = undefined;
+    }
+
+    constructor(type: string, isPresenter: boolean) {
         this.type = type;
         this.isPresenter = isPresenter;
     }
@@ -60,9 +74,9 @@ export class Node {
 
         const findParentNextSibling = (node: Node) => {
             let parent = node.parent;
-            while(parent){
+            while (parent) {
                 let parentNextSibling = parent.nextSibling;
-                if(parentNextSibling) return parentNextSibling;
+                if (parentNextSibling) return parentNextSibling;
                 parent = parent.parent;
             }
         }
@@ -109,9 +123,9 @@ export class Node {
         const findParentPreSibling = (node: Node) => {
             let parent = node.parent;
 
-            while(parent){
+            while (parent) {
                 let parentPreSibling = parent.preSibling;
-                if(parentPreSibling) return parentPreSibling;
+                if (parentPreSibling) return parentPreSibling;
                 parent = parent.parent;
             }
         }

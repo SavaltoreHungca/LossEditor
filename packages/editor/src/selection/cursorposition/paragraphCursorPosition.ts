@@ -44,7 +44,7 @@ export function setCursorPositionForParagraph(paragraph: HTMLElement, offset: nu
     return ans;
 }
 
-function binarySearchWhichRange(array: HTMLCollection, offset: number) {
+export function binarySearchWhichRange(array: HTMLCollection, offset: number) {
     let foundLine;
     let right = Math.floor(array.length / 2);
     let left = 0;

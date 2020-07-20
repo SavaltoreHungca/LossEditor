@@ -424,14 +424,21 @@ export class Utils {
         }
     }
 
-    static getRefStageNode<T>(node: T, root: T, stage: number, getParent: (node: T) => T | undefined | null) {
+    /**
+     * 
+     * @param node 
+     * @param stage 0 代表 root
+     * @param getParent 
+     * @param isRoot 
+     */
+    static getRefStageNode<T>(node: T, stage: number, getParent: (node: T) => T | undefined | null, isRoot: (node: T) => boolean) {
         const path = new Array<T>();
-        while (node && node !== root) {
+        while (node && !isRoot(node)) {
             path.push(node);
             node = <T>getParent(node);
         }
-        if (node !== root) return undefined;
-        path.push(root);
+        if (!isRoot(node)) return undefined;
+        path.push(node);
         if (path.length > stage) {
             return path[path.length - 1 - stage];
         }
@@ -496,7 +503,7 @@ export class Utils {
                         if (critical > 0 && value < sortedRanges[critical - 1][0]) {
                             ans.nearestNextRange = sortedRanges[critical - 1];
                             ans.nearestPreRange = critical - 2 >= 0 ? sortedRanges[critical - 2] : undefined;
-                        }else {
+                        } else {
                             ans.nearestNextRange = sortedRanges[critical];
                             ans.nearestPreRange = critical - 1 >= 0 ? sortedRanges[critical - 1] : undefined;
                         }

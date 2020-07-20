@@ -14,4 +14,9 @@ export class BidMap<K, V> {
         this.keyMap.set(k, v);
         this.valueMap.set(v, k);
     }
+
+    remove(k: K){
+        this.valueMap.delete(this.getvalue(k));
+        this.keyMap.delete(k);
+    }
 }

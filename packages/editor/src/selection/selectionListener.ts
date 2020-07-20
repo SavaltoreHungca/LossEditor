@@ -9,7 +9,7 @@ export function listenUserChangeSelection(editor: Editor) {
         const srcElement = <HTMLElement>e.event.target;
         const node = getDocNodeFromChild(srcElement);
         if(node){
-            editor.docTree.setSelection(editor.uiMap.getkey(node), e);
+            editor.docTree.setSelection(editor.uiMap.getNode(node), e);
         }
     })
 }
