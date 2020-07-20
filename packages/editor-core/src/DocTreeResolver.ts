@@ -38,6 +38,8 @@ export class DocTreeResolver {
         const node = new Node(obj.type, obj.isPresenter);
         node.content = obj.content;
         node.sentinelAct = obj.sentinelAct;
+        node.isCombine = obj.isCombine;
+        node.inCombine = obj.inCombine;
         return node;
     }
 

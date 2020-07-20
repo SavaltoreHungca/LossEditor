@@ -8,13 +8,17 @@ export function listenTextInput(editor: Editor) {
         skipInputEvent = true;
     })
     editor.cursor.addEventListener("compositionend", (event: any) => {
-        editor.docTree.textInput(event.data);
+        triggleTextInput(editor, event.data)
         skipInputEvent = false;
-        editor.eventManager.triggleEvent(Constants.events.TEXT_INPUT);
     })
     editor.cursor.addEventListener('input', (event: any) => {
-        const evt: InputEvent = event;
         if (skipInputEvent) return;
-        editor.docTree.textInput(evt.data || '');
+        triggleTextInput(editor, event.data)
     })
+}
+
+function triggleTextInput(editor: Editor, data: string | undefined | null) {
+    if(data && data !== ''){
+        editor.docTree.textInput(data);
+    }
 }

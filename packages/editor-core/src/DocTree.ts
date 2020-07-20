@@ -20,11 +20,12 @@ export class DocTree {
     root?: Node;
     selection?: Selection;
 
-
     regisdEvents = new Map<string, Array<Function>>();
+
     cursorMoveBehaviorSet = new Map<string, Function>();
     setSelectionBehaviorSet = new Map<string, Function>();
     textInputBehaviorSet = new Map<string, Function>();
+    deleteBehaviorSet = new Map<string, Function>();
     regisdRenderer = new Map<string, Function>();
 
     setRoot(root: Node) {

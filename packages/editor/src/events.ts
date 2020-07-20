@@ -13,6 +13,8 @@ import { setCursorPositionForSentinel } from "./selection/cursorposition/sentine
 import { sentinelSelectionBehavior } from "./selection/sentinelSelectionBehavior";
 import { paragraphTextInputBehaviorFactory } from "./textinput/paragraphTextInputBehavior";
 import { sentinelTextInputBehaviorFactory } from "./textinput/sentinelTextInputBehavior";
+import { textInputRendererFactor } from "./render/textInput";
+import { imageRendererFactory } from "./render/image";
 
 export function registryEvents(editor: Editor) {
     initializeUi(editor);
@@ -84,6 +86,8 @@ function regisNodeRenderer(editor: Editor) {
         editor.docTree.regisRenderer('root', (parent, node) => { })
         editor.docTree.regisRenderer('sentinel', sentinelRendererFactory(editor));
         editor.docTree.regisRenderer('paragraph', paragraphRendererFactor(editor));
+        editor.docTree.regisRenderer('textInput', textInputRendererFactor(editor));
+        editor.docTree.regisRenderer('image', imageRendererFactory(editor));
         editor.docTree.regisRenderer('captionImage', captionImageRendererFactory(editor));
         editor.docTree.regisRenderer('table', tableRendererFactory(editor));
         editor.docTree.regisRenderer('row', rowRendererFactory(editor));

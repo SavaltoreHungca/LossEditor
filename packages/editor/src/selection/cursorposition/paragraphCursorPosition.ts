@@ -46,7 +46,7 @@ export function setCursorPositionForParagraph(paragraph: HTMLElement, offset: nu
 
 export function binarySearchWhichRange(array: HTMLCollection, offset: number) {
     let foundLine;
-    let right = Math.floor(array.length / 2);
+    let right = array.length - 1;
     let left = 0;
 
     if (array.length === 1) {
@@ -54,23 +54,26 @@ export function binarySearchWhichRange(array: HTMLCollection, offset: number) {
     }
 
     while (!foundLine && left < right) {
-        const line = <HTMLElement>array[left];
         const nextLine = <HTMLElement>array[right];
-        const lineStart = paragraphProps.getElementStart(line);
-        const nextLineStart = paragraphProps.getElementStart(nextLine);
+
+        const rightStart = paragraphProps.getElementStart(nextLine);
 
         const len = Math.abs(left - right);
-        if (offset > nextLineStart) {
-            left = right;
-            right += Math.ceil(len / 2);
-            if(right >= array.length) right = array.length - 1;
-        } else if (offset <= lineStart) {
-            right = left;
-            left -= Math.floor(len / 2);
-            if(left < 0) left = 0;
-        } else if (Math.abs(left - right) === 1){
-            foundLine = array[left];
-            break;
+        const mid = left + Math.floor(len / 2);
+        const midStart = paragraphProps.getElementStart(<HTMLElement>array[mid]);
+
+        if (offset > midStart) {
+            left = mid;
+        } else if (offset <= midStart) {
+            right = mid;
+        }
+
+        if (len === 1) {
+            if (offset > rightStart) {
+                foundLine = nextLine;
+            } else {
+                break;
+            }
         }
     }
     if (!foundLine) {

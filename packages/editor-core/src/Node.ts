@@ -3,6 +3,8 @@ import { Utils } from 'utils';
 export class Node {
     type: string
     isPresenter: boolean
+    isCombine?: boolean
+    inCombine?: boolean
     indentation?: number
     children?: Array<Node>
     parent?: Node

@@ -50,7 +50,7 @@ function createWindow(memloss: MemLoss, container: EditorWindowCon, nodeParents:
             <div data-mem-loss-type="crumbs" id="${idset.crumbs}"></div>
             <div data-mem-loss-type="editorContainer" id="${idset.editorContainer}" style="flex-grow: 1; overflow: hidden">
                 <div data-mem-loss-type="scrollable" id="${idset.scrollable}" style="width: fit-content; padding: 10px">
-                    <div data-mem-loss-type="resizeContainer" id=${idset.resizeContainer} style="display: block; position: relative; width: 600px; border: 1px solid #eee; padding: 20px; overflow: hidden">
+                    <div data-mem-loss-type="resizeContainer" id=${idset.resizeContainer} style="display: block; position: relative; width: 200px; border: 1px solid #eee; padding: 20px; overflow: hidden">
                         <div data-mem-loss-type="resizePoint" id="${idset.resizePoint}" class="hover-show background-change-selected" style="position: absolute; top: 0; right: -2.5px; height: 100%; width: 5px; z-index: 103; cursor: ew-resize"></div>
                         <div data-mem-loss-type="editor" id="${idset.editorElemt}" style='width: 100%;'></div>
                     </div>
