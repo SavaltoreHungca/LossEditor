@@ -1,8 +1,14 @@
 import { Editor } from "../Editor";
 import { Constants } from "../Constants";
+import isHotkey from "is-hotkey";
 
 let skipInputEvent = false;
 export function listenTextInput(editor: Editor) {
+    editor.container.addEventListener('keydown', (event)=>{
+        if(isHotkey('backspace')){
+            editor.docTree.backspace();
+        }
+    })
 
     editor.cursor.addEventListener("compositionstart", (event) => {
         skipInputEvent = true;

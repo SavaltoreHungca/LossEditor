@@ -29,7 +29,7 @@ declare type RenderContext = {
     renderFinish: boolean,
 }
 
-interface TextContent {
+export interface TextContent {
     str: string
     styleList?: StyleList
 }

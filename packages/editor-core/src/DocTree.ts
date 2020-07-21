@@ -25,7 +25,7 @@ export class DocTree {
     cursorMoveBehaviorSet = new Map<string, Function>();
     setSelectionBehaviorSet = new Map<string, Function>();
     textInputBehaviorSet = new Map<string, Function>();
-    deleteBehaviorSet = new Map<string, Function>();
+    backspaceBehaviorSet = new Map<string, Function>();
     regisdRenderer = new Map<string, Function>();
 
     setRoot(root: Node) {
@@ -98,6 +98,10 @@ export class DocTree {
         this.textInputBehaviorSet.set(nodeType, behavior);
     }
 
+    regisBackSpceBehavior(nodeType: string, behavior: (selection: Selection) => void) {
+        this.backspaceBehaviorSet.set(nodeType, behavior);
+    }
+
     moveCursorPosition(offset: number, isHorizontal: boolean): void {
         if (!this.selection) return;
         const { end } = this.selection;
@@ -133,6 +137,19 @@ export class DocTree {
                 this.triggleEvent('selection_change', event => event(<Selection>this.selection));
                 break;
             }
+        }
+    }
+
+    backspace(selection?: Selection) {
+        selection = selection ? selection : this.selection;
+        if (!selection) return;
+
+        if (selection.relativePostionStartEnd === 'OVERLAPPING') {
+            let { end } = selection;
+            end = <Point>end;
+            const behavior = this.backspaceBehaviorSet.get(end.node.type);
+            if(!behavior) throw new Error(`${end.node.type}的backspce行为未定义`);
+            behavior(selection);
         }
     }
 
