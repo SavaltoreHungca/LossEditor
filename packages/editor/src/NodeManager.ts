@@ -3,6 +3,7 @@ import { Node } from 'editor-core';
 
 export class NodeManager {
     private nodeMap = new BidMap<Node, HTMLElement>();
+    
 
     hasElement(node: Node | undefined): boolean {
         return node && this.nodeMap.getvalue(node) ? true : false;

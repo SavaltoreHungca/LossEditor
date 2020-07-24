@@ -25,6 +25,10 @@ export var paragraphProps = {
         node.setAttribute(Constants.props.DATA_UNIT_BLOCK_TYPE, type);
         node.setAttribute(Constants.props.DATA_UNIT_BLOCK_VALUE, value);
     },
+    getUnitblockOffset: function (node: HTMLElement) {
+        const { type, value } = paragraphProps.getUnitBlockType(node);
+        return type.length + value.length + 6;
+    },
     getUnitBlockType: function (node: HTMLElement) {
         return {
             type: <string>node.getAttribute(Constants.props.DATA_UNIT_BLOCK_TYPE),

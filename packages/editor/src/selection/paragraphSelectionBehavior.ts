@@ -88,5 +88,6 @@ function getOffsetInUnitBlock(blockNode: HTMLElement, mouseEvent: MouseEvent) {
 
     if (offset === 0) return paragraphProps.getElementStart(blockNode);
 
-    return type.length + value.length + 6 + paragraphProps.getElementStart(blockNode);
+    return paragraphProps.getUnitblockOffset(blockNode)
+        + paragraphProps.getElementStart(blockNode);
 }
