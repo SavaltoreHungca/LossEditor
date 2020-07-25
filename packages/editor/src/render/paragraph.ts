@@ -58,6 +58,7 @@ function renderEmptyInParagraph(paragraph: HTMLElement) {
     paragraph.appendChild(line);
     const text = createElement('text');
     paragraphProps.setElementStart(text, 0);
+    paragraphProps.setEleUniId(text);
     line.appendChild(text);
 
     Utils.setStyle(text, {
