@@ -26,6 +26,7 @@ export class DocTree {
     setSelectionBehaviorSet = new Map<string, Function>();
     textInputBehaviorSet = new Map<string, Function>();
     backspaceBehaviorSet = new Map<string, Function>();
+    typesettingBehaviorSet = new Map<string, Function>();
     regisdRenderer = new Map<string, Function>();
 
     setRoot(root: Node) {
@@ -102,6 +103,10 @@ export class DocTree {
         this.backspaceBehaviorSet.set(nodeType, behavior);
     }
 
+    regisTypesettingBehavior(nodeType: string, behavior: (point: Point) => void) {
+        this.typesettingBehaviorSet.set(nodeType, behavior);
+    }
+
     moveCursorPosition(offset: number, isHorizontal: boolean): void {
         if (!this.selection) return;
         const { end } = this.selection;
@@ -151,6 +156,12 @@ export class DocTree {
             if(!behavior) throw new Error(`${end.node.type}的backspce行为未定义`);
             behavior(selection);
         }
+    }
+
+    typesetting(point: Point){
+        const behavior = this.typesettingBehaviorSet.get(point.node.type);
+        if(!behavior) throw new Error(`${point.node.type}的排版行为未设定`);
+        behavior(point);
     }
 
     changeSelection(start: Point, end: Point, pressEventTriggle?: boolean) {

@@ -473,8 +473,12 @@ export class Utils {
         }
 
         if (sortedRanges.length === 1) {
-            if (inRange(sortedRanges[0], value)) {
+            if(inLeft(sortedRanges[0], value)){
+                ans.nearestNextRange = sortedRanges[0];
+            }else if(inRange(sortedRanges[0], value)){
                 ans.foundRange = sortedRanges[0];
+            }else{
+                ans.nearestPreRange = sortedRanges[0];
             }
             return ans;
         }

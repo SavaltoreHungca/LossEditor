@@ -3,7 +3,7 @@ import { Node } from "editor-core";
 
 /// <reference path="./katex.d.ts"/>
 import katex from 'katex';
-import { createElement, paragraphProps } from "../utils";
+import { createElement, paragraphProps, props } from "../utils";
 import { Constants } from "../Constants";
 import { Utils } from "utils";
 import { renderAttachment } from "./renderAttachment";
@@ -12,7 +12,7 @@ import { indentationWrap } from "./indentationWrap";
 import { mountChild } from "./resolveNodeRelation";
 
 
-declare type Style = {
+export type Style = {
     [index: string]: string
 }
 declare type StyleList = Array<[number, number, Style]>;
@@ -22,11 +22,12 @@ declare type RenderContext = {
     strIndex: number,
     unit: HTMLElement | undefined,
     maxWidth: number,
-    line: HTMLElement,
+    line: HTMLElement | undefined,
     sortedRanges: Array<[number, number]>,
     styleMap: Map<[number, number], Style>,
     exceed: boolean,
     renderFinish: boolean,
+    styleIdMap: Map<Style, string>,
 }
 
 export interface TextContent {
@@ -81,45 +82,41 @@ export function appendLineToParagraph(textContent: TextContent, paragraph: HTMLE
         styleMap.set(range, item[2]);
     });
 
+    const context: RenderContext = {
+        str: textContent.str,
+        strIndex: offset,
+        unit: undefined,
+        maxWidth: paragraphInfo.innerWidth,
+        line: undefined,
+        exceed: false,
+        renderFinish: false,
+        sortedRanges: sortedRanges,
+        styleMap: styleMap,
+        styleIdMap: new Map<Style, string>(),
+    }
+
     while (offset < textContent.str.length) {
         line = createElement('paragraph-line');
         paragraphProps.setElementStart(line, offset);
         paragraph.appendChild(line);
 
+        context.line = line;
+        context.strIndex = offset;
+        context.exceed = false;
+        context.renderFinish = false;
         offset += renderElementsInLine(
-            textContent.str,
-            sortedRanges,
-            styleMap,
-            offset,
-            line,
-            paragraphInfo.innerWidth,
+            context,
             [renderText, renderUnitBlock]
         );
     }
 }
 
 export function renderElementsInLine(
-    str: string,
-    sortedRanges: Array<[number, number]>,
-    styleMap: Map<[number, number], Style>,
-    startOffset: number,
-    line: HTMLElement,
-    maxWdith: number,
+    context: RenderContext,
     renders: Array<(context: RenderContext) => void>): number {
-
-    Utils.setStyle(line, { width: 'fit-content' });
-
-    const context: RenderContext = {
-        str: str,
-        strIndex: startOffset,
-        unit: undefined,
-        maxWidth: maxWdith,
-        line: line,
-        exceed: false,
-        renderFinish: false,
-        sortedRanges: sortedRanges,
-        styleMap: styleMap,
-    }
+    if (!context.line) throw new Error();
+    const start = context.strIndex;
+    Utils.setStyle(context.line, { width: 'fit-content' });
 
     while (!context.renderFinish && !context.exceed) {
         renders.forEach(render => {
@@ -127,9 +124,9 @@ export function renderElementsInLine(
         })
     }
 
-    Utils.setStyle(line, { width: 'auto' });
+    Utils.setStyle(context.line, { width: 'auto' });
 
-    return context.strIndex - startOffset;
+    return context.strIndex - start;
 }
 
 function startRender(context: RenderContext, render: (context: RenderContext) => void) {
@@ -144,6 +141,7 @@ function startRender(context: RenderContext, render: (context: RenderContext) =>
 }
 
 function renderText(context: RenderContext): void {
+    if (!context.line) throw new Error();
     if (findUnitBlock(context.str, context.strIndex).unitBlock) {
         return;
     }
@@ -152,9 +150,11 @@ function renderText(context: RenderContext): void {
     const style = foundRange ? context.styleMap.get(foundRange) : undefined;
 
     context.unit = createElement('text');
+
+    setEleUniIdAndStyle(style, context);
+
     paragraphProps.setElementStart(context.unit, context.strIndex);
     context.line.appendChild(context.unit);
-    if (style) Utils.setStyle(context.unit, style);
 
     while (context.strIndex < context.str.length) {
         if (findUnitBlock(context.str, context.strIndex).unitBlock) {
@@ -193,6 +193,7 @@ function renderText(context: RenderContext): void {
 
 
 function renderUnitBlock(context: RenderContext): void {
+    if (!context.line) throw new Error();
     const { nextPosition, unitBlock, type, value } = findUnitBlock(context.str, context.strIndex);
     if (!unitBlock) return;
 
@@ -203,7 +204,8 @@ function renderUnitBlock(context: RenderContext): void {
     const { foundRange, nearestNextRange } = Utils.findInWhichRange(context.sortedRanges, context.strIndex);
     const style = foundRange ? context.styleMap.get(foundRange) : undefined;
 
-    if (style) Utils.setStyle(context.unit, style);
+    setEleUniIdAndStyle(style, context);
+
     paragraphProps.setUnitBlockType(context.unit, type, value);
     switch (type) {
         case 'formula':
@@ -256,4 +258,19 @@ function findUnitBlock(str: string, position: number) {
         ans.value = RegExp.$2;
     }
     return ans;
+}
+
+
+function setEleUniIdAndStyle(style: Style | undefined, context: RenderContext) {
+    if (!context.unit) return;
+    if (style) {
+        const styleid = context.styleIdMap.get(style);
+        if (!styleid) {
+            context.styleIdMap.set(style, Utils.randmonId());
+        }
+        paragraphProps.setEleUniId(context.unit, styleid);
+        props.setStyle(context.unit, style);
+    } else {
+        paragraphProps.setEleUniId(context.unit);
+    }
 }

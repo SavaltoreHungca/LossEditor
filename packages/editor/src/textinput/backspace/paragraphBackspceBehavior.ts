@@ -16,13 +16,8 @@ export function paragraphBackspaceFactory(editor: Editor) {
         const leftLine = binarySearchWhichRange(paragraph.children, left.offset);
 
         if (selection.isCollapsed) {
-            const ele = binarySearchWhichRange(leftLine.children, left.offset);
-            const eleOffset = left.offset - paragraphProps.getElementStart(ele);
-            ele.innerText = ele.innerText.substring(0, eleOffset - 1)
-                + ele.innerText.substring(eleOffset);
-            textContent.str = textContent.str.substring(0, left.offset - 1)
-                + textContent.str.substring(left.offset);
-            
+            backspceCollapsed(textContent, left, leftLine);
+            editor.docTree.typesetting(left);
             return;
         }
 
@@ -37,7 +32,27 @@ export function paragraphBackspaceFactory(editor: Editor) {
         textContent.str = textContent.str.substring(0, left.offset)
             + textContent.str.substring(right.offset);
 
-        
+        editor.docTree.typesetting(left);
+    }
+}
+function backspceCollapsed(textContent: TextContent, left: Point, leftLine: HTMLElement) {
+    const ele = binarySearchWhichRange(leftLine.children, left.offset);
+    const eleOffset = left.offset - paragraphProps.getElementStart(ele);
+
+    switch (getType(ele)) {
+        case 'text': {
+            ele.innerText = ele.innerText.substring(0, eleOffset - 1)
+                + ele.innerText.substring(eleOffset);
+            textContent.str = textContent.str.substring(0, left.offset - 1)
+                + textContent.str.substring(left.offset);
+            break;
+        }
+        case 'unit-block': {
+            if (eleOffset > 0) {
+                leftLine.removeChild(ele);
+            }
+            break;
+        }
     }
 }
 

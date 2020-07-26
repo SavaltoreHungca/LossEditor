@@ -16,6 +16,7 @@ import { sentinelTextInputBehaviorFactory } from "./textinput/sentinelTextInputB
 import { textInputRendererFactor } from "./render/textInput";
 import { imageRendererFactory } from "./render/image";
 import { paragraphBackspaceFactory } from "./textinput/backspace/paragraphBackspceBehavior";
+import { paragraphTypesettingFactory } from "./typesetting/paragraphTypesetting";
 
 export function registryEvents(editor: Editor) {
     initializeUi(editor);
@@ -24,6 +25,7 @@ export function registryEvents(editor: Editor) {
     regisSetSelectionBehavior(editor);
     regisSetCursorPositionBehavior(editor);
     regisTextInputBehavior(editor);
+    regisTypesettingBehavior(editor);
 }
 
 
@@ -115,4 +117,10 @@ function regisTextInputBehavior(editor: Editor) {
 
         editor.docTree.regisBackSpceBehavior('paragraph', paragraphBackspaceFactory(editor));
     }, 'regis-textinput-behavior-ok')
+}
+
+function regisTypesettingBehavior(editor: Editor){
+    editor.eventManager.registryEventDpendsOn([Constants.events.DOC_TREE_CREATED], () => {
+        editor.docTree.regisTypesettingBehavior('paragraph', paragraphTypesettingFactory(editor));
+    }, 'regis-typesetting-behavior-ok')
 }
