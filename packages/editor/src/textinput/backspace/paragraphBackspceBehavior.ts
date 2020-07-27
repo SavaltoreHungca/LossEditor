@@ -16,26 +16,29 @@ export function paragraphBackspaceFactory(editor: Editor) {
         const leftLine = binarySearchWhichRange(paragraph.children, left.offset);
 
         if (selection.isCollapsed) {
-            backspceCollapsed(textContent, left, leftLine);
+            const p = backspceCollapsed(textContent, left, leftLine);
             editor.docTree.typesetting(left);
+            editor.docTree.changeSelection(p, p);
             return;
         }
 
         const rightLine = binarySearchWhichRange(paragraph.children, right.offset);
 
+        let p;
         if (leftLine !== rightLine) {
-            backspceDiffLine(left, right, leftLine, rightLine);
+            p = backspceDiffLine(left, right, leftLine, rightLine);
         } else {
-            backspaceSameLine(left, right, leftLine);
+            p = backspaceSameLine(left, right, leftLine);
         }
 
         textContent.str = textContent.str.substring(0, left.offset)
             + textContent.str.substring(right.offset);
 
         editor.docTree.typesetting(left);
+        editor.docTree.changeSelection(p, p);
     }
 }
-function backspceCollapsed(textContent: TextContent, left: Point, leftLine: HTMLElement) {
+function backspceCollapsed(textContent: TextContent, left: Point, leftLine: HTMLElement): Point {
     const ele = binarySearchWhichRange(leftLine.children, left.offset);
     const eleOffset = left.offset - paragraphProps.getElementStart(ele);
 
@@ -45,18 +48,22 @@ function backspceCollapsed(textContent: TextContent, left: Point, leftLine: HTML
                 + ele.innerText.substring(eleOffset);
             textContent.str = textContent.str.substring(0, left.offset - 1)
                 + textContent.str.substring(left.offset);
-            break;
+            
+            left.offset -= 1;
+            return left;
         }
         case 'unit-block': {
             if (eleOffset > 0) {
                 leftLine.removeChild(ele);
+                left.offset -= eleOffset;
             }
-            break;
+            return left;
         }
     }
+    throw new Error();
 }
 
-function backspceDiffLine(left: Point, right: Point, leftLine: HTMLElement, rightLine: HTMLElement) {
+function backspceDiffLine(left: Point, right: Point, leftLine: HTMLElement, rightLine: HTMLElement): Point {
     const paragraph = <HTMLElement>leftLine.parentElement;
     while (leftLine.nextElementSibling && leftLine.nextElementSibling !== rightLine) {
         paragraph.removeChild(leftLine.nextElementSibling);
@@ -113,9 +120,10 @@ function backspceDiffLine(left: Point, right: Point, leftLine: HTMLElement, righ
             break;
         }
     }
+    return left;
 }
 
-function backspaceSameLine(left: Point, right: Point, line: HTMLElement) {
+function backspaceSameLine(left: Point, right: Point, line: HTMLElement): Point {
     const leftEle = binarySearchWhichRange(line.children, left.offset);
     const rightEle = binarySearchWhichRange(line.children, right.offset);
 
@@ -168,15 +176,12 @@ function backspaceSameLine(left: Point, right: Point, line: HTMLElement) {
     } else {
         switch (getType(leftEle)) {
             case 'text': {
-                let innerText = leftEle.innerText;
-                innerText = innerText.substring(
+                leftEle.innerText = leftEle.innerText.substring(
                     left.offset - paragraphProps.getElementStart(leftEle),
-                    right.offset - left.offset
-                );
-                if (innerText === '') {
+                    right.offset - left.offset) 
+                + leftEle.innerText.substring(right.offset - paragraphProps.getElementStart(leftEle));
+                if (leftEle.innerText === '') {
                     line.removeChild(leftEle);
-                } else {
-                    leftEle.innerText = innerText;
                 }
                 break;
             }
@@ -188,4 +193,5 @@ function backspaceSameLine(left: Point, right: Point, line: HTMLElement) {
             }
         }
     }
+    return left;
 }

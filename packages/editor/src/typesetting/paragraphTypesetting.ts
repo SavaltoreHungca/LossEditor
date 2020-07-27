@@ -9,6 +9,7 @@ export function paragraphTypesettingFactory(editor: Editor) {
         const paragraphUi = editor.uiMap.getElement(point.node);
         const paragraph = paragraphUi.children[0].children[0].children[0];
         let line: HTMLElement | null | undefined = binarySearchWhichRange(paragraph.children, point.offset);
+        if (line?.previousElementSibling) line = <HTMLElement>line.previousElementSibling;
         line = findSuitableStartLine(line);
 
         if (!line) return;
@@ -27,7 +28,7 @@ export function paragraphTypesettingFactory(editor: Editor) {
 
             ele = <HTMLElement>line.firstElementChild;
             if (ele) {
-                fillUpLine(line);
+                isLineExceed(line) ? appendUpLine(line) : fillUpLine(line);
                 while (ele) {
                     nextstart = updateNextStart(ele, nextstart);
                     ele = <HTMLElement>ele.nextElementSibling;
@@ -74,6 +75,15 @@ function findSuitableStartLine(line: HTMLElement): HTMLElement | undefined {
     }
 }
 
+function isLineExceed(line: HTMLElement): boolean {
+    const paragraph = <HTMLElement>line.parentElement;
+    const maxWidth = Utils.getElementInfo(paragraph).innerWidth;
+    Utils.setStyle(line, { width: 'fit-content' });
+    const exceed = line.offsetWidth > maxWidth;
+    Utils.setStyle(line, { width: 'auto' });
+    return exceed;
+}
+
 function fillUpLine(line: HTMLElement) {
     const paragraph = <HTMLElement>line.parentElement;
     const maxWidth = Utils.getElementInfo(paragraph).innerWidth;
@@ -112,6 +122,7 @@ function fillUpLine(line: HTMLElement) {
     const nextEleId = paragraphProps.getEleUniId(nextEle);
     const lastEleStyle = props.getStyle(lastEle);
     const nextEleStyle = props.getStyle(nextEle);
+
     if (nextEleType === 'unit-block') {
         suitableLine.removeChild(nextEle);
         line.appendChild(nextEle);
@@ -147,6 +158,78 @@ function fillUpLine(line: HTMLElement) {
     else if (lastEleType === 'unit-block') {
         nEleAppend();
         return;
+    }
+}
+
+function appendUpLine(line: HTMLElement) {
+    const paragraph = <HTMLElement>line.parentElement;
+    const maxWidth = Utils.getElementInfo(paragraph).innerWidth;
+
+    Utils.setStyle(line, { width: 'fit-content' });
+    if (line.offsetWidth <= maxWidth) {
+        Utils.setStyle(line, { width: 'auto' });
+        return;
+    }
+
+    const lastEle = <HTMLElement>line.lastElementChild;
+    if (!lastEle) return;
+    let suitableLine = findSuitableStartLine(<HTMLElement>line.nextElementSibling);
+    let foundSuitableLine = true;
+    if (!suitableLine) {
+        suitableLine = createElement('paragraph-line');
+        paragraph.appendChild(suitableLine);
+        foundSuitableLine = false;
+    }
+
+    const lastEleType = getType(lastEle);
+
+    const nEleAppend = () => {
+        const c = lastEle.innerText.substring(lastEle.innerText.length - 1);
+        lastEle.innerText = lastEle.innerText.substring(0, lastEle.innerText.length - 1);
+        const ntext = createElement('text');
+        ntext.innerText = c;
+        (<HTMLElement>suitableLine).appendChild(ntext);
+        props.setStyle(ntext, props.getStyle(lastEle));
+        paragraphProps.setEleUniId(ntext, paragraphProps.getEleUniId(lastEle));
+
+        if (lastEle.innerText === '') line.removeChild(lastEle);
+    }
+
+
+    if (lastEleType === 'unit-block') {
+        line.removeChild(lastEle);
+        suitableLine.insertBefore(lastEle, suitableLine.firstElementChild);
+        appendUpLine(line);
+        return;
+    }
+    else if (!foundSuitableLine) {
+        nEleAppend();
+        appendUpLine(line);
+        return;
+    }
+    else {
+        const nextEle = <HTMLElement>suitableLine.firstElementChild;
+        const nextEleType = getType(nextEle);
+        const lastEleId = paragraphProps.getEleUniId(lastEle);
+        const nextEleId = paragraphProps.getEleUniId(nextEle);
+        const lastEleStyle = props.getStyle(lastEle);
+        const nextEleStyle = props.getStyle(nextEle);
+
+        if (nextEleType === 'text' && (lastEleId === nextEleId || (typeof lastEleStyle === 'undefined' && typeof nextEleStyle === 'undefined'))) {
+            const c = lastEle.innerText.substring(lastEle.innerText.length - 1);
+            lastEle.innerText = lastEle.innerText.substring(0, lastEle.innerText.length - 1);
+            nextEle.innerText = c + nextEle.innerText;
+
+            if (lastEle.innerText === '') line.removeChild(lastEle);
+
+            appendUpLine(line);
+            return;
+        }
+        else {
+            nEleAppend();
+            appendUpLine(line);
+            return;
+        }
     }
 }
 
