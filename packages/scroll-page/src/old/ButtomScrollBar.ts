@@ -1,10 +1,13 @@
-import Constants from "./Constants";
 import { Element } from "./Element";
+import Constants from "../Constants";
 
 export default class extends Element {
+
     getType(){
-        return "TopShallow";
+        return "ButtomScrollBar";
     }
 
-    __init__(){}
+    __init__(){
+    }
+
 }

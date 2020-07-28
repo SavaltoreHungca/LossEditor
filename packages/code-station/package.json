@@ -17,7 +17,6 @@
     "monaco-editor": "^0.20.0"
   },
   "peerDependencies": {
-    "event-driven": "*",
     "scroll-page": "*",
     "utils": "*"
   },

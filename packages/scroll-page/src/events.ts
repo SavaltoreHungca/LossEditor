@@ -1,8 +1,7 @@
 import Constants from "./Constants";
 import { ScrollPage } from "./ScrollPage";
-import ButtomSlider from "./ButtomSlider";
-import { Utils, DragState } from "utils";
-import RightSlider from "./RightSlider";
+import { $$, DragState, $, extend } from "utils";
+import { eleExt, windowExt, Window, Page, pageExt, RightScrollBar, RightSlider, ButtomScrollBar, ButtomSlider, TopShallow, RightShallow, rightScrollBarExt, rightSliderExt, buttomScrollBarExt, buttomSliderExt, topShallowExt, rightShallowExt} from "./elementTyps";
 
 export function registryEvents(scrollPage: ScrollPage) {
     assembleElementsAndInitializeUi(scrollPage);
@@ -13,76 +12,56 @@ export function registryEvents(scrollPage: ScrollPage) {
 }
 
 
-function assembleElementsAndInitializeUi(scrollPage: ScrollPage) {
+function assembleElementsAndInitializeUi(sp: ScrollPage) {
     // 组装元素事件
     // 初始化样式, 位置, 尺寸
-    scrollPage.eventManager.registryEventDpendsOn([Constants.events.ELEMENTS_CREATED],
+    sp.eventManager.registryEventDpendsOn([Constants.events.ELEMENTS_CREATED],
         () => {
-            let {
-                container,
-                window,
-                page,
-                buttomScrollBar,
-                rightScrollBar,
-                topshallow,
-                rightshallow,
-                buttomSlider,
-                rightSlider,
-                content
-            } = scrollPage.elements;
-
-            container.append(window);
-            window.append(page);
-            container.append(rightScrollBar);
-            container.append(buttomScrollBar);
-            container.append(topshallow);
-            container.append(rightshallow);
-            buttomScrollBar.append(buttomSlider);
-            rightScrollBar.append(rightSlider);
-            page.append(content);
-
+            const { container, content } = sp.elements;
+            const idset = {
+                window: $$.randmonId(),
+                page: $$.randmonId(),
+                rightScrollBar: $$.randmonId(),
+                rightSlider: $$.randmonId(),
+                buttomScrollBar: $$.randmonId(),
+                buttomSlider: $$.randmonId(),
+                topshallow: $$.randmonId(),
+                rightshallow: $$.randmonId(),
+            }
             container.setStyle({
                 position: 'relative',
                 overflow: 'hidden',
-                width: scrollPage.settings.containerWidth,
-                height: scrollPage.settings.containerHeight,
+                width: sp.settings.containerWidth,
+                height: sp.settings.containerHeight,
             })
-            window.setStyle({
-                position: 'relative',
-                overflow: 'hidden'
-            })
-            topshallow.setStyle({
-                position: 'absolute',
-                'box-shadow': '#dddddd 0 6px 6px -6px inset',
-            })
-            rightshallow.setStyle({
-                position: 'absolute',
-                'box-shadow': '#dddddd -6px 0 6px -6px inset'
-            })
-            buttomScrollBar.setStyle({
-                position: 'absolute',
-                'z-index': '100'
-            })
-            buttomSlider.setStyle({
-                position: 'absolute',
-                background: 'hsla(0,0%,39%,.4)'
-            });
-            rightScrollBar.setStyle({
-                position: 'absolute',
-                'z-index': '100'
-            })
-            rightSlider.setStyle({
-                position: 'absolute',
-                background: 'hsla(0,0%,39%,.4)',
-            })
-            page.setStyle({
-                position: 'absolute',
-                contain: 'strict',
-                overflow: 'hidden'
-            })
-            content.setStyle({
-                position: 'relative'
-            })
+
+            container.innerHTML = `
+                <div data-scrollpage-type="window" id="${idset.window}" style="overflow: hidden">
+                    <div data-scrollpage-type="page" id="${idset.page}" style="contain: strict; overflow: hidden">
+
+                    </div>
+                </div>
+                <div data-scrollpage-type="rightScrollBar" id="${idset.rightScrollBar}" style="z-index: 100">
+                    <div data-scrollpage-type="rightSlider" id="${idset.rightSlider}" style="background: hsla(0,0%,39%,.4)"></div>
+                </div>
+                <div data-scrollpage-type="buttomScrollBar" id="${idset.buttomScrollBar}" 
+                    style="z-index: 100; height: ${sp.settings.bottomScrollBarHeight}px; left: 0; bottom: 0 ">
+                    <div data-scrollpage-type="buttomSlider" id="${idset.buttomSlider}" style="background: hsla(0,0%,39%,.4)"></div>
+                </div>
+                <div data-scrollpage-type="topshallow" id="${idset.topshallow}" style="box-shadow: #dddddd 0 6px 6px -6px inset">
+                </div>
+                <div data-scrollpage-type="rightshallow" id="${idset.rightshallow}" style="box-shadow: #dddddd -6px 0 6px -6px inset">
+                </div>
+            `
+
+            sp.elements.window = <Window>extend($$.wrapEle('block', $(idset.window)), [eleExt(sp), windowExt(sp)]);
+            sp.elements.page = <Page>extend($$.wrapEle('absolute', $(idset.page)), [eleExt(sp), pageExt(sp)]);
+            sp.elements.rightScrollBar = <RightScrollBar>extend($$.wrapEle('absolute', $(idset.rightScrollBar)), [eleExt(sp), rightScrollBarExt(sp)]);
+            sp.elements.rightSlider = <RightSlider>extend($$.wrapEle('absolute', $(idset.rightSlider)), [eleExt(sp), rightSliderExt(sp)]);
+            sp.elements.buttomScrollBar = <ButtomScrollBar>extend($$.wrapEle('absolute', $(idset.buttomScrollBar)), [eleExt(sp), buttomScrollBarExt(sp)]);
+            sp.elements.buttomSlider = <ButtomSlider>extend($$.wrapEle('absolute', $(idset.buttomSlider)), [eleExt(sp), buttomSliderExt(sp)]);
+            sp.elements.topshallow = <TopShallow>extend($$.wrapEle('absolute', $(idset.topshallow)), [eleExt(sp), topShallowExt(sp)]);
+            sp.elements.rightshallow = <RightShallow>extend($$.wrapEle('absolute', $(idset.rightshallow)), [eleExt(sp), rightShallowExt(sp)]);
 
             buttomScrollBar.setHeight(scrollPage.settings.bottomScrollBarHeight + 'px');
             buttomScrollBar.setLeft('0');
@@ -185,7 +164,7 @@ function setScrollBar(scrollPage: ScrollPage) {
                 const sliderWidth = Math.pow(buttomScrollBarInfo.innerWidth, 2) / pageInfo.innerWidth;
                 buttomSlider.setWidth(sliderWidth + 'px');
             }
-        }else{
+        } else {
             buttomScrollBar.disappear();
         }
     })
@@ -215,7 +194,7 @@ function setScrollBar(scrollPage: ScrollPage) {
                 const sliderHeight = Math.pow(rightScrollBarInfo.innerHeight, 2) / pageInfo.innerHeight;
                 rightSlider.setHeight(sliderHeight + 'px');
             }
-        }else{
+        } else {
             rightScrollBar.disappear();
         }
     })

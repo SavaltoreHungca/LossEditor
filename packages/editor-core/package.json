@@ -16,7 +16,6 @@
   "devDependencies": {
   },
   "peerDependencies": {
-    "event-driven": "*",
     "utils": "*"
   },
   "keywords": []

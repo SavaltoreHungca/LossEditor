@@ -16,7 +16,6 @@
   "devDependencies": {
   },
   "peerDependencies": {
-    "event-driven": "*",
     "scroll-page": "*",
     "utils": "*",
     "editor": "*"

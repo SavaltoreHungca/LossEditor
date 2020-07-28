@@ -20,7 +20,6 @@
   "peerDependencies": {
     "scroll-page": "*",
     "utils": "*",
-    "event-driven": "*",
     "editor-core": "*"
   },
   "keywords": []

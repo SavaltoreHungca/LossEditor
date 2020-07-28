@@ -6,7 +6,6 @@
       "outDir": "./lib"
     },
     "references": [
-        { "path": "../event-driven" },
         { "path": "../utils" },
         { "path": "../scroll-page" },
         { "path": "../editor-core"},

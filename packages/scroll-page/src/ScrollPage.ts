@@ -1,36 +1,27 @@
-import { EventManager, DataListener } from 'event-driven';
-import Container from './Container';
-import Constants from './Constants';
-import Window from './Window';
-import Page from './Page';
-import TopShallow from './TopShallow';
-import RightShallow from './RightShallow';
-import ButtomScrollBar from './ButtomScrollBar';
-import RightScrollBar from './RightScrollBar';
-import ButtomSlider from './ButtomSlider';
-import RightSlider from './RightSlider';
 import { Settings, SettingReceiver } from './Settings';
-import Content from './Content';
 import { registryEvents } from './events';
 import { registryListeners } from './listeners';
-import { Utils } from 'utils';
+import { EventManager, $$, extend } from 'utils';
+import { buttomScrollBarExt, eleExt, ButtomScrollBar, Container, Page, Window, RightScrollBar, TopShallow, RightShallow, ButtomSlider, RightSlider, Content, containerExt, windowExt, pageExt, rightScrollBarExt, topShallowExt, rightShallowExt, buttomSliderExt, rightSliderExt, contentExt } from './elementTyps';
+import Constants from './Constants';
+
+declare type ElementsSet = {
+    container: Container,
+    window?: Window,
+    page?: Page,
+    buttomScrollBar?: ButtomScrollBar,
+    rightScrollBar?: RightScrollBar,
+    topshallow?: TopShallow,
+    rightshallow?: RightShallow,
+    buttomSlider?: ButtomSlider,
+    rightSlider?: RightSlider,
+    content?: Content,
+};
 
 export class ScrollPage {
     eventManager: EventManager;
-    dataListener: DataListener;
-    settings: Settings = new Settings();
-    elements: {
-        container: Container,
-        window: Window,
-        page: Page,
-        buttomScrollBar: ButtomScrollBar,
-        rightScrollBar: RightScrollBar,
-        topshallow: TopShallow,
-        rightshallow: RightShallow,
-        buttomSlider: ButtomSlider,
-        rightSlider: RightSlider,
-        content: Content,
-    };
+    settings = new Settings();
+    elements: ElementsSet
 
     constructor(content: HTMLElement, settings?: SettingReceiver) {
         if (settings) {
@@ -39,21 +30,8 @@ export class ScrollPage {
         }
 
         this.eventManager = new EventManager();
-        this.dataListener = new DataListener(200);
 
-
-        this.elements = {
-            container: new Container(document.createElement('div'), this),
-            window: new Window(document.createElement('div'), this),
-            page: new Page(document.createElement('div'), this),
-            buttomScrollBar: new ButtomScrollBar(document.createElement('div'), this),
-            rightScrollBar: new RightScrollBar(document.createElement('div'), this),
-            topshallow: new TopShallow(document.createElement('div'), this),
-            rightshallow: new RightShallow(document.createElement('div'), this),
-            buttomSlider: new ButtomSlider(document.createElement('div'), this),
-            rightSlider: new RightSlider(document.createElement('div'), this),
-            content: new Content(content, this),
-        }
+        this.elements = { container: extend(content, [eleExt(this), containerExt(this)]) }
 
         registryEvents(this);
         registryListeners(this);
@@ -61,7 +39,7 @@ export class ScrollPage {
         if (content.parentElement) {
             const parent = content.parentElement;
             const { container } = this.elements;
-            parent.insertBefore(container.getNative(), content);
+            parent.insertBefore(container, content);
             parent.removeChild(content);
         }
         this.eventManager.triggleEvent(Constants.events.ELEMENTS_CREATED);
@@ -69,20 +47,21 @@ export class ScrollPage {
 
     updateContainerSize() {
         const { container } = this.elements;
-        const containerParent = container.getNative().parentElement;
+        const containerParent = container.parentElement;
         if (containerParent) {
             const containerInfo = container.getInfo();
-            const parentInfo = Utils.getElementInfo(containerParent);
-            container.setWidth(parentInfo.innerWidth + 'px');
-            container.setHeight(parentInfo.innerHeight + 'px');
+            const parentInfo = $$.getElementInfo(containerParent);
+            container.setWidth(parentInfo.innerWidth);
+            container.setHeight(parentInfo.innerHeight);
         }
     }
 
     updatePageSize() {
         const { content, page } = this.elements;
+        if(!content || !page) throw new Error();
         const contentInfo = content.getInfo();
-        page.setWidth(contentInfo.width + 'px');
-        page.setHeight(contentInfo.height + 'px');
+        page.setWidth(contentInfo.width);
+        page.setHeight(contentInfo.height);
     }
 
     setContainerStyle(obj: Object) {
@@ -92,9 +71,9 @@ export class ScrollPage {
     contentWidthFollowContainer() {
         const { content, container } = this.elements;
         const containerInfo = container.getInfo();
-        if(content){
-            content.setWidth(containerInfo.innerWidth + 'px');
-            if(containerInfo.innerWidth !== content.getInfo().width){
+        if (content) {
+            content.setWidth(containerInfo.innerWidth);
+            if (containerInfo.innerWidth !== content.getInfo().width) {
                 throw new Error("cant't set content width follow container");
             }
         }
@@ -103,9 +82,9 @@ export class ScrollPage {
     contentHeightFollowContainer() {
         const { content, container } = this.elements;
         const containerInfo = container.getInfo();
-        if(content){
+        if (content) {
             content.setHeight(containerInfo.innerHeight + 'px');
-            if(containerInfo.innerHeight !== content.getInfo().height){
+            if (containerInfo.innerHeight !== content.getInfo().height) {
                 throw new Error("cant't set content height follow container");
             }
         }

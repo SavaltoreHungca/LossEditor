@@ -9,7 +9,6 @@ import typescript from 'rollup-plugin-typescript2'
 import { terser } from 'rollup-plugin-terser'
 import { startCase } from 'lodash'
 
-import EventDriven from '../../packages/event-driven/package.json'
 import ScrollPage from '../../packages/scroll-page/package.json'
 import Utils from '../../packages/utils/package.json'
 import Editor from '../../packages/editor/package.json'
@@ -216,7 +215,6 @@ function factory(pkg, options = {}) {
  */
 
 export default [
-    ...factory(EventDriven),
     ...factory(Utils),
     ...factory(ScrollPage),
     ...factory(EditorCore),

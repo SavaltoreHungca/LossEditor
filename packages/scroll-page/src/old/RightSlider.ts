@@ -1,4 +1,4 @@
-import { Element } from "./Element";
+import { Element } from "./old/Element";
 import Constants from "./Constants";
 import { DragState } from "utils";
 

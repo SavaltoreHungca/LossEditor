@@ -25,70 +25,119 @@ export function $(id: string): HTMLElement {
     return <HTMLElement>document.getElementById(id);
 }
 
-export class Utils {
+declare type EleTypes = 'block' | 'inline' | 'fixed' | 'absolute' | 'flex' | 'flex-item';
+
+export class $$ {
+    private static timeoutIdMap: Map<String, Array<number>> = new Map();
+    private static dragStates: Map<string, DragState> = new Map();
+
+    static wrapEle(type: EleTypes, element: HTMLElement | Element, style?: Object) {
+        const ele = <HTMLElement>element;
+        switch (type) {
+            case 'block': {
+                this.setStyle(ele, {
+                    display: 'block',
+                    position: 'relative'
+                })
+                break;
+            }
+            case 'inline': {
+                this.setStyle(ele, {
+                    display: 'inline-block',
+                    position: 'relative'
+                })
+                break;
+            }
+            case 'fixed': {
+                this.setStyle(ele, {
+                    display: 'block',
+                    position: 'fixed'
+                })
+                break;
+            }
+            case 'absolute': {
+                this.setStyle(ele, {
+                    display: 'block',
+                    position: 'absolute'
+                })
+                break;
+            }
+            case 'flex': {
+                this.setStyle(ele, {
+                    display: 'flex',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    'flex-grow': '1',
+                })
+                break;
+            }
+            case 'flex-item': {
+                this.setStyle(ele, {
+                    display: 'block',
+                    position: 'relative',
+                    'flex-grow': '1'
+                })
+                break;
+            }
+        }
+        if (style) this.setStyle(ele, style);
+        return ele;
+    }
+
+
+    static creEle(type: EleTypes, style?: Object): HTMLElement {
+        return this.wrapEle(type, document.createElement('div'), style);
+    }
+
     static setStyle(element: HTMLElement, style: Object) {
-        if (this.isObject(style)) {
-            for (let name in style) {
-                switch (name) {
-                    case 'top': case 'left': case 'bottom': case 'right': case 'width': case 'height':
-                    case 'padding': case 'padding-left': case 'padding-top': case 'padding-right': case 'padding-bottom':
-                        if (typeof style[name] === 'number') {
-                            style[name] = style[name] + 'px';
-                        }
-                        break;
-                }
+        for (let name in style) {
+            switch (name) {
+                case 'top': case 'left': case 'bottom': case 'right': case 'width': case 'height':
+                case 'padding': case 'padding-left': case 'padding-top': case 'padding-right': case 'padding-bottom':
+                    if (typeof style[name] === 'number') {
+                        style[name] = style[name] + 'px';
+                    }
+                    break;
             }
-        }
-
-        let getCssText = (style: Object) => {
-            let ans = "";
-            if (!this.isObject(style)) return "";
-            for (let name in style) {
-                ans += name + ':' + style[name] + ';';
-            }
-            return ans;
-        }
-
-        let getCssStyle = (cssText: String) => {
-            if (cssText) {
-                let ans = {};
-                let styles = cssText.split(';').filter(Boolean);
-                for (let style of styles) {
-                    let [name, value] = style.split(':');
-                    ans[name] = value;
-                }
-                return ans;
-            }
-            return {}
         }
 
         if (element.style.cssText) {
-            let beforeStyle = getCssStyle(element.style.cssText)
+            let beforeStyle = this.getInlineCssStyle(element)
             for (let name in style) {
-                if (style[name] === "") {
+                if (style[name] === '') {
                     delete beforeStyle[name];
                 } else {
                     beforeStyle[name] = style[name];
                 }
             }
-            element.style.cssText = getCssText(beforeStyle);
-        } else {
-            if (!this.isObject(style)) return;
-            element.style.cssText = getCssText(style)
+            element.style.cssText = this.toCssText(beforeStyle);
+        }
+        else {
+            element.style.cssText = this.toCssText(style)
         }
     }
 
-    static getInlineCssStyle(element: HTMLElement) {
-        let cssText = element.style.cssText;
+    static toCssText(style: Object) {
+        let ans = "";
+        if (!this.isObject(style)) return "";
+        for (let name in style) {
+            ans += name + ':' + style[name] + ';';
+        }
+        return ans;
+    }
+
+    static getInlineCssStyle(elementOrCssText: HTMLElement | string) {
+        const cssText = typeof elementOrCssText === 'string' ? elementOrCssText
+            : elementOrCssText.style.cssText;
+        const ans = {};
         if (cssText) {
-            let ans = {};
-            let styles = cssText.split(';').filter(Boolean);
-            for (let style of styles) {
-                let [name, value] = style.split(':');
+            const styles = cssText.split(';').filter(Boolean);
+            for (const style of styles) {
+                const [name, value] = style.split(':');
                 ans[name] = value;
             }
-            return ans;
         }
+        return ans;
     }
 
     static getElementInfoBatch(consumer: (...info: ElementInfo[]) => void, ...elements: HTMLElement[]) {
@@ -170,19 +219,20 @@ export class Utils {
         return typeof f === 'function';
     }
 
-    static in(obj: any, array: any) {
-        if (this.isObject(array)) {
-            for (let item of array) {
-                if (obj === item) {
-                    return true;
-                }
+    static in(obj: any, array: Array<any> | Object) {
+        for (const name in array) {
+            if (obj === array[name]) {
+                return true;
             }
         }
         return false;
     }
+
     static get(obj: any, propName: string): any {
         return obj[propName];
     }
+
+
     static getMousePositionInElement(elemt: HTMLElement, event: MouseEvent): {
         left: number,
         top: number,
@@ -206,6 +256,8 @@ export class Utils {
             leaved: leaved
         }
     }
+
+
     static getComputedStyle(node: HTMLElement, attr: string) {
         if (typeof getComputedStyle != 'undefined') {
             let value: any = getComputedStyle(node, null).getPropertyValue(attr);
@@ -218,6 +270,8 @@ export class Utils {
             }
         }
     }
+
+
     static getStrPx(str: string, container: HTMLElement) {
         const span = window.document.createElement("span");
         span.innerText = str;
@@ -246,6 +300,8 @@ export class Utils {
         span.parentElement?.removeChild(span);
         return ans;
     }
+
+
     static getRelativePosition(elemt: HTMLElement, parent: HTMLElement) {
         const originalElement = elemt;
         const ans = {
@@ -268,14 +324,15 @@ export class Utils {
         ans.bottomBorderLeft = ans.top + originalElementInfo.height;
         return ans;
     }
+
     static splitToSuitLength(container: HTMLElement, str: string) {
-        const containerInfo = Utils.getElementInfo(container);
-        if (str.length === 0 || Utils.getStrPx(str, container).width <= containerInfo.innerWidth) {
+        const containerInfo = this.getElementInfo(container);
+        if (str.length === 0 || this.getStrPx(str, container).width <= containerInfo.innerWidth) {
             return [str, ""];
         }
         let critical = str.length / 2;
         while (true) {
-            const { width } = Utils.getStrPx(str.substring(0, critical), container);
+            const { width } = this.getStrPx(str.substring(0, critical), container);
             const accuracy = containerInfo.innerWidth - width;
             if (accuracy >= 0 && accuracy < 10) {
                 return [str.substring(0, critical), str.substring(critical)]
@@ -293,95 +350,82 @@ export class Utils {
         for (let i of ids) {
             clearTimeout(i);
         }
+        this.timeoutIdMap.delete(id);
     }
 
-    static timeoutIdMap: Map<String, Array<number>> = new Map();
     static setLastTimeout(id: string, func: Function, delay: number) {
         let ids = this.timeoutIdMap.get(id);
-        if (!Utils.isArray(ids)) {
+        if (!ids) {
             ids = [];
             this.timeoutIdMap.set(id, ids);
         }
         this.cancelLastTimeout(id);
-        ids?.push(window.setTimeout(func, delay));
+        ids.push(window.setTimeout(func, delay));
     }
 
-
-    private static dragStates: Map<string, DragState> = new Map();
-    static addEventListener(
-        name: string,
-        element: HTMLElement,
-        callback: Function,
-        option?: boolean | AddEventListenerOptions
-    ) {
-        if (name === 'drag') {
-            const dragStateId = uuid.v1();
-            this.dragStates.set(dragStateId, {
-                startX: 0,
-                startY: 0,
-                pressed: false,
-                deltaX: 0,
-                deltaY: 0,
-                registered: false,
-                event: undefined
-            });
-            const startResize = (event: MouseEvent) => {
-                let dragState = this.dragStates.get(dragStateId);
-                if (!dragState) throw new Error('Sys error');
-                if (dragState.pressed && !dragState.registered) {
-                    dragState.registered = true;
-                    document.addEventListener('mousemove', resizing);
-                    document.addEventListener('mouseup', resizeDone);
-                    document.removeEventListener('mousemove', startResize);
-                }
+    static addDragEvent(element: HTMLElement, callback: Function) {
+        const dragStateId = uuid.v1();
+        this.dragStates.set(dragStateId, {
+            startX: 0,
+            startY: 0,
+            pressed: false,
+            deltaX: 0,
+            deltaY: 0,
+            registered: false,
+            event: undefined
+        });
+        const startResize = (event: MouseEvent) => {
+            let dragState = this.dragStates.get(dragStateId);
+            if (!dragState) throw new Error('Sys error');
+            if (dragState.pressed && !dragState.registered) {
+                dragState.registered = true;
+                document.addEventListener('mousemove', resizing);
+                document.addEventListener('mouseup', resizeDone);
+                document.removeEventListener('mousemove', startResize);
             }
-            const resizing = (event: MouseEvent) => {
-                let dragState = this.dragStates.get(dragStateId);
-                if (!dragState) throw new Error('Sys error');
-                if (dragState.pressed && dragState.registered) {
-                    dragState.deltaX = event.screenX - dragState.startX;
-                    dragState.deltaY = event.screenY - dragState.startY;
-                    dragState.startX += dragState.deltaX;
-                    dragState.startY += dragState.deltaY;
-                    dragState.event = event;
-                    callback(dragState);
-                }
-            };
-            const resizeDone = (event: MouseEvent) => {
-                let dragState = this.dragStates.get(dragStateId);
-                if (!dragState) throw new Error('Sys error');
-                if (dragState.pressed) {
-                    dragState.pressed = false;
-                    dragState.registered = false;
-                    dragState.event = event;
-                    callback(dragState);
-                    document.removeEventListener('mousemove', resizing);
-                    document.removeEventListener('mouseup', resizeDone);
-                    element.removeEventListener('mouseup', resizeDone);
-                }
-            };
-            element.addEventListener('mousedown', (event) => {
-                let dragState = this.dragStates.get(dragStateId);
-                if (!dragState) throw new Error('Sys error');
-                dragState.startX = event.screenX;
-                dragState.startY = event.screenY;
-                dragState.pressed = true;
+        }
+        const resizing = (event: MouseEvent) => {
+            let dragState = this.dragStates.get(dragStateId);
+            if (!dragState) throw new Error('Sys error');
+            if (dragState.pressed && dragState.registered) {
+                dragState.deltaX = event.screenX - dragState.startX;
+                dragState.deltaY = event.screenY - dragState.startY;
+                dragState.startX += dragState.deltaX;
+                dragState.startY += dragState.deltaY;
+                dragState.event = event;
+                callback(dragState);
+            }
+        };
+        const resizeDone = (event: MouseEvent) => {
+            let dragState = this.dragStates.get(dragStateId);
+            if (!dragState) throw new Error('Sys error');
+            if (dragState.pressed) {
+                dragState.pressed = false;
                 dragState.registered = false;
                 dragState.event = event;
                 callback(dragState);
-                document.addEventListener('mousemove', startResize);
-                element.addEventListener('mouseup', resizeDone);
-            })
-        } else {
-            element.addEventListener(name, callback as any, option);
-        }
+                document.removeEventListener('mousemove', resizing);
+                document.removeEventListener('mouseup', resizeDone);
+                element.removeEventListener('mouseup', resizeDone);
+            }
+        };
+        element.addEventListener('mousedown', (event) => {
+            let dragState = this.dragStates.get(dragStateId);
+            if (!dragState) throw new Error('Sys error');
+            dragState.startX = event.screenX;
+            dragState.startY = event.screenY;
+            dragState.pressed = true;
+            dragState.registered = false;
+            dragState.event = event;
+            callback(dragState);
+            document.addEventListener('mousemove', startResize);
+            element.addEventListener('mouseup', resizeDone);
+        })
     }
 
-    static statckPeek<T>(stack: Array<T>) {
-        if (this.isArray(stack)) {
-            if (stack.length > 0) {
-                return stack[stack.length - 1];
-            }
+    static stackPeek<T>(stack: Array<T>) {
+        if (stack.length > 0) {
+            return stack[stack.length - 1];
         }
         return undefined;
     }
@@ -412,8 +456,6 @@ export class Utils {
             curN1 = <T>parent(curN1);
         } while (curN1 !== root);
         if (root) n1Path.push(root);
-
-
         while (n2) {
             for (let i = 0; i < n1Path.length; i++) {
                 if (n2 === n1Path[i]) {
@@ -473,11 +515,11 @@ export class Utils {
         }
 
         if (sortedRanges.length === 1) {
-            if(inLeft(sortedRanges[0], value)){
+            if (inLeft(sortedRanges[0], value)) {
                 ans.nearestNextRange = sortedRanges[0];
-            }else if(inRange(sortedRanges[0], value)){
+            } else if (inRange(sortedRanges[0], value)) {
                 ans.foundRange = sortedRanges[0];
-            }else{
+            } else {
                 ans.nearestPreRange = sortedRanges[0];
             }
             return ans;

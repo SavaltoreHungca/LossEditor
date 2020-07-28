@@ -1,22 +1,22 @@
 
-export class Settings {
-    containerHeight: string = ''
-    containerWidth: string = ''
-    bottomScrollBarInner: boolean = true
-    bottomScrollBarHeight: number = 14
-    rightScrollBarInner: boolean = true
-    rightScrollBarWidth: number = 14
-    showTopShallow: boolean = true
-    showRightShallow: boolean = true
-    bottomScrollBarAutoFadeTime: number = 500
-    rightScrollBarAutoFadeTime: number = 500
-    autoUpdateContainerSize: boolean = true
-    autoUpdatePageSize: boolean = true
-    contentFollowContainerWidth: boolean = false
-    contentFollowContainerHeight: boolean = false
-    hiddenRightScrollBar: boolean = false
-    hiddenBottomScrollBar: boolean = false
-    debug: boolean = false
+export class Settings implements SettingReceiver {
+    containerHeight = ''
+    containerWidth = ''
+    bottomScrollBarInner = true
+    bottomScrollBarHeight = 14
+    rightScrollBarInner = true
+    rightScrollBarWidth = 14
+    showTopShallow = true
+    showRightShallow = true
+    bottomScrollBarAutoFadeTime = 500
+    rightScrollBarAutoFadeTime = 500
+    autoUpdateContainerSize = true
+    autoUpdatePageSize = true
+    contentFollowContainerWidth = false
+    contentFollowContainerHeight = false
+    hiddenRightScrollBar = false
+    hiddenBottomScrollBar = false
+    debug = false
 }
 
 export interface SettingReceiver {
@@ -32,9 +32,9 @@ export interface SettingReceiver {
     rightScrollBarAutoFadeTime?: number
     autoUpdateContainerSize?: boolean
     autoUpdatePageSize?: boolean
-    contentFollowContainerWidth?: boolean 
+    contentFollowContainerWidth?: boolean
     contentFollowContainerHeight?: boolean
-    hiddenRightScrollBar?: boolean 
+    hiddenRightScrollBar?: boolean
     hiddenBottomScrollBar?: boolean
     debug?: boolean
 }

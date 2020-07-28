@@ -1,9 +1,9 @@
-import { Element } from "./Element";
 import Constants from "./Constants";
+import { Element } from "./old/Element";
 
 export default class extends Element {
     getType(){
-        return "Container";
+        return "RightShallow";
     }
 
     __init__(){}
