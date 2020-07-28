@@ -1,6 +1,6 @@
 import { Settings, SettingReceiver } from './Settings';
-import { registryEvents } from './events';
-import { registryListeners } from './listeners';
+import { registryEvents } from './events/events';
+// import { registryListeners } from './listeners';
 import { EventManager, $$, extend } from 'utils';
 import { buttomScrollBarExt, eleExt, ButtomScrollBar, Container, Page, Window, RightScrollBar, TopShallow, RightShallow, ButtomSlider, RightSlider, Content, containerExt, windowExt, pageExt, rightScrollBarExt, topShallowExt, rightShallowExt, buttomSliderExt, rightSliderExt, contentExt } from './elementTyps';
 import Constants from './Constants';
@@ -15,7 +15,7 @@ declare type ElementsSet = {
     rightshallow?: RightShallow,
     buttomSlider?: ButtomSlider,
     rightSlider?: RightSlider,
-    content?: Content,
+    content: Content,
 };
 
 export class ScrollPage {
@@ -31,10 +31,13 @@ export class ScrollPage {
 
         this.eventManager = new EventManager();
 
-        this.elements = { container: extend(content, [eleExt(this), containerExt(this)]) }
+        this.elements = {
+            container: extend($$.creEle('block'), [eleExt(this), containerExt(this)]),
+            content: extend(content, [eleExt(this), contentExt(this)]),
+        }
 
         registryEvents(this);
-        registryListeners(this);
+        // registryListeners(this);
 
         if (content.parentElement) {
             const parent = content.parentElement;
@@ -58,7 +61,7 @@ export class ScrollPage {
 
     updatePageSize() {
         const { content, page } = this.elements;
-        if(!content || !page) throw new Error();
+        if (!content || !page) throw new Error();
         const contentInfo = content.getInfo();
         page.setWidth(contentInfo.width);
         page.setHeight(contentInfo.height);

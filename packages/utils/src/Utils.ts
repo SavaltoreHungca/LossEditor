@@ -134,7 +134,7 @@ export class $$ {
             const styles = cssText.split(';').filter(Boolean);
             for (const style of styles) {
                 const [name, value] = style.split(':');
-                ans[name] = value;
+                ans[name] = value.trim();
             }
         }
         return ans;
@@ -423,11 +423,11 @@ export class $$ {
         })
     }
 
-    static stackPeek<T>(stack: Array<T>) {
+    static stackPeek<T>(stack: Array<T>): T {
         if (stack.length > 0) {
             return stack[stack.length - 1];
         }
-        return undefined;
+        return <T><unknown>undefined;
     }
 
     static addClass(elemt: HTMLElement, c: string) {

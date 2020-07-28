@@ -3,3 +3,4 @@ export * from './BidMap';
 export * from './EventManager';
 export * from './DataListener';
 export * from './extend';
+export * from './htmlTemplate';

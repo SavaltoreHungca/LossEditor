@@ -1,5 +1,6 @@
 import { ScrollPage } from './ScrollPage';
-import { $$, ElementInfo} from 'utils';
+import { $$, ElementInfo } from 'utils';
+import Constants from './Constants';
 
 interface Element extends HTMLElement {
     setWidth(wdith: string | number): void
@@ -23,6 +24,7 @@ interface Element extends HTMLElement {
     setRole(roleName: string): void
     setAttribute(name: string, value?: string): void
     addClass(c: string): void
+    addDragEvent(callback: Function): void
 }
 
 export interface ButtomScrollBar extends Element { }
@@ -32,75 +34,109 @@ export interface Page extends Element { }
 export interface RightScrollBar extends Element { }
 export interface TopShallow extends Element { }
 export interface RightShallow extends Element { }
-export interface ButtomSlider extends Element { }
-export interface RightSlider extends Element { }
+export interface ButtomSlider extends Element {
+    dragging: boolean
+    lightenColor(): void
+    darkenColor(): void
+}
+export interface RightSlider extends Element {
+    dragging: boolean
+    lightenColor(): void
+    darkenColor(): void
+}
 export interface Content extends Element { }
 
 export function buttomScrollBarExt(sp: ScrollPage) {
-    return (ele: HTMLElement)=>{
+    return (ele: HTMLElement) => {
         return {
             getType: () => 'ButtomScrollBar'
         }
     }
 }
 export function containerExt(sp: ScrollPage) {
-    return (ele: HTMLElement)=>{
+    return (ele: HTMLElement) => {
         return {
             getType: () => 'Container'
         }
     }
 }
 export function windowExt(sp: ScrollPage) {
-    return (ele: HTMLElement)=>{
+    return (ele: HTMLElement) => {
         return {
             getType: () => 'Window'
         }
     }
 }
 export function pageExt(sp: ScrollPage) {
-    return (ele: HTMLElement)=>{
+    return (ele: HTMLElement) => {
         return {
             getType: () => 'Page'
         }
     }
 }
 export function rightScrollBarExt(sp: ScrollPage) {
-    return (ele: HTMLElement)=>{
+    return (ele: HTMLElement) => {
         return {
             getType: () => 'RightScrollBar'
         }
     }
 }
 export function topShallowExt(sp: ScrollPage) {
-    return (ele: HTMLElement)=>{
+    return (ele: HTMLElement) => {
         return {
             getType: () => 'TopShallow'
         }
     }
 }
 export function rightShallowExt(sp: ScrollPage) {
-    return (ele: HTMLElement)=>{
+    return (ele: HTMLElement) => {
         return {
             getType: () => 'RightShallow'
         }
     }
 }
 export function buttomSliderExt(sp: ScrollPage) {
-    return (ele: HTMLElement)=>{
+    return (ele: HTMLElement) => {
+        const sf = <Element>ele;
         return {
+            lightenColor: function () {
+                sf.setStyle({
+                    background: 'hsla(0,0%,39%,.4)'
+                })
+            },
+            darkenColor: function () {
+                sf.cancelLastTimeout(Constants.timeout.BUTTOM_SLIDER_FADE_TIMEOUT);
+                sf.setStyle({
+                    background: 'hsla(0,0%,39%,.7)'
+                })
+            },
+            dragging: false,
             getType: () => 'ButtomSlider'
         }
     }
 }
 export function rightSliderExt(sp: ScrollPage) {
-    return (ele: HTMLElement)=>{
+    return (ele: HTMLElement) => {
+        const sf = <Element>ele;
         return {
+            lightenColor: function () {
+                sf.setStyle({
+                    background: 'hsla(0,0%,39%,.4)'
+                })
+            },
+            darkenColor: function () {
+                sf.cancelLastTimeout(Constants.timeout.RIGHT_SLIDER_FADE_TIMEOUT);
+                sf.setStyle({
+                    background: 'hsla(0,0%,39%,.7)'
+                })
+            },
+            dragging: false,
             getType: () => 'RightSlider'
         }
     }
 }
 export function contentExt(sp: ScrollPage) {
-    return (ele: HTMLElement)=>{
+    return (ele: HTMLElement) => {
         return {
             getType: () => 'Content'
         }
