@@ -48,7 +48,7 @@ function backspceCollapsed(textContent: TextContent, left: Point, leftLine: HTML
                 + ele.innerText.substring(eleOffset);
             textContent.str = textContent.str.substring(0, left.offset - 1)
                 + textContent.str.substring(left.offset);
-            
+
             left.offset -= 1;
             return left;
         }
@@ -176,10 +176,8 @@ function backspaceSameLine(left: Point, right: Point, line: HTMLElement): Point 
     } else {
         switch (getType(leftEle)) {
             case 'text': {
-                leftEle.innerText = leftEle.innerText.substring(
-                    left.offset - paragraphProps.getElementStart(leftEle),
-                    right.offset - left.offset) 
-                + leftEle.innerText.substring(right.offset - paragraphProps.getElementStart(leftEle));
+                leftEle.innerText = leftEle.innerText.substring(0, left.offset - paragraphProps.getElementStart(leftEle))
+                    + leftEle.innerText.substring(right.offset - paragraphProps.getElementStart(leftEle));
                 if (leftEle.innerText === '') {
                     line.removeChild(leftEle);
                 }

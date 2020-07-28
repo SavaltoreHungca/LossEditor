@@ -5,7 +5,7 @@ import isHotkey from "is-hotkey";
 let skipInputEvent = false;
 export function listenTextInput(editor: Editor) {
     editor.container.addEventListener('keydown', (event)=>{
-        if(isHotkey('backspace')){
+        if(isHotkey('backspace', event)){
             editor.docTree.backspace();
         }
     })

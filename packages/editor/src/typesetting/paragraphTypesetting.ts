@@ -114,6 +114,7 @@ function fillUpLine(line: HTMLElement) {
             nextEle.innerText = nextEle.innerText.substring(1);
             Utils.setStyle(line, { width: 'auto' });
             fillUpLine(line);
+            return;
         }
     }
 
@@ -135,6 +136,7 @@ function fillUpLine(line: HTMLElement) {
         else {
             Utils.setStyle(line, { width: 'auto' });
             fillUpLine(line);
+            return;
         }
     }
     else if (lastEleType === 'text') {
@@ -143,11 +145,14 @@ function fillUpLine(line: HTMLElement) {
             lastEle.innerText += firstChar;
             if (line.offsetWidth > maxWidth) {
                 lastEle.innerText = lastEle.innerText.substring(0, lastEle.innerText.length - 1);
+                Utils.setStyle(line, { width: 'auto' });
                 return;
             }
             else {
                 nextEle.innerText = nextEle.innerText.substring(1);
                 fillUpLine(line);
+                Utils.setStyle(line, { width: 'auto' });
+                return;
             }
         }
         else {

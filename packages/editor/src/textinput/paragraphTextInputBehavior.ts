@@ -7,7 +7,7 @@ import { paragraphProps } from '../utils';
 export function paragraphTextInputBehaviorFactory(editor: Editor) {
     return (point: Point, text: string) => {
         if (!point.node.content) point.node.content = {str: ''};
-        Utils.insertStrBefore(point.node.content.str, point.offset, text);
+        point.node.content.str = Utils.insertStrBefore(point.node.content.str, point.offset, text);
 
         const paragraphUi = editor.uiMap.getElement(point.node);
         const lines = paragraphUi.children[0].children[0].children[0].children;
@@ -15,8 +15,12 @@ export function paragraphTextInputBehaviorFactory(editor: Editor) {
         const ele = binarySearchWhichRange(line.children, point.offset);
 
         ele.innerText = Utils.insertStrBefore(ele.innerText, point.offset - paragraphProps.getElementStart(ele), text);
-
-        point.offset += text.length;
-        editor.docTree.changeSelection(point, point);
+        
+        const p = {
+            node: point.node,
+            offset: point.offset + text.length
+        }
+        editor.docTree.typesetting(point);
+        editor.docTree.changeSelection(p, p);
     }
 }
