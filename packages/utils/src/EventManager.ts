@@ -1,23 +1,26 @@
 import uuid from 'uuid';
 
 // 事件函数
-export interface Event {
-    (): [Boolean, number?] | void; // 是否重试 延迟执行, 单位 ms
+export interface EventFunc {
+    (): {
+        retry: boolean,
+        delayTime?: number
+    } | void; // 是否重试 延迟执行, 单位 ms
 }
 
 // 事件管理器
 export class EventManager {
-    private eventMap: Map<String, Array<Event>> = new Map();
+    private eventMap: Map<String, Array<EventFunc>> = new Map();
     private eventTriggleTimes: Map<String, number> = new Map();
     private eventDependencies: Map<String, Set<String>> = new Map(); // 记录事件依赖的前置事件
     private eventRelyOn: Map<String, Set<String>> = new Map(); // 记录该事件被那些事件作为前置事件
 
     // 如果执行的事件失败, 则会在指定的延迟时间之后再次执行
-    private execEvent = (id: string, event: Event) => {
+    private execEvent = (id: string, event: EventFunc) => {
         try {
             let result = event();
             if (result) {
-                let [retry, delayTime] = result;
+                let { retry, delayTime } = result;
                 if (retry) {
                     if (!delayTime) delayTime = 0;
                     setTimeout(() => this.execEvent(id, event), delayTime);
@@ -53,12 +56,15 @@ export class EventManager {
                     }
                 }
             }
-
         }
     }
 
+    bindEventOnMany(ids: String[], event: EventFunc, execNow?: Boolean) {
+        ids.forEach(id => this.bindEventOn(id, event, execNow));
+    }
+
     // 注册事件
-    registryEvent(id: String, event: Event, execNow?: Boolean) {
+    bindEventOn(id: String, event: EventFunc, execNow?: Boolean) {
         let eventList = this.eventMap.get(id);
         if (!eventList) {
             eventList = [];
@@ -70,7 +76,7 @@ export class EventManager {
 
     // 注册依赖事件触发链
     // 仅当所有所有事件 dependsOn 都都至少执行一次后才会触发
-    registryEventDpendsOn(dependsOn: Array<String>, event: Event, id?: String) {
+    bindEventAtLeastExecOnceOn(dependsOn: Array<String>, id: String | undefined, event: EventFunc) {
         if (!id) id = uuid.v1();
         let dependencies = this.eventDependencies.get(id);
         if (!dependencies) {
@@ -83,18 +89,16 @@ export class EventManager {
                 relyons = new Set<String>();
                 this.eventRelyOn.set(item, relyons);
             }
-            if (id) relyons.add(id);
-            else throw new Error("System error");
 
+            if (id) relyons.add(id); else throw new Error("System error");
             dependencies?.add(item)
         });
-        this.registryEvent(id, event);
+        this.bindEventOn(id, event);
     }
 
     // 触发事件
     triggleEvent(...ids: string[]) {
         for (let id of ids) {
-            // console.log("触发事件: ", id);
             let eventList = this.eventMap.get(id);
             if (!eventList) {
                 eventList = [];

@@ -3,7 +3,7 @@ import { DragState, $$ } from "utils";
 import Constants from "../Constants";
 
 export function sliderDragingBehavior(sp: ScrollPage) {
-    sp.eventManager.registryEventDpendsOn([Constants.events.ASSEMBLE_ELEMENTS_FINISH], ()=>{
+    sp.eventManager.bindEventOn(Constants.events.ASSEMBLE_ELEMENTS_FINISH, () => {
         buttomSliderBehavior(sp);
         rightSliderBehavior(sp);
     })
@@ -39,19 +39,7 @@ function buttomSliderBehavior(sp: ScrollPage) {
             offset = buttomScrollBarInfo.innerWidth - buttomSliderInfo.innerWidth;
         }
         buttomSlider.setLeft(offset);
-        page.setLeft(- pageInfo.innerWidth / buttomScrollBarInfo.innerWidth * offset);
-    })
-
-    buttomSlider.addEventListener('mousemove', () => {
-        buttomSlider.darkenColor();
-        $$.setLastTimeout(Constants.timeout.BUTTOM_SLIDER_FADE_TIMEOUT,
-            () => {
-                buttomSlider.lightenColor();
-            }, 1000);
-    })
-
-    buttomSlider.addEventListener('mouseleave', () => {
-        buttomSlider.lightenColor();
+        page.setLeft(- Math.ceil(pageInfo.innerWidth / buttomScrollBarInfo.innerWidth * offset));
     })
 }
 
@@ -83,15 +71,5 @@ function rightSliderBehavior(sp: ScrollPage) {
         }
         rightSlider.setTop(offset);
         page.setTop(- pageInfo.innerHeight / rightScrollBarInfo.innerHeight * offset);
-    })
-    rightSlider.addEventListener('mousemove', () => {
-        rightSlider.darkenColor();
-        $$.setLastTimeout(Constants.timeout.RIGHT_SLIDER_FADE_TIMEOUT,
-            () => {
-                rightSlider.lightenColor();
-            }, 1000);
-    })
-    rightSlider.addEventListener('mouseleave', () => {
-        rightSlider.lightenColor();
     })
 }

@@ -1,12 +1,11 @@
 import Constants from "../Constants";
 import { ScrollPage } from "../ScrollPage";
-import { $$, DragState, $, extend, innerHtml } from "utils";
-import { eleExt, windowExt, Window, Page, pageExt, RightScrollBar, RightSlider, ButtomScrollBar, ButtomSlider, TopShallow, RightShallow, rightScrollBarExt, rightSliderExt, buttomScrollBarExt, buttomSliderExt, topShallowExt, rightShallowExt } from "../elementTyps";
 
 export function setScrollBar(scrollPage: ScrollPage) {
     // 设定底部滚动条 slider 的宽度
     // 是否显示底部滚动条
-    scrollPage.eventManager.registryEventDpendsOn([
+    scrollPage.eventManager.bindEventOnMany([
+        Constants.events.ASSEMBLE_ELEMENTS_FINISH,
         Constants.events.BUTTOMSCROLLBAR_WIDTH_CHANGE,
         Constants.events.PAGE_WIDTH_CHANGE
     ], () => {
@@ -33,7 +32,8 @@ export function setScrollBar(scrollPage: ScrollPage) {
 
     // 设定右部滚动条 slider 的高度
     // 是否显示右部滚动条
-    scrollPage.eventManager.registryEventDpendsOn([
+    scrollPage.eventManager.bindEventOnMany([
+        Constants.events.ASSEMBLE_ELEMENTS_FINISH,
         Constants.events.RIGHTSCROLLBAR_WIDTH_CHANGE,
         Constants.events.PAGE_HEIGHT_CHANGE
     ], () => {

@@ -6,11 +6,11 @@ import { eleExt, windowExt, Window, Page, pageExt, RightScrollBar, RightSlider, 
 export function traceContainerSizeChange(sp: ScrollPage) {
     // 追踪 container 尺寸变化事件
     // 设置 window buttomScrollBar rightScrollBar topshallow rightshallow 的尺寸
-    sp.eventManager.registryEventDpendsOn([
+    sp.eventManager.bindEventOnMany([
+        Constants.events.ASSEMBLE_ELEMENTS_FINISH,
         Constants.events.CONTAINER_HEIGHT_CHANGE,
         Constants.events.CONTAINER_WIDTH_CHANGE
-    ],
-        () => {
+    ], () => {
             let { container, window, buttomScrollBar, rightScrollBar, topshallow, rightshallow } = sp.elements;
             if (!container || !window || !buttomScrollBar || !rightScrollBar || !topshallow || !rightshallow) throw new Error();
 

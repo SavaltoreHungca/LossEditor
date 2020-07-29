@@ -17,10 +17,7 @@ interface Element extends HTMLElement {
     visible(): boolean
     show(): void
     cancelDisappear(): void
-    fadeOut(duration?: number): void
-    cancelFadeOut(): void
     disappear(delay?: number, callback?: Function): void
-    cancelLastTimeout(id: string): void
     setRole(roleName: string): void
     setAttribute(name: string, value?: string): void
     addClass(c: string): void
@@ -105,7 +102,6 @@ export function buttomSliderExt(sp: ScrollPage) {
                 })
             },
             darkenColor: function () {
-                sf.cancelLastTimeout(Constants.timeout.BUTTOM_SLIDER_FADE_TIMEOUT);
                 sf.setStyle({
                     background: 'hsla(0,0%,39%,.7)'
                 })
@@ -125,7 +121,6 @@ export function rightSliderExt(sp: ScrollPage) {
                 })
             },
             darkenColor: function () {
-                sf.cancelLastTimeout(Constants.timeout.RIGHT_SLIDER_FADE_TIMEOUT);
                 sf.setStyle({
                     background: 'hsla(0,0%,39%,.7)'
                 })
@@ -146,12 +141,6 @@ export function contentExt(sp: ScrollPage) {
 export function eleExt(sp: ScrollPage) {
     return (ele: HTMLElement) => {
         return {
-            opacity: 1,
-            initialOpacity: -1,
-            fadeGradient: 0.1,
-            fadeInterval: 100,
-            fadeoutGoing: false,
-            FADE_OUT_TIME_ID: $$.randmonId(),
             DISPEAR_ID: $$.randmonId(),
             setWidth: function (wdith: string | number) {
                 this.setStyle({ width: wdith });
@@ -200,12 +189,10 @@ export function eleExt(sp: ScrollPage) {
             },
             show: function () {
                 this.cancelDisappear();
-                this.cancelFadeOut();
                 this.setStyle({ visibility: 'visible' });
             },
             disappear: function (delay?: number, callback?: Function) {
                 this.cancelDisappear();
-                this.cancelFadeOut();
                 if (delay) {
                     $$.setLastTimeout(this.DISPEAR_ID, () => {
                         this.setStyle({ visibility: 'hidden' });
@@ -218,45 +205,6 @@ export function eleExt(sp: ScrollPage) {
             },
             cancelDisappear: function () {
                 $$.cancelLastTimeout(this.DISPEAR_ID);
-            },
-            fadeOut: function (duration?: number) {
-                if (this.fadeoutGoing) return;
-                if (!duration) duration = 1500;
-                if (this.getCssStyle().opacity === "") {
-                    this.initialOpacity = 1;
-                } else {
-                    this.initialOpacity = parseFloat(this.getCssStyle().opacity);
-                }
-                this.opacity = this.initialOpacity;
-                this.fadeInterval = duration / 10 < 100 ? 100 : duration / 10;
-                this.fadeGradient = this.initialOpacity / (duration / this.fadeInterval);
-
-                const fadeFunc = () => {
-                    let newopacity = this.opacity - this.fadeGradient;
-                    if (newopacity <= 0) {
-                        this.disappear();
-                        this.cancelFadeOut();
-                        return;
-                    }
-                    this.setStyle({
-                        opacity: newopacity
-                    })
-                    this.opacity = newopacity;
-                    $$.setLastTimeout(this.FADE_OUT_TIME_ID, fadeFunc, this.fadeInterval);
-                }
-                this.fadeoutGoing = true;
-                $$.setLastTimeout(this.FADE_OUT_TIME_ID, fadeFunc, this.fadeInterval);
-            },
-            cancelFadeOut: function () {
-                if (this.fadeoutGoing) {
-                    $$.cancelLastTimeout(this.FADE_OUT_TIME_ID);
-                    if (this.initialOpacity !== -1) {
-                        this.setStyle({
-                            opacity: this.initialOpacity
-                        })
-                    }
-                }
-                this.fadeoutGoing = false;
             },
             setRole: function (roleName: string) {
                 this.setAttribute("data-role", roleName);

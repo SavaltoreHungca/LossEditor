@@ -1,12 +1,13 @@
 import Constants from "../Constants";
 import { ScrollPage } from "../ScrollPage";
-import { $$, DragState, $, extend, innerHtml } from "utils";
+import { $$, $, extend, innerHtml } from "utils";
 import { eleExt, windowExt, Window, Page, pageExt, RightScrollBar, RightSlider, ButtomScrollBar, ButtomSlider, TopShallow, RightShallow, rightScrollBarExt, rightSliderExt, buttomScrollBarExt, buttomSliderExt, topShallowExt, rightShallowExt } from "../elementTyps";
 
 export function assembleElementsAndInitializeUi(sp: ScrollPage) {
     // 组装元素事件
     // 初始化样式, 位置, 尺寸
-    sp.eventManager.registryEventDpendsOn([Constants.events.ELEMENTS_CREATED],
+    sp.eventManager.bindEventAtLeastExecOnceOn([Constants.events.ELEMENTS_CREATED],
+        Constants.events.ASSEMBLE_ELEMENTS_FINISH,
         () => {
             const { container, content } = sp.elements;
             const idset = {
@@ -64,11 +65,10 @@ export function assembleElementsAndInitializeUi(sp: ScrollPage) {
             if (sp.settings.rightScrollBarInner) {
                 rightshallow.setRight('0');
             } else {
-                rightshallow.setRight(sp.settings.rightScrollBarWidth + 'px');
+                rightshallow.setRight(sp.settings.rightScrollBarWidth);
             }
 
             // sp.updateContainerSize();
             sp.updatePageSize();
-
-        }, Constants.events.ASSEMBLE_ELEMENTS_FINISH)
+        })
 }
