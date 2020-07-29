@@ -25,7 +25,6 @@ export class ScrollPage {
     elements: ElementsSet
 
     constructor(content: HTMLElement, settings?: SettingReceiver) {
-        window['sp'] = this;
         if (settings) {
             for (let k in settings)
                 this.settings[k] = settings[k];

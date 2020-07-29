@@ -1,4 +1,4 @@
-import { Utils } from 'utils';
+import { $$ } from 'utils';
 
 export class Node {
     type: string
@@ -58,7 +58,7 @@ export class Node {
             const stack = [node];
             const indexMap = new Map<Node, number>();
             while (stack.length > 0) {
-                const root = <Node>Utils.statckPeek(stack);
+                const root: Node = $$.stackPeek(stack);
                 const children = root.children || [];
                 let childIndex = indexMap.get(root);
                 if (!childIndex) childIndex = 0;
@@ -106,7 +106,7 @@ export class Node {
             const stack = [node];
             const indexMap = new Map<Node, number>();
             while (stack.length > 0) {
-                const root = <Node>Utils.statckPeek(stack);
+                const root: Node = $$.stackPeek(stack);
                 const children = root.children || [];
                 let childIndex = indexMap.get(root);
                 if (!childIndex) childIndex = children.length - 1;

@@ -143,7 +143,7 @@ export class $$ {
         }
     }
 
-    static toCssText(style: Object): string{
+    static toCssText(style: Object): string {
         let ans = "";
         if (!this.isObject(style)) return "";
         for (let name in style) {
@@ -152,7 +152,7 @@ export class $$ {
         return ans;
     }
 
-    static getInlineCssStyle(elementOrCssText: HTMLElement | string): Object{
+    static getInlineCssStyle(elementOrCssText: HTMLElement | string): Object {
         const cssText = typeof elementOrCssText === 'string' ? elementOrCssText
             : elementOrCssText.style.cssText;
         const ans = {};
@@ -166,9 +166,9 @@ export class $$ {
         return ans;
     }
 
-    static removeStyle(ele: HTMLElement, ...names: string[]){
+    static removeStyle(ele: HTMLElement, ...names: string[]) {
         const style = this.getInlineCssStyle(ele);
-        for(const name of names){
+        for (const name of names) {
             delete style[name];
         }
         ele.style.cssText = this.toCssText(style);
@@ -385,16 +385,16 @@ export class $$ {
         for (let i of ids) {
             clearTimeout(i);
         }
-        this.timeoutIdMap.delete(id);
+        this.timeoutIdMap.set(id, []);
     }
 
     static setLastTimeout(id: string, func: Function, delay: number) {
+        this.cancelLastTimeout(id);
         let ids = this.timeoutIdMap.get(id);
         if (!ids) {
             ids = [];
             this.timeoutIdMap.set(id, ids);
         }
-        this.cancelLastTimeout(id);
         ids.push(window.setTimeout(func, delay));
     }
 

@@ -1,5 +1,5 @@
 import { Node } from './Node'
-import { Utils } from 'utils';
+import { $$ } from 'utils';
 
 export type Point = {
     node: Node
@@ -21,15 +21,15 @@ export class Selection {
     }
 
     get startSecondParent() {
-        return Utils.getRefStageNode(this.start?.node, 1, node => node?.parent, node => node?.type === 'root');
+        return $$.getRefStageNode(this.start?.node, 1, node => node?.parent, node => node?.type === 'root');
     }
 
     get endSecondParent() {
-        return Utils.getRefStageNode(this.end?.node, 1, node => node?.parent, node => node?.type === 'root');
+        return $$.getRefStageNode(this.end?.node, 1, node => node?.parent, node => node?.type === 'root');
     }
 
     get ancestor(): Node | undefined {
-        return Utils.getCommonAncestor(this.start?.node, this.end?.node, node => node?.parent);
+        return $$.getCommonAncestor(this.start?.node, this.end?.node, node => node?.parent);
     }
 
     get relativePostionStartEnd(): "START_IN_RIGHT" | "START_IN_LEFT" | "OVERLAPPING" {

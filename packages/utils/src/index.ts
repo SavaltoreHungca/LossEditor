@@ -4,3 +4,4 @@ export * from './EventManager';
 export * from './DataListener';
 export * from './extend';
 export * from './htmlTemplate';
+export * from './stepper';
