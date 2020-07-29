@@ -2,6 +2,7 @@ import Constants from "../Constants";
 import { ScrollPage } from "../ScrollPage";
 import { $$, $, extend, innerHtml } from "utils";
 import { eleExt, windowExt, Window, Page, pageExt, RightScrollBar, RightSlider, ButtomScrollBar, ButtomSlider, TopShallow, RightShallow, rightScrollBarExt, rightSliderExt, buttomScrollBarExt, buttomSliderExt, topShallowExt, rightShallowExt } from "../elementTyps";
+import { classes } from '../styleClassSheet'
 
 export function assembleElementsAndInitializeUi(sp: ScrollPage) {
     // 组装元素事件
@@ -34,13 +35,13 @@ export function assembleElementsAndInitializeUi(sp: ScrollPage) {
                 </div>
                 <div data-scrollpage-type="rightScrollBar" id="${idset.rightScrollBar}" 
                     style="z-index: 100; right: 0; top: 0; width: ${sp.settings.rightScrollBarWidth}px">
-                    <div data-scrollpage-type="rightSlider" id="${idset.rightSlider}" 
-                        style="background: hsla(0,0%,39%,.4); width: ${sp.settings.rightScrollBarWidth}px"></div>
+                    <div data-scrollpage-type="rightSlider" class="${classes.sliderhover}" id="${idset.rightSlider}" 
+                        style="width: ${sp.settings.rightScrollBarWidth}px"></div>
                 </div>
                 <div data-scrollpage-type="buttomScrollBar" id="${idset.buttomScrollBar}" 
                     style="z-index: 100; height: ${sp.settings.bottomScrollBarHeight}px; left: 0; bottom: 0 ">
-                    <div data-scrollpage-type="buttomSlider" id="${idset.buttomSlider}" 
-                        style="background: hsla(0,0%,39%,.4); height: ${sp.settings.bottomScrollBarHeight}px"></div>
+                    <div data-scrollpage-type="buttomSlider" class="${classes.sliderhover}" id="${idset.buttomSlider}" 
+                        style="height: ${sp.settings.bottomScrollBarHeight}px"></div>
                 </div>
                 <div data-scrollpage-type="topshallow" id="${idset.topshallow}" 
                     style="box-shadow: #dddddd 0 6px 6px -6px inset; height: 6px; left: 0; top: 0">

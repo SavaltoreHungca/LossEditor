@@ -6,7 +6,6 @@ import { ScrollPage } from 'scroll-page'
 
 const Home = () => {
     const render = () => {
-        $('container').innerHTML = '';
         // new MemLoss($('container'));
         new ScrollPage($('container'), {
             containerHeight: 300,
@@ -22,8 +21,14 @@ const Home = () => {
         <div>
             <div> <button onClick={render}>加载</button></div>
             <div id="container" style={
-                { width: '80vw', height: '80vh' }}
-            />
+                { width: '1000px', height: '1000px' }}
+            >
+                <div id="hah" style={{
+                    position: 'absolute',
+                    left: '700px',
+                    top: '800px'
+                }}>你</div>
+            </div>
         </div>
     )
 }

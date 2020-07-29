@@ -30,6 +30,32 @@ declare type EleTypes = 'block' | 'inline' | 'fixed' | 'absolute' | 'flex' | 'fl
 export class $$ {
     private static timeoutIdMap: Map<String, Array<number>> = new Map();
     private static dragStates: Map<string, DragState> = new Map();
+    private static sheetName = $$.randmonId();
+
+    static createStyleSheet() {
+        const head = document.head || document.getElementsByTagName('head')[0];
+        const style = document.createElement('style');
+        style.type = 'text/css';
+        head.appendChild(style);
+        return style.sheet || style['styleSheet'];
+    }
+
+    static addStyleSheet(selector: string, rules: string, index?: number) {
+        // 创建一个 style， 返回其 stylesheet 对象
+        // 注意：IE6/7/8中使用 style.stylesheet，其它浏览器 style.sheet
+        // 创建 stylesheet 对象
+        const sheet: CSSStyleSheet = window[this.sheetName] || this.createStyleSheet();
+        if (!window[this.sheetName]) {
+            window[this.sheetName] = sheet;
+        }
+
+        if (sheet.insertRule) {
+            const rule = selector + "{" + rules + "}";
+            sheet.insertRule(rule, index);
+        } else if (sheet.addRule) {
+            sheet.addRule(selector, rules, index);
+        }
+    }
 
     static wrapEle(type: EleTypes, element: HTMLElement | Element, style?: Object) {
         const ele = <HTMLElement>element;
@@ -117,7 +143,7 @@ export class $$ {
         }
     }
 
-    static toCssText(style: Object) {
+    static toCssText(style: Object): string{
         let ans = "";
         if (!this.isObject(style)) return "";
         for (let name in style) {
@@ -126,7 +152,7 @@ export class $$ {
         return ans;
     }
 
-    static getInlineCssStyle(elementOrCssText: HTMLElement | string) {
+    static getInlineCssStyle(elementOrCssText: HTMLElement | string): Object{
         const cssText = typeof elementOrCssText === 'string' ? elementOrCssText
             : elementOrCssText.style.cssText;
         const ans = {};
@@ -134,10 +160,19 @@ export class $$ {
             const styles = cssText.split(';').filter(Boolean);
             for (const style of styles) {
                 const [name, value] = style.split(':');
-                ans[name] = value.trim();
+                ans[name.trim()] = value.trim();
             }
         }
         return ans;
+    }
+
+    static removeStyle(ele: HTMLElement, ...names: string[]){
+        const style = this.getInlineCssStyle(ele);
+        for(const name of names){
+            delete style[name];
+        }
+        ele.style.cssText = this.toCssText(style);
+        return style;
     }
 
     static getElementInfoBatch(consumer: (...info: ElementInfo[]) => void, ...elements: HTMLElement[]) {

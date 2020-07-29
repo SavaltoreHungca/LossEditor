@@ -96,15 +96,18 @@ export function buttomSliderExt(sp: ScrollPage) {
     return (ele: HTMLElement) => {
         const sf = <Element>ele;
         return {
+            isDarken: false,
             lightenColor: function () {
-                sf.setStyle({
-                    background: 'hsla(0,0%,39%,.4)'
-                })
+                this.isDarken = false;
+                $$.removeStyle(sf, 'background');
             },
             darkenColor: function () {
-                sf.setStyle({
-                    background: 'hsla(0,0%,39%,.7)'
-                })
+                if(!this.isDarken){
+                    sf.setStyle({
+                        background: 'hsla(0,0%,39%,.7)'
+                    })
+                    this.isDarken = true;
+                }
             },
             dragging: false,
             getType: () => 'ButtomSlider'
@@ -115,15 +118,18 @@ export function rightSliderExt(sp: ScrollPage) {
     return (ele: HTMLElement) => {
         const sf = <Element>ele;
         return {
+            isDarken: false,
             lightenColor: function () {
-                sf.setStyle({
-                    background: 'hsla(0,0%,39%,.4)'
-                })
+                this.isDarken = false;
+                $$.removeStyle(sf, 'background')
             },
             darkenColor: function () {
-                sf.setStyle({
-                    background: 'hsla(0,0%,39%,.7)'
-                })
+                if(!this.isDarken){
+                    sf.setStyle({
+                        background: 'hsla(0,0%,39%,.7)'
+                    })
+                    this.isDarken = true;
+                }
             },
             dragging: false,
             getType: () => 'RightSlider'

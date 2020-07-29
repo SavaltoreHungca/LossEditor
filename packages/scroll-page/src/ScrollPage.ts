@@ -1,9 +1,10 @@
 import { Settings, SettingReceiver } from './Settings';
 import { registryEvents } from './events/events';
-// import { registryListeners } from './listeners';
 import { EventManager, $$, extend } from 'utils';
 import { buttomScrollBarExt, eleExt, ButtomScrollBar, Container, Page, Window, RightScrollBar, TopShallow, RightShallow, ButtomSlider, RightSlider, Content, containerExt, windowExt, pageExt, rightScrollBarExt, topShallowExt, rightShallowExt, buttomSliderExt, rightSliderExt, contentExt } from './elementTyps';
 import Constants from './Constants';
+import { regisStyleSheet } from './styleClassSheet';
+import { scrollShow } from './scrollShow';
 
 declare type ElementsSet = {
     container: Container,
@@ -24,6 +25,7 @@ export class ScrollPage {
     elements: ElementsSet
 
     constructor(content: HTMLElement, settings?: SettingReceiver) {
+        window['sp'] = this;
         if (settings) {
             for (let k in settings)
                 this.settings[k] = settings[k];
@@ -36,6 +38,7 @@ export class ScrollPage {
             content: extend(content, [eleExt(this), contentExt(this)]),
         }
 
+        regisStyleSheet(this);
         registryEvents(this);
         // registryListeners(this);
 
@@ -48,7 +51,7 @@ export class ScrollPage {
         this.eventManager.triggleEvent(Constants.events.ELEMENTS_CREATED);
     }
 
-    updateContainerSize() {
+    containerSizeFollowOuter() {
         const { container } = this.elements;
         const containerParent = container.parentElement;
         if (containerParent) {
@@ -67,8 +70,9 @@ export class ScrollPage {
         page.setHeight(contentInfo.height);
     }
 
-    setContainerStyle(obj: Object) {
-        this.elements.container.setStyle(obj);
+    setContainerSize(size: {width?: number | string, height?: number | string}) {
+        if(size.width) this.elements.container.setWidth(size.width);
+        if(size.height) this.elements.container.setHeight(size.height);
     }
 
     contentWidthFollowContainer() {
@@ -80,6 +84,10 @@ export class ScrollPage {
                 throw new Error("cant't set content width follow container");
             }
         }
+    }
+
+    scrollShow(ele: HTMLElement){
+        scrollShow(ele, this);
     }
 
     contentHeightFollowContainer() {
