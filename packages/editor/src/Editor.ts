@@ -1,7 +1,6 @@
 import { NodeManager } from './NodeManager';
 import { data } from './testdata';
 import { DocTree, DocTreeResolver, Node } from 'editor-core';
-import { EventManager, DataListener } from 'event-driven';
 import { Utils, BidMap } from 'utils';
 import { createCursor, listenSelectionToSetCursor } from './selection/cursor';
 import { createElement } from './utils';
@@ -11,6 +10,9 @@ import { Constants } from './Constants';
 import { listenUserChangeSelection } from './selection/selectionListener';
 import { listenTextInput } from './textinput/listenTextInput';
 
+declare type Elements = {
+    
+}
 
 export type SetCursorPositionResult = {
     left: number,
@@ -24,8 +26,6 @@ export class Editor {
     viewLines: HTMLElement = createElement('view-lines');
     backLayer: HTMLElement = createElement('back-layer');
     regionContainer: HTMLElement = document.createElement('div');
-    eventManager: EventManager = new EventManager();
-    dataListener: DataListener = new DataListener(200);
 
     setCursorPositionBehaviorSet = new Map<string, Function>();
     docTree: DocTree = new DocTree();

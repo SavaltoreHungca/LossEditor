@@ -217,8 +217,8 @@ function factory(pkg, options = {}) {
 export default [
     ...factory(Utils),
     ...factory(ScrollPage),
-    // ...factory(EditorCore),
-    // ...factory(Editor),
+    ...factory(EditorCore),
+    ...factory(Editor),
     // ...factory(Client),
     // ...factory(CodeStation),
 ]

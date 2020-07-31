@@ -25,10 +25,7 @@ export class ScrollPage {
     elements: ElementsSet
 
     constructor(content: HTMLElement, settings?: SettingReceiver) {
-        if (settings) {
-            for (let k in settings)
-                this.settings[k] = settings[k];
-        }
+        if (settings) for (let k in settings) this.settings[k] = settings[k];
 
         this.eventManager = new EventManager();
 
@@ -69,9 +66,9 @@ export class ScrollPage {
         page.setHeight(contentInfo.height);
     }
 
-    setContainerSize(size: {width?: number | string, height?: number | string}) {
-        if(size.width) this.elements.container.setWidth(size.width);
-        if(size.height) this.elements.container.setHeight(size.height);
+    setContainerSize(size: { width?: number | string, height?: number | string }) {
+        if (size.width) this.elements.container.setWidth(size.width);
+        if (size.height) this.elements.container.setHeight(size.height);
     }
 
     contentWidthFollowContainer() {
@@ -85,7 +82,7 @@ export class ScrollPage {
         }
     }
 
-    scrollShow(ele: HTMLElement){
+    scrollShow(ele: HTMLElement) {
         scrollShow(ele, this);
     }
 
