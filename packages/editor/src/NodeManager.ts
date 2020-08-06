@@ -1,28 +1,37 @@
-import { BidMap } from "utils";
+import { Editor } from './Editor';
+import { BidMap, $$ } from "utils";
 import { Node } from 'editor-core';
+import { DocNode } from './elements/elementTypes';
 
 export class NodeManager {
-    private nodeMap = new BidMap<Node, HTMLElement>();
+    private nodeMap = new BidMap<Node, DocNode>();
+    private editor: Editor;
     
+    constructor(editor: Editor){
+        this.editor = editor;
+    }
 
     hasElement(node: Node | undefined): boolean {
         return node && this.nodeMap.getvalue(node) ? true : false;
     }
 
-    getElement(node: Node) {
+    getElement(node: Node, ifAbsense?: (node: Node)=>DocNode) {
         let ele = this.nodeMap.getvalue(node);
         if (!ele) {
-            ele = document.createElement('div');
+            if(ifAbsense)
+                ele = ifAbsense(node);
+            else
+                ele = $$.creEle('block');
             this.setElement(node, ele);
         }
         return ele;
     }
 
-    getNode(element: HTMLElement) {
+    getNode(element: DocNode) {
         return this.nodeMap.getkey(element);
     }
 
-    setElement(node: Node, element: HTMLElement) {
+    setElement(node: Node, element: DocNode) {
         element.setAttribute('data-node-type', node.type);
         this.nodeMap.set(node, element);
     }

@@ -1,8 +1,12 @@
+import { ParagraphContext } from './../../elements/elementTypes';
 import { Editor } from '../../Editor';
-import { paragraphProps, getType } from "../../utils";
-import { Utils } from "utils";
+import { getType } from "../../utils";
+import { $$, ct } from "utils";
+import { Paragraph, ParagraphLine, Inlineblock } from '../../elements/elementTypes';
 
-export function setCursorPositionForParagraph(paragraph: HTMLElement, offset: number, editor: Editor) {
+export function setCursorPositionForParagraph(paragraph: Paragraph, offset: number, editor: Editor) {
+    if (!editor.viewLines || !editor.cursor) throw new Error();
+
     const ans = {
         left: 0,
         top: 0,
@@ -10,14 +14,14 @@ export function setCursorPositionForParagraph(paragraph: HTMLElement, offset: nu
     };
 
     const paragraphLines = paragraph.children[0].children[0].children[0].children;
-    const line = binarySearchWhichRange(paragraphLines, offset);
-    const inLineElement = binarySearchWhichRange(line.children, offset);
+    const line = <ParagraphLine>binarySearchWhichRange(paragraphLines, offset);
+    const inLineElement = <Inlineblock>binarySearchWhichRange(line.children, offset);
 
     switch (getType(inLineElement)) {
         case 'text': {
-            const posi = Utils.getRelativePosition(inLineElement, editor.viewLines);
-            const textOffset = Utils.getStrPx(
-                inLineElement.innerText.substring(0, offset - paragraphProps.getElementStart(inLineElement)),
+            const posi = $$.getRelativePosition(inLineElement, editor.viewLines);
+            const textOffset = $$.getStrPx(
+                inLineElement.innerText.substring(0, offset - inLineElement.getElementStart()),
                 inLineElement
             ).width;
 
@@ -27,10 +31,10 @@ export function setCursorPositionForParagraph(paragraph: HTMLElement, offset: nu
             break;
         }
         case 'unit-block': {
-            const posi = Utils.getRelativePosition(inLineElement, editor.viewLines);
-            let blockOffset = -Utils.getElementInfo(editor.cursor).width;
-            if (offset > paragraphProps.getElementStart(inLineElement)) {
-                blockOffset = Utils.getElementInfo(inLineElement).width;
+            const posi = $$.getRelativePosition(inLineElement, editor.viewLines);
+            let blockOffset = -$$.getElementInfo(editor.cursor).width;
+            if (offset > inLineElement.getElementStart()) {
+                blockOffset = $$.getElementInfo(inLineElement).width;
             }
 
             ans.left = posi.left + blockOffset;
@@ -45,22 +49,22 @@ export function setCursorPositionForParagraph(paragraph: HTMLElement, offset: nu
 }
 
 export function binarySearchWhichRange(array: HTMLCollection, offset: number) {
-    let foundLine;
+    let foundLine: ParagraphContext;
     let right = array.length - 1;
     let left = 0;
 
     if (array.length === 1) {
-        foundLine = array[0];
+        foundLine = ct(array[0]);
     }
 
     while (!foundLine && left < right) {
-        const nextLine = <HTMLElement>array[right];
+        const nextLine: ParagraphContext = ct(array[right]);
 
-        const rightStart = paragraphProps.getElementStart(nextLine);
+        const rightStart = nextLine.getElementStart();
 
         const len = Math.abs(left - right);
         const mid = left + Math.floor(len / 2);
-        const midStart = paragraphProps.getElementStart(<HTMLElement>array[mid]);
+        const midStart = (<ParagraphContext>ct(array[mid])).getElementStart();
 
         if (offset > midStart) {
             left = mid;
@@ -77,7 +81,7 @@ export function binarySearchWhichRange(array: HTMLCollection, offset: number) {
         }
     }
     if (!foundLine) {
-        foundLine = array[left];
+        foundLine = ct(array[left]);
     }
     return <HTMLElement>foundLine;
 }

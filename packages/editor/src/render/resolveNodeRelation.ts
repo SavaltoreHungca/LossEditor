@@ -1,17 +1,17 @@
 import { Editor } from '../Editor';
 import { Node } from 'editor-core';
+import { DocNode } from '../elements/elementTypes';
 
-export function mountChild(editor: Editor, parent: Node | undefined, child: Node) {
-    if (!parent) throw new Error(`无法找到承载的父容器`);
-    const parentUi = <HTMLElement>editor.uiMap.getElement(parent);
-    const nodeUi = <HTMLElement>editor.uiMap.getElement(child);
-
+export function mountChild(editor: Editor, parent: Node, child: Node, ifAbsense?: (node: Node)=>DocNode) {
+    const parentUi = editor.uiMap.getElement(parent); if(!parentUi) throw new Error('无法找到父节点Doc容器');
+    const nodeUi = editor.uiMap.getElement(child, ifAbsense);
+    
     if (nodeUi.parentElement !== parentUi) {
         nodeUi.parentElement?.removeChild(nodeUi);
         parentUi.appendChild(nodeUi);
     }
+    
     nodeUi.innerHTML = '';
-    nodeUi.innerText = '';
     return {
         parentUi: parentUi,
         nodeUi: nodeUi

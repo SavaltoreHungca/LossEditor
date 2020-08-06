@@ -3,26 +3,24 @@ import { Node } from "editor-core";
 
 /// <reference path="./katex.d.ts"/>
 import katex from 'katex';
-import { createElement, paragraphProps, props } from "../utils";
 import { Constants } from "../Constants";
-import { Utils } from "utils";
+import { $$ } from "utils";
 import { renderAttachment } from "./renderAttachment";
 import { renderCodeOpen } from "./renderCodeOpen";
 import { indentationWrap } from "./indentationWrap";
 import { mountChild } from "./resolveNodeRelation";
+import { Style, Paragraph, ParagraphLine, Text, Inlineblock, UnitBlock } from "../elements/elementTypes";
+import { creEle } from "../elements/creEle";
 
 
-export type Style = {
-    [index: string]: string
-}
 declare type StyleList = Array<[number, number, Style]>;
 
 declare type RenderContext = {
     str: string,
     strIndex: number,
-    unit: HTMLElement | undefined,
+    unit: Inlineblock | undefined,
     maxWidth: number,
-    line: HTMLElement | undefined,
+    line: ParagraphLine | undefined,
     sortedRanges: Array<[number, number]>,
     styleMap: Map<[number, number], Style>,
     exceed: boolean,
@@ -37,42 +35,51 @@ export interface TextContent {
 
 export function paragraphRendererFactor(editor: Editor) {
     return (parent: Node | undefined, node: Node) => {
+        if(!parent) throw new Error();
+
         const { parentUi, nodeUi } = mountChild(editor, parent, node);
 
         const textContent = <TextContent>node.content;
-        const viewLines = indentationWrap(nodeUi, node.indentation);
+        const viewLines = indentationWrap(editor, nodeUi, node.indentation);
 
-        const paragraph = createElement('paragraph');
+        const paragraph: Paragraph = creEle(editor, 'paragraph');
+
         viewLines.appendChild(paragraph);
 
         if (!textContent || !textContent.str) {
-            renderEmptyInParagraph(paragraph);
+            renderEmptyInParagraph(editor, paragraph);
         } else {
-            appendLineToParagraph(textContent, paragraph);
+            appendLineToParagraph(editor, textContent, paragraph);
         }
     }
 }
 
-function renderEmptyInParagraph(paragraph: HTMLElement) {
-    const line = createElement('paragraph-line');
-    paragraphProps.setElementStart(line, 0);
+function renderEmptyInParagraph(editor: Editor, paragraph: Paragraph) {
+    const line: ParagraphLine = creEle(editor, 'paragraph-line');
+
+    line.setElementStart(0);
+
     paragraph.appendChild(line);
-    const text = createElement('text');
-    paragraphProps.setElementStart(text, 0);
-    paragraphProps.setEleUniId(text);
+
+    const text: Text = creEle(editor, 'text');
+
+    text.setElementStart(0);
+    text.setEleUniId();
+
     line.appendChild(text);
 
-    Utils.setStyle(text, {
-        'min-height': Utils.getStrPx(Constants.WIDTH_BASE_CHAR, text).height + 'px',
+    text.setStyle({
+        'min-height': $$.getStrPx(Constants.WIDTH_BASE_CHAR, text).height + 'px',
         'min-width': '1px'
-    })
-    Utils.setStyle(line, { width: 'auto' });
+    });
+
+    line.autoWidth();
 }
 
-export function appendLineToParagraph(textContent: TextContent, paragraph: HTMLElement) {
-    let line: HTMLElement | undefined = undefined;
+export function appendLineToParagraph(editor: Editor, textContent: TextContent, paragraph: Paragraph) {
+    let line: ParagraphLine | undefined = undefined;
 
-    const paragraphInfo = Utils.getElementInfo(paragraph);
+    const paragraphInfo = paragraph.getInfo();
     let offset = 0;
     const sortedRanges = new Array<[number, number]>();
     const styleMap = new Map<[number, number], Style>();
@@ -96,8 +103,10 @@ export function appendLineToParagraph(textContent: TextContent, paragraph: HTMLE
     }
 
     while (offset < textContent.str.length) {
-        line = createElement('paragraph-line');
-        paragraphProps.setElementStart(line, offset);
+        line = creEle(editor, 'paragraph-line');
+
+        line.setElementStart(offset);
+
         paragraph.appendChild(line);
 
         context.line = line;
@@ -105,6 +114,7 @@ export function appendLineToParagraph(textContent: TextContent, paragraph: HTMLE
         context.exceed = false;
         context.renderFinish = false;
         offset += renderElementsInLine(
+            editor,
             context,
             [renderText, renderUnitBlock]
         );
@@ -112,24 +122,26 @@ export function appendLineToParagraph(textContent: TextContent, paragraph: HTMLE
 }
 
 export function renderElementsInLine(
+    editor: Editor,
     context: RenderContext,
-    renders: Array<(context: RenderContext) => void>): number {
+    renders: Array<(editor: Editor, context: RenderContext) => void>): number {
     if (!context.line) throw new Error();
     const start = context.strIndex;
-    Utils.setStyle(context.line, { width: 'fit-content' });
+
+    context.line.fitContent();
 
     while (!context.renderFinish && !context.exceed) {
         renders.forEach(render => {
-            startRender(context, render);
+            startRender(editor, context, render);
         })
     }
 
-    Utils.setStyle(context.line, { width: 'auto' });
+    context.line.autoWidth();
 
     return context.strIndex - start;
 }
 
-function startRender(context: RenderContext, render: (context: RenderContext) => void) {
+function startRender(editor: Editor, context: RenderContext, render: (editor: Editor, context: RenderContext) => void) {
     if (context.renderFinish || context.exceed) return;
 
     if (context.strIndex >= context.str.length) {
@@ -137,23 +149,24 @@ function startRender(context: RenderContext, render: (context: RenderContext) =>
         return;
     }
 
-    render(context);
+    render(editor, context);
 }
 
-function renderText(context: RenderContext): void {
+function renderText(editor: Editor, context: RenderContext): void {
     if (!context.line) throw new Error();
     if (findUnitBlock(context.str, context.strIndex).unitBlock) {
         return;
     }
-    const { foundRange, nearestNextRange } = Utils.findInWhichRange(context.sortedRanges, context.strIndex);
+    const { foundRange, nearestNextRange } = $$.findInWhichRange(context.sortedRanges, context.strIndex);
 
     const style = foundRange ? context.styleMap.get(foundRange) : undefined;
 
-    context.unit = createElement('text');
+    context.unit = creEle(editor, 'text');
 
     setEleUniIdAndStyle(style, context);
 
-    paragraphProps.setElementStart(context.unit, context.strIndex);
+    context.unit.setElementStart(context.strIndex);
+
     context.line.appendChild(context.unit);
 
     while (context.strIndex < context.str.length) {
@@ -171,8 +184,8 @@ function renderText(context: RenderContext): void {
         }
 
         context.unit.innerText += context.str[context.strIndex];
-        const lineInfo = Utils.getElementInfo(context.line);
-
+        const lineInfo = context.line.getInfo();
+        
         if (lineInfo.width > context.maxWidth) {
             const text = context.unit.innerText;
             context.unit.innerText = text.substring(0, text.length - 1);
@@ -192,24 +205,23 @@ function renderText(context: RenderContext): void {
 }
 
 
-function renderUnitBlock(context: RenderContext): void {
+function renderUnitBlock(editor: Editor, context: RenderContext): void {
     if (!context.line) throw new Error();
     const { nextPosition, unitBlock, type, value } = findUnitBlock(context.str, context.strIndex);
     if (!unitBlock) return;
 
-    context.unit = createElement('unit-block');
-    paragraphProps.setElementStart(context.unit, context.strIndex);
+    context.unit = creEle(editor, 'unit-block');
+    context.unit.setElementStart(context.strIndex);
     context.line.appendChild(context.unit);
 
-    const { foundRange, nearestNextRange } = Utils.findInWhichRange(context.sortedRanges, context.strIndex);
+    const { foundRange, nearestNextRange } = $$.findInWhichRange(context.sortedRanges, context.strIndex);
     const style = foundRange ? context.styleMap.get(foundRange) : undefined;
 
     setEleUniIdAndStyle(style, context);
 
-    paragraphProps.setUnitBlockType(context.unit, type, value);
+    (<UnitBlock>context.unit).setUnitBlockType(type,value);
     switch (type) {
         case 'formula':
-            Utils.setStyle(context.unit, { cursor: 'pointer' });
             katex.render(value, context.unit, { throwOnError: false });
             break;
         case 'attachment':
@@ -220,7 +232,7 @@ function renderUnitBlock(context: RenderContext): void {
             break;
     }
 
-    const lineInfo = Utils.getElementInfo(context.line);
+    const lineInfo = context.line.getInfo();
     if (lineInfo.width > context.maxWidth) {
         context.line.removeChild(context.unit);
         context.exceed = true;
@@ -266,11 +278,11 @@ function setEleUniIdAndStyle(style: Style | undefined, context: RenderContext) {
     if (style) {
         const styleid = context.styleIdMap.get(style);
         if (!styleid) {
-            context.styleIdMap.set(style, Utils.randmonId());
+            context.styleIdMap.set(style, $$.randmonId());
         }
-        paragraphProps.setEleUniId(context.unit, styleid);
-        props.setStyle(context.unit, style);
+        context.unit.setEleUniId(styleid);
+        context.unit.setStyle(style);
     } else {
-        paragraphProps.setEleUniId(context.unit);
+        context.unit.setEleUniId();
     }
 }

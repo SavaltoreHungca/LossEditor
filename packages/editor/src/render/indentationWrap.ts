@@ -1,19 +1,21 @@
-import { createElement } from "../utils";
-import { Utils } from "utils";
+import { ContentContainer } from './../elements/elementTypes';
+import { $$ } from "utils";
 import { Constants } from "../Constants";
+import { creEle } from '../elements/creEle';
+import { Editor } from '../Editor';
 
-export function indentationWrap(viewLines: HTMLElement, padd?: number,): HTMLElement {
-    const indentation = createElement('indentation');
-    const contentContainer = createElement('content-container');
-    viewLines.appendChild(indentation);
+export function indentationWrap(editor: Editor, container: HTMLElement, padd?: number,): ContentContainer {
+    const indentation = creEle(editor, 'indentation');
+    const contentContainer = creEle(editor, 'content-container');
+    container.appendChild(indentation);
     indentation.appendChild(contentContainer);
 
-    const viewLinesInfo = Utils.getElementInfo(viewLines);
+    const viewLinesInfo = $$.getElementInfo(container);
     const paddingLeft = Constants.INDENTATION_WIDTH * (padd || 0);
-    Utils.setStyle(indentation, {
+    indentation.setStyle({
         'padding-left': paddingLeft,
     })
-    Utils.setStyle(contentContainer, {
+    contentContainer.setStyle({
         width: viewLinesInfo.innerWidth - paddingLeft
     })
     return contentContainer;

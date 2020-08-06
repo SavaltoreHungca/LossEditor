@@ -1,6 +1,6 @@
 import { Settings, SettingReceiver } from './Settings';
 import { registryEvents } from './events/events';
-import { EventManager, $$, extend } from 'utils';
+import { EventManager, $$, extend, nil } from 'utils';
 import { buttomScrollBarExt, eleExt, ButtomScrollBar, Container, Page, Window, RightScrollBar, TopShallow, RightShallow, ButtomSlider, RightSlider, Content, containerExt, windowExt, pageExt, rightScrollBarExt, topShallowExt, rightShallowExt, buttomSliderExt, rightSliderExt, contentExt } from './elementTyps';
 import Constants from './Constants';
 import { regisStyleSheet } from './styleClassSheet';
@@ -8,7 +8,7 @@ import { scrollShow } from './scrollShow';
 
 declare type ElementsSet = {
     container: Container,
-    window?: Window,
+    window: Window,
     page?: Page,
     buttomScrollBar?: ButtomScrollBar,
     rightScrollBar?: RightScrollBar,
@@ -32,6 +32,7 @@ export class ScrollPage {
         this.elements = {
             container: extend($$.creEle('block'), [eleExt(this), containerExt(this)]),
             content: extend(content, [eleExt(this), contentExt(this)]),
+            window: nil()
         }
 
         regisStyleSheet(this);

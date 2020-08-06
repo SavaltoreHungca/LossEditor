@@ -1,11 +1,9 @@
 import { Editor } from "./Editor";
 import { Constants } from "./Constants";
-import { Utils, DragState } from "utils";
+import { $$, DragState, innerHtml, extend, $ } from "utils";
 import { paragraphRendererFactor } from "./render/paragraph";
 import { captionImageRendererFactory } from "./render/captionImage";
 import { tableRendererFactory, rowRendererFactory, cellRendererFactory } from "./render/table";
-import { Node, SetSelectionResult, Point } from 'editor-core';
-import { getNodeFromChild, paragraphProps, getType } from "./utils";
 import { paragraphSelectionBehavior } from "./selection/paragraphSelectionBehavior";
 import { setCursorPositionForParagraph } from "./selection/cursorposition/paragraphCursorPosition";
 import { sentinelRendererFactory } from "./render/sentinel";
@@ -17,10 +15,11 @@ import { textInputRendererFactor } from "./render/textInput";
 import { imageRendererFactory } from "./render/image";
 import { paragraphBackspaceFactory } from "./textinput/backspace/paragraphBackspceBehavior";
 import { paragraphTypesettingFactory } from "./typesetting/paragraphTypesetting";
+import { Cursor } from "./elements/elementTypes";
+import { creEle } from "./elements/creEle";
 
 export function registryEvents(editor: Editor) {
     initializeUi(editor);
-    setNodeUiMap(editor);
     regisNodeRenderer(editor);
     regisSetSelectionBehavior(editor);
     regisSetCursorPositionBehavior(editor);
@@ -30,62 +29,36 @@ export function registryEvents(editor: Editor) {
 
 
 function initializeUi(editor: Editor) {
-    editor.eventManager.registryEventDpendsOn([
-        Constants.events.ELEMENTS_CREATED
-    ], () => {
-        Utils.setStyle(editor.container, {
-            "white-space": "pre",
-            position: "relative",
-            "font-family": 'Menlo, Monaco, "Courier New", monospace',
-            "font-weight": 'normal',
-            "font-size": '12px',
-            "font-feature-settings": '"liga" 0, "calt" 0',
-            "line-height": '18px',
-            "letter-spacing": '0px',
-            height: 'fit-content',
-            outline: 'none',
-            'user-select': 'none',
-        });
-        editor.container.setAttribute('tabindex', '1');
-        editor.container.appendChild(editor.viewLines);
-        const containerInfo = Utils.getElementInfo(editor.container);
-        Utils.setStyle(editor.viewLines, {
-            top: containerInfo.innerTop,
-            left: containerInfo.innerLeft,
-            width: containerInfo.innerWidth,
-        });
-        editor.container.appendChild(editor.backLayer);
-        Utils.setStyle(editor.backLayer, {
-            top: containerInfo.innerTop,
-            left: containerInfo.innerLeft,
-            'z-index': '-1'
-        });
-        editor.backLayer.appendChild(editor.cursor);
-        Utils.setStyle(editor.regionContainer, {
-            display: 'block',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            'z-index': '-1'
-        })
-        editor.backLayer.appendChild(editor.regionContainer);
-    }, 'initialized-ui-ok')
-}
-
-function setNodeUiMap(editor: Editor) {
-    editor.eventManager.registryEventDpendsOn([Constants.events.DOC_TREE_ROOT_SETED], () => {
-        editor.docTree.walkTree(node => {
-            if (node.type === 'root') {
-                editor.uiMap.setElement(node, editor.viewLines);
-            } else {
-                editor.uiMap.setElement(node, document.createElement('div'));
+    editor.eventManager.bindEventAtLeastExecOnceOn([Constants.events.CONTAINER_SETED],
+        Constants.events.ELEMENTS_CREATED,
+        () => {
+            const containerInfo = editor.container.getInfo();
+            const idset = {
+                viewlines: $$.randmonId(),
+                backlayer: $$.randmonId(),
+                cursor: $$.randmonId(),
+                region: $$.randmonId(),
             }
+            innerHtml(editor.container, `
+                <div data-ele-type="view-lines" id="${idset.viewlines}"
+                    style="top: ${containerInfo.innerTop}px; left: ${containerInfo.innerLeft}px; width: ${containerInfo.innerWidth}px;"></div>
+
+                <div data-ele-type="back-layer" id="${idset.backlayer}"
+                    style="top: ${containerInfo.innerTop}px; left: ${containerInfo.innerLeft}px; z-index: -1">
+                    <textarea data-ele-type="cursor" id="${idset.cursor}"></textarea>
+                    <div data-ele-type="region-container" id="${idset.region}"
+                        style="top: ${containerInfo.innerTop}px; left: ${containerInfo.innerLeft}px; width: ${containerInfo.innerWidth}px; z-index: -1"></div>
+                </div>
+            `);
+            editor.viewLines = creEle(editor, 'view-lines', $(idset.viewlines));
+            editor.backLayer = creEle(editor, 'back-layer', $(idset.backlayer));
+            editor.regionContainer = creEle(editor, 'region-container', $(idset.region));
+            editor.cursor = creEle(editor, 'cursor', $(idset.cursor));
         })
-    }, 'node-ui-map-seted');
 }
 
 function regisNodeRenderer(editor: Editor) {
-    editor.eventManager.registryEventDpendsOn([Constants.events.DOC_TREE_CREATED], () => {
+    editor.eventManager.bindEventOn(Constants.events.DOC_TREE_CREATED, () => {
         editor.docTree.regisRenderer('root', (parent, node) => { })
         editor.docTree.regisRenderer('sentinel', sentinelRendererFactory(editor));
         editor.docTree.regisRenderer('paragraph', paragraphRendererFactor(editor));
@@ -95,14 +68,14 @@ function regisNodeRenderer(editor: Editor) {
         editor.docTree.regisRenderer('table', tableRendererFactory(editor));
         editor.docTree.regisRenderer('row', rowRendererFactory(editor));
         editor.docTree.regisRenderer('cell', cellRendererFactory(editor));
-    }, 'regis-node-renderer-ok');
+    });
 }
 
 function regisSetSelectionBehavior(editor: Editor) {
-    editor.eventManager.registryEventDpendsOn([Constants.events.DOC_TREE_CREATED], () => {
+    editor.eventManager.bindEventOn(Constants.events.DOC_TREE_CREATED, () => {
         editor.docTree.regisSetSelectionBehavior('paragraph', paragraphSelectionBehavior)
         editor.docTree.regisSetSelectionBehavior('sentinel', sentinelSelectionBehavior)
-    }, 'regis-set-selection-behavior-ok');
+    });
 }
 
 function regisSetCursorPositionBehavior(editor: Editor) {
@@ -111,16 +84,16 @@ function regisSetCursorPositionBehavior(editor: Editor) {
 }
 
 function regisTextInputBehavior(editor: Editor) {
-    editor.eventManager.registryEventDpendsOn([Constants.events.DOC_TREE_CREATED], () => {
+    editor.eventManager.bindEventOn(Constants.events.DOC_TREE_CREATED, () => {
         editor.docTree.regisTextInputBehavior('paragraph', paragraphTextInputBehaviorFactory(editor));
         editor.docTree.regisTextInputBehavior('sentinel', sentinelTextInputBehaviorFactory(editor));
 
         editor.docTree.regisBackSpceBehavior('paragraph', paragraphBackspaceFactory(editor));
-    }, 'regis-textinput-behavior-ok')
+    })
 }
 
-function regisTypesettingBehavior(editor: Editor){
-    editor.eventManager.registryEventDpendsOn([Constants.events.DOC_TREE_CREATED], () => {
+function regisTypesettingBehavior(editor: Editor) {
+    editor.eventManager.bindEventOn(Constants.events.DOC_TREE_CREATED, () => {
         editor.docTree.regisTypesettingBehavior('paragraph', paragraphTypesettingFactory(editor));
-    }, 'regis-typesetting-behavior-ok')
+    })
 }

@@ -1,5 +1,3 @@
-import { createElement } from "../utils";
-import { Utils, $ } from "utils";
 import { ScrollPage } from "scroll-page";
 import { Editor } from "../Editor";
 import { Node } from "editor-core";
@@ -14,6 +12,8 @@ interface CaptionImageContent {
 
 export function captionImageRendererFactory(editor: Editor){
     return (parent: Node | undefined, node: Node)=>{
+        if(!parent) throw new Error();
+        
         const {parentUi, nodeUi} = mountChild(editor, parent, node);
     }
 }

@@ -1,8 +1,9 @@
-import { Utils } from 'utils';
+import { $$ } from 'utils';
+import { Inlineblock } from '../elements/elementTypes';
 
-export function renderAttachment(content: string, unitBlock: HTMLElement) {
+export function renderAttachment(content: string, unitBlock: Inlineblock) {
     unitBlock.innerHTML = '<i class="fa fa-file-archive-o fa-2x" aria-hidden="true"></i>';
-    Utils.setStyle(unitBlock, {
+    $$.setStyle(unitBlock, {
         cursor: 'pointer'
     })
 }

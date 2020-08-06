@@ -111,8 +111,8 @@ export class $$ {
     }
 
 
-    static creEle(type: EleTypes, style?: Object): HTMLElement {
-        return this.wrapEle(type, document.createElement('div'), style);
+    static creEle<K extends keyof HTMLElementTagNameMap>(type: EleTypes, style?: Object, tagName?: K): HTMLElement {
+        return this.wrapEle(type, document.createElement(tagName || 'div'), style);
     }
 
     static setStyle(element: HTMLElement, style: Object) {
