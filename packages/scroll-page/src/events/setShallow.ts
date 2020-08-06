@@ -11,7 +11,6 @@ export function setShallow(scrollPage: ScrollPage) {
         Constants.events.PAGE_WIDTH_CHANGE
     ], () => {
         let { page, topshallow, rightshallow, window } = scrollPage.elements;
-        if (!page || !topshallow || !rightshallow || !window) throw new Error();
 
         if (!scrollPage.settings.showTopShallow) {
             topshallow.disappear();

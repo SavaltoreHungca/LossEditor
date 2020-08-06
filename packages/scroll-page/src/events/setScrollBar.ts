@@ -10,7 +10,6 @@ export function setScrollBar(scrollPage: ScrollPage) {
         Constants.events.PAGE_WIDTH_CHANGE
     ], () => {
         let { page, buttomScrollBar, buttomSlider, window } = scrollPage.elements;
-        if (!page || !buttomSlider || !window || !buttomScrollBar) throw new Error();
 
         if (!scrollPage.settings.hiddenBottomScrollBar) {
             const pageInfo = page.getInfo();
@@ -38,7 +37,6 @@ export function setScrollBar(scrollPage: ScrollPage) {
         Constants.events.PAGE_HEIGHT_CHANGE
     ], () => {
         let { page, rightScrollBar, rightSlider, window } = scrollPage.elements;
-        if (!page || !rightScrollBar || !window || !rightSlider) throw new Error();
 
         if (!scrollPage.settings.hiddenRightScrollBar) {
             const pageInfo = page.getInfo();

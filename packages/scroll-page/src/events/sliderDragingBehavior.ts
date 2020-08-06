@@ -12,12 +12,10 @@ export function sliderDragingBehavior(sp: ScrollPage) {
 
 function buttomSliderBehavior(sp: ScrollPage) {
     const { buttomSlider } = sp.elements;
-    if (!buttomSlider) throw new Error();
 
     // 拖动底部 slider 的拖动事件
     buttomSlider.addDragEvent((e: DragState) => {
         const { page, buttomScrollBar, rightshallow, buttomSlider } = sp.elements;
-        if (!buttomSlider || !buttomScrollBar || !page) throw new Error();
 
         if (e.pressed === false) { // 拖动事件结束
             buttomSlider.lightenColor();
@@ -45,7 +43,6 @@ function buttomSliderBehavior(sp: ScrollPage) {
 
 function rightSliderBehavior(sp: ScrollPage) {
     const { rightSlider } = sp.elements;
-    if (!rightSlider) throw new Error();
 
     // 拖动底部 slider 的拖动事件
     rightSlider.addDragEvent((e: DragState) => {
@@ -57,7 +54,6 @@ function rightSliderBehavior(sp: ScrollPage) {
         rightSlider.dragging = true;
         rightSlider.darkenColor();
         const { page, rightScrollBar } = sp.elements;
-        if (!rightScrollBar || !page) throw new Error();
 
         const rightSliderInfo = rightSlider.getInfo();
         const rightScrollBarInfo = rightScrollBar.getInfo();

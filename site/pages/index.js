@@ -7,6 +7,7 @@ import { ScrollPage } from 'scroll-page'
 const Home = () => {
     const render = () => {
         // new MemLoss($('container'));
+        $('container').innerHTML = '';
         new ScrollPage($('container'), {
             containerHeight: 300,
             containerWidth: 300

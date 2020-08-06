@@ -3,7 +3,6 @@ import Constants from '../Constants';
 export function makeWinScrollable(sp: ScrollPage) {
     sp.eventManager.bindEventOn(Constants.events.ASSEMBLE_ELEMENTS_FINISH, () => {
         const { window: win } = sp.elements;
-        if (!win) throw new Error();
         // 水平滚动事件
         win.addEventListener('wheel', (e: WheelEvent) => {
             e.stopPropagation();
@@ -12,7 +11,6 @@ export function makeWinScrollable(sp: ScrollPage) {
             if (e.deltaX === 0) return;
 
             let { page, buttomScrollBar, buttomSlider, } = sp.elements;
-            if (!page || !buttomScrollBar || !buttomSlider) throw new Error();
 
             const pageInfo = page.getInfo();
             const buttomScrollBarInfo = buttomScrollBar.getInfo();
@@ -31,7 +29,6 @@ export function makeWinScrollable(sp: ScrollPage) {
         win.addEventListener('wheel', (e: WheelEvent) => {
             if (e.deltaY === 0) return;
             let { page, rightScrollBar, rightSlider } = sp.elements;
-            if (!page || !rightScrollBar || !rightSlider) throw new Error();
 
             const pageInfo = page.getInfo();
             const rightScrollBarInfo = rightScrollBar.getInfo();

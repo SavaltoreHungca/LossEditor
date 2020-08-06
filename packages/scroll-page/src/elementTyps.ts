@@ -1,6 +1,18 @@
 import { ScrollPage } from './ScrollPage';
-import { $$, ElementInfo } from 'utils';
-import Constants from './Constants';
+import { $$, ElementInfo, extend } from 'utils';
+
+export type ElementTypsMap = {
+    'buttom-scrollbar': ButtomScrollBar
+    'container': Container
+    'window': Window
+    'page': Page
+    'right-scrollbar': RightScrollBar
+    'top-shallow': TopShallow
+    'right-shallow': RightShallow
+    'buttom-slider': ButtomSlider
+    'right-slider': RightSlider
+    'content': Content
+}
 
 interface Element extends HTMLElement {
     setWidth(wdith: string | number): void
@@ -19,7 +31,6 @@ interface Element extends HTMLElement {
     cancelDisappear(): void
     disappear(delay?: number, callback?: Function): void
     setRole(roleName: string): void
-    setAttribute(name: string, value?: string): void
     addClass(c: string): void
     addDragEvent(callback: Function): void
 }
@@ -102,7 +113,7 @@ export function buttomSliderExt(sp: ScrollPage) {
                 $$.removeStyle(sf, 'background');
             },
             darkenColor: function () {
-                if(!this.isDarken){
+                if (!this.isDarken) {
                     sf.setStyle({
                         background: 'hsla(0,0%,39%,.7)'
                     })
@@ -124,7 +135,7 @@ export function rightSliderExt(sp: ScrollPage) {
                 $$.removeStyle(sf, 'background')
             },
             darkenColor: function () {
-                if(!this.isDarken){
+                if (!this.isDarken) {
                     sf.setStyle({
                         background: 'hsla(0,0%,39%,.7)'
                     })
@@ -144,8 +155,9 @@ export function contentExt(sp: ScrollPage) {
     }
 }
 
-export function eleExt(sp: ScrollPage) {
+export function eleExt<K extends keyof ElementTypsMap>(sp: ScrollPage, type: K) {
     return (ele: HTMLElement) => {
+        ele.setAttribute('data-scrollpage-type', type)
         return {
             DISPEAR_ID: $$.randmonId(),
             setWidth: function (wdith: string | number) {
@@ -213,15 +225,46 @@ export function eleExt(sp: ScrollPage) {
                 $$.cancelLastTimeout(this.DISPEAR_ID);
             },
             setRole: function (roleName: string) {
-                this.setAttribute("data-role", roleName);
-            },
-            setAttribute: function (name: string, value?: string) {
-                if (!value) value = "";
-                this.setAttribute(name, value);
+                ele.setAttribute("data-role", roleName);
             },
             addClass: function (c: string) {
                 $$.addClass(ele, c);
             }
         }
     }
+}
+
+export function creEle<K extends keyof ElementTypsMap>(sp: ScrollPage, type: K, ele?: HTMLElement): ElementTypsMap[K] {
+    switch (type) {
+        case 'container':
+            return extend($$.creEle('block'), [eleExt(sp, type), containerExt(sp)]);
+        case 'content':
+            if (!ele) throw new Error();
+            return extend(ele, [eleExt(sp, type), contentExt(sp)]);
+        case 'window':
+            if (!ele) throw new Error();
+            return extend($$.wrapEle('block', ele), [eleExt(sp, type), windowExt(sp)]);
+        case 'page':
+            if (!ele) throw new Error();
+            return extend($$.wrapEle('absolute', ele), [eleExt(sp, type), pageExt(sp)]);
+        case 'right-scrollbar':
+            if (!ele) throw new Error();
+            return extend($$.wrapEle('absolute', ele), [eleExt(sp, type), rightScrollBarExt(sp)]);
+        case 'right-slider':
+            if (!ele) throw new Error();
+            return extend($$.wrapEle('absolute', ele), [eleExt(sp, type), rightSliderExt(sp)]);
+        case 'buttom-scrollbar':
+            if (!ele) throw new Error();
+            return extend($$.wrapEle('absolute', ele), [eleExt(sp, type), buttomScrollBarExt(sp)]);
+        case 'buttom-slider':
+            if (!ele) throw new Error();
+            return extend($$.wrapEle('absolute', ele), [eleExt(sp, type), buttomSliderExt(sp)]);
+        case 'top-shallow':
+            if (!ele) throw new Error();
+            return extend($$.wrapEle('absolute', ele), [eleExt(sp, type), topShallowExt(sp)]);
+        case 'right-shallow':
+            if (!ele) throw new Error();
+            return extend($$.wrapEle('absolute', ele), [eleExt(sp, type), rightShallowExt(sp)]);
+    }
+    throw new Error();
 }

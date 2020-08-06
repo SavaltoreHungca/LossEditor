@@ -1,3 +1,1 @@
-export function nil<T>(): T{
-    return <T><unknown>undefined;
-}
+export var Nil = undefined as any;

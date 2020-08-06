@@ -1,7 +1,5 @@
 import Constants from "../Constants";
 import { ScrollPage } from "../ScrollPage";
-import { $$, DragState, $, extend, innerHtml } from "utils";
-import { eleExt, windowExt, Window, Page, pageExt, RightScrollBar, RightSlider, ButtomScrollBar, ButtomSlider, TopShallow, RightShallow, rightScrollBarExt, rightSliderExt, buttomScrollBarExt, buttomSliderExt, topShallowExt, rightShallowExt } from "../elementTyps";
 
 export function traceContainerSizeChange(sp: ScrollPage) {
     // 追踪 container 尺寸变化事件
@@ -12,7 +10,6 @@ export function traceContainerSizeChange(sp: ScrollPage) {
         Constants.events.CONTAINER_WIDTH_CHANGE
     ], () => {
             let { container, window, buttomScrollBar, rightScrollBar, topshallow, rightshallow } = sp.elements;
-            if (!container || !window || !buttomScrollBar || !rightScrollBar || !topshallow || !rightshallow) throw new Error();
 
             const containerInfo = container.getInfo();
 

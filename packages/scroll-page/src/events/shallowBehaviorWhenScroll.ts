@@ -9,7 +9,6 @@ export function shallowBehaviorWhenScroll(scrollPage: ScrollPage) {
         Constants.events.PAGE_TOP_CHANGE,
     ], () => {
         let { page, topshallow, rightshallow, window } = scrollPage.elements;
-        if (!page || !topshallow || !rightshallow || !window) throw new Error();
 
         const pageInfo = page.getInfo();
         const windowInfo = window.getInfo();

@@ -3,7 +3,6 @@ import { $$, stepper } from 'utils';
 
 export function scrollShow(ele: HTMLElement, sp: ScrollPage) {
     const { page } = sp.elements;
-    if (!page) throw new Error();
 
     const { left, top } = $$.getRelativePosition(ele, page);
     scrollShowPosition(left, 80, top, 80, sp);
@@ -16,7 +15,6 @@ export function scrollShowPosition(x: number, xlen: number, y: number, ylen: num
 
 function yScrollShow(y: number, ylen: number, sp: ScrollPage) {
     const { page, window: win, rightSlider, rightScrollBar } = sp.elements;
-    if (!page || !win || !rightSlider || !rightScrollBar) throw new Error();
 
     const { innerHeight: winHeight } = $$.getElementInfo(win);
     const { height: pageHeight, top: pageTop } = $$.getElementInfo(page);
@@ -41,7 +39,6 @@ function yScrollShow(y: number, ylen: number, sp: ScrollPage) {
 
 function xScrollShow(x: number, xlen: number, sp: ScrollPage) {
     const { page, window: win, buttomSlider, buttomScrollBar } = sp.elements;
-    if (!page || !win || !buttomSlider || !buttomScrollBar) throw new Error();
 
     const { innerWidth: winWidth } = $$.getElementInfo(win);
     const { width: pageWidth, left: pageLeft } = $$.getElementInfo(page);

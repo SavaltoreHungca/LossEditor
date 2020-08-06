@@ -1,7 +1,7 @@
 import { Settings, SettingReceiver } from './Settings';
 import { registryEvents } from './events/events';
-import { EventManager, $$, extend, nil } from 'utils';
-import { buttomScrollBarExt, eleExt, ButtomScrollBar, Container, Page, Window, RightScrollBar, TopShallow, RightShallow, ButtomSlider, RightSlider, Content, containerExt, windowExt, pageExt, rightScrollBarExt, topShallowExt, rightShallowExt, buttomSliderExt, rightSliderExt, contentExt } from './elementTyps';
+import { EventManager, $$, extend, Nil } from 'utils';
+import { buttomScrollBarExt, eleExt, ButtomScrollBar, Container, Page, Window, RightScrollBar, TopShallow, RightShallow, ButtomSlider, RightSlider, Content, containerExt, windowExt, pageExt, rightScrollBarExt, topShallowExt, rightShallowExt, buttomSliderExt, rightSliderExt, contentExt, creEle } from './elementTyps';
 import Constants from './Constants';
 import { regisStyleSheet } from './styleClassSheet';
 import { scrollShow } from './scrollShow';
@@ -9,13 +9,13 @@ import { scrollShow } from './scrollShow';
 declare type ElementsSet = {
     container: Container,
     window: Window,
-    page?: Page,
-    buttomScrollBar?: ButtomScrollBar,
-    rightScrollBar?: RightScrollBar,
-    topshallow?: TopShallow,
-    rightshallow?: RightShallow,
-    buttomSlider?: ButtomSlider,
-    rightSlider?: RightSlider,
+    page: Page,
+    buttomScrollBar: ButtomScrollBar,
+    rightScrollBar: RightScrollBar,
+    topshallow: TopShallow,
+    rightshallow: RightShallow,
+    buttomSlider: ButtomSlider,
+    rightSlider: RightSlider,
     content: Content,
 };
 
@@ -30,9 +30,16 @@ export class ScrollPage {
         this.eventManager = new EventManager();
 
         this.elements = {
-            container: extend($$.creEle('block'), [eleExt(this), containerExt(this)]),
-            content: extend(content, [eleExt(this), contentExt(this)]),
-            window: nil()
+            container: creEle(this, 'container'),
+            content: creEle(this, 'content', content),
+            window: Nil,
+            page: Nil,
+            buttomScrollBar: Nil,
+            rightScrollBar: Nil,
+            topshallow: Nil,
+            rightshallow: Nil,
+            buttomSlider: Nil,
+            rightSlider: Nil,
         }
 
         regisStyleSheet(this);
@@ -61,7 +68,6 @@ export class ScrollPage {
 
     updatePageSize() {
         const { content, page } = this.elements;
-        if (!content || !page) throw new Error();
         const contentInfo = content.getInfo();
         page.setWidth(contentInfo.width);
         page.setHeight(contentInfo.height);
