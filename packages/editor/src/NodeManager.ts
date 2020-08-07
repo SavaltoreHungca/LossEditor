@@ -7,8 +7,8 @@ import { creDocEle } from './elements/creDocEle';
 export class NodeManager {
     private nodeMap = new BidMap<Node, DocNode>();
     private editor: Editor;
-    
-    constructor(editor: Editor){
+
+    constructor(editor: Editor) {
         this.editor = editor;
     }
 
@@ -16,11 +16,14 @@ export class NodeManager {
         return node && this.nodeMap.getvalue(node) ? true : false;
     }
 
-    getElement(node: Node, ifAbsense?: (node: Node)=>DocNode) {
+    getElement(node: Node, ifAbsense?: (node: Node) => DocNode) {
         let ele = this.nodeMap.getvalue(node);
         if (!ele) {
-            if(ifAbsense)
+            if (ifAbsense)
                 ele = ifAbsense(node);
+            else if (node.type === 'root') {
+                ele = this.editor.viewLines;
+            }
             else
                 ele = creDocEle(this.editor, ct<keyof DocNodeTypesMap>(node.type));
             this.setElement(node, ele);
@@ -33,14 +36,14 @@ export class NodeManager {
     }
 
     setElement(node: Node, element: DocNode) {
-        element.setAttribute('data-node-type', node.type);
+        element.setAttribute('data-editor-doc-type', node.type);
         this.nodeMap.set(node, element);
     }
 
     delete(node: Node) {
         if (this.hasElement(node.parent)) {
             const ele = this.getElement(<Node>node.parent);
-            if(this.hasElement(node)){
+            if (this.hasElement(node)) {
                 ele.removeChild(this.getElement(node))
             }
         }

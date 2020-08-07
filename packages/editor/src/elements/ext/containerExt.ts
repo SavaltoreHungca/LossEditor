@@ -3,7 +3,7 @@ import { $$ } from "utils";
 
 export function containerExt(editor: Editor) {
     return (ele: HTMLElement)=>{
-        $$.setStyle(editor.container, {
+        $$.setStyle(ele, {
             "white-space": "pre",
             position: "relative",
             "font-family": 'Menlo, Monaco, "Courier New", monospace',

@@ -1,8 +1,8 @@
 import { Paragraph } from "./elementTypes";
 
 export type DocNodeTypesMap = {
-    'doc-paragraph': DocParagraph
-    'doc-sentinal': DocSentinal
+    'paragraph': DocParagraph
+    'sentinel': DocSentinal
 }
 
 export interface DocNode extends HTMLElement {

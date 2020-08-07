@@ -1,5 +1,6 @@
 import { Editor } from '../../Editor';
 import { $$ } from 'utils';
+import { classes } from '../../styleClassSheet';
 export function cursorExt(editor: Editor) {
 
     return (cursor: HTMLElement) => {
@@ -27,7 +28,7 @@ export function cursorExt(editor: Editor) {
             "z-index": "1",
             "user-select": "none",
             'white-space': 'pre',
-            animation: 'flashing-cursor 600ms infinite;'
+            animation: `${classes.flashcursor} 600ms infinite;`
             // "visibility": "hidden"
         })
 

@@ -218,7 +218,7 @@ export default [
     ...factory(Utils),
     ...factory(ScrollPage),
     ...factory(EditorCore),
-    // ...factory(Editor),
+    ...factory(Editor),
     // ...factory(Client),
     // ...factory(CodeStation),
 ]

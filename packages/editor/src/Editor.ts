@@ -10,6 +10,7 @@ import { listenTextInput } from './textinput/listenTextInput';
 import { Cursor, ViewLines, BackLayer, RegionContainer, Container } from './elements/elementTypes';
 import { uiExt } from './elements/ext/uiExt';
 import { creEle } from './elements/creEle';
+import { regisStyleSheet } from './styleClassSheet';
 
 export type SetCursorPositionResult = {
     left: number,
@@ -33,6 +34,7 @@ export class Editor {
         this.container = creEle(this, 'container', container);
         this.uiMap = new NodeManager(this);
 
+        regisStyleSheet(this);
         registryEvents(this);
 
         this.eventManager.triggleEvent(Constants.events.CONTAINER_SETED);
@@ -49,6 +51,8 @@ export class Editor {
         this.docTree.addEventListener('selection_change', sele => {
             console.log(sele);
         })
+
+        this.render();
     }
 
     render() {

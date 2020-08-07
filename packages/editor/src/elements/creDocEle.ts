@@ -6,9 +6,9 @@ import { docExt } from "./docExt/docExt";
 
 export function creDocEle<K extends keyof DocNodeTypesMap>(editor: Editor, type: K, ele?: HTMLElement): DocNodeTypesMap[K] {
     switch (type) {
-        case 'doc-paragraph':
+        case 'paragraph':
             return extend($$.creEle('block'), [docExt(editor, type), docParaExt(editor)]);
-        case 'doc-sentinal':
+        case 'sentinel':
             return extend($$.creEle('block'), [docExt(editor, type)]);
     }
 

@@ -8,6 +8,7 @@ import { paraCntxtExt } from './ext/paraCntxtExt';
 import { lineExt } from './ext/lineExt';
 import { inlineBlockExt } from './ext/inlineBlockExt';
 import { uniBlockExt } from './ext/uniBlockExt';
+import { containerExt } from './ext/containerExt';
 
 export function creEle<K extends keyof UiNodeTypesMap>(editor: Editor, type: K, ele?: HTMLElement): UiNodeTypesMap[K] {
     let element: HTMLElement;
@@ -15,7 +16,7 @@ export function creEle<K extends keyof UiNodeTypesMap>(editor: Editor, type: K, 
     switch (type) {
         case 'container':
             if (!ele) throw new Error();
-            return extend(ele, [uiExt(editor, 'container')]);
+            return extend(ele, [uiExt(editor, 'container'), containerExt(editor)]);
         case 'cursor':
             if (!ele) throw new Error();
             return extend($$.wrapEle('absolute', ele), [uiExt(editor, 'cursor'), cursorExt(editor)]);
@@ -27,7 +28,7 @@ export function creEle<K extends keyof UiNodeTypesMap>(editor: Editor, type: K, 
                 outline: 'none',
                 'user-select': 'none',
             }
-            if (ele) element = $$.wrapEle('absolute', ele, style); else element = $$.creEle('absolute', style);
+            if (ele) element = $$.wrapEle('block', ele, style); else element = $$.creEle('block', style);
             element.setAttribute('tabindex', '1');
             return extend(element, [uiExt(editor, 'view-lines')]);
         case 'region-container':
