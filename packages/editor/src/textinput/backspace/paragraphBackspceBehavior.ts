@@ -1,19 +1,21 @@
-import { paragraphProps } from './../../utils';
 import { Editor } from '../../Editor';
 import { Selection, Point } from 'editor-core';
 import { binarySearchWhichRange } from '../../selection/cursorposition/paragraphCursorPosition';
 import { getType } from '../../utils';
 import { TextContent } from '../../render/paragraph';
+import { DocParagraph } from '../../elements/docElementTypes';
+import { ct } from 'utils';
+import { Inlineblock, ParagraphLine, Paragraph } from '../../elements/elementTypes';
 
 export function paragraphBackspaceFactory(editor: Editor) {
     return (selection: Selection) => {
         const { left, right } = selection.leftAndRight;
-        const paragraphUi = editor.uiMap.getElement(left.node);
-        const paragraph = paragraphUi.children[0].children[0].children[0];
+        const paragraphUi: DocParagraph = ct(editor.uiMap.getElement(left.node));
+        const paragraph = paragraphUi.getParaUiEle();
 
         const textContent = <TextContent>left.node.content;
 
-        const leftLine = binarySearchWhichRange(paragraph.children, left.offset);
+        const leftLine: ParagraphLine = ct(binarySearchWhichRange(paragraph.children, left.offset));
 
         if (selection.isCollapsed) {
             const p = backspceCollapsed(textContent, left, leftLine);
@@ -22,7 +24,7 @@ export function paragraphBackspaceFactory(editor: Editor) {
             return;
         }
 
-        const rightLine = binarySearchWhichRange(paragraph.children, right.offset);
+        const rightLine: ParagraphLine = ct(binarySearchWhichRange(paragraph.children, right.offset));
 
         let p;
         if (leftLine !== rightLine) {
@@ -38,9 +40,9 @@ export function paragraphBackspaceFactory(editor: Editor) {
         editor.docTree.changeSelection(p, p);
     }
 }
-function backspceCollapsed(textContent: TextContent, left: Point, leftLine: HTMLElement): Point {
-    const ele = binarySearchWhichRange(leftLine.children, left.offset);
-    const eleOffset = left.offset - paragraphProps.getElementStart(ele);
+function backspceCollapsed(textContent: TextContent, left: Point, leftLine: ParagraphLine): Point {
+    const ele: Inlineblock = ct(binarySearchWhichRange(leftLine.children, left.offset));
+    const eleOffset = left.offset - ele.getElementStart();
 
     switch (getType(ele)) {
         case 'text': {
@@ -63,8 +65,8 @@ function backspceCollapsed(textContent: TextContent, left: Point, leftLine: HTML
     throw new Error();
 }
 
-function backspceDiffLine(left: Point, right: Point, leftLine: HTMLElement, rightLine: HTMLElement): Point {
-    const paragraph = <HTMLElement>leftLine.parentElement;
+function backspceDiffLine(left: Point, right: Point, leftLine: ParagraphLine, rightLine: ParagraphLine): Point {
+    const paragraph: Paragraph = leftLine.getParagraph();
     while (leftLine.nextElementSibling && leftLine.nextElementSibling !== rightLine) {
         paragraph.removeChild(leftLine.nextElementSibling);
     }
@@ -78,7 +80,7 @@ function backspceDiffLine(left: Point, right: Point, leftLine: HTMLElement, righ
         case 'text': {
             let innerText = leftEle.innerText;
             innerText = innerText.substring(0,
-                left.offset - paragraphProps.getElementStart(leftEle));
+                left.offset - leftEle.getElementStart());
             if (innerText === '') {
                 leftLine.removeChild(leftEle);
             } else {
@@ -87,7 +89,7 @@ function backspceDiffLine(left: Point, right: Point, leftLine: HTMLElement, righ
             break;
         }
         case 'unit-block': {
-            const blockoffset = left.offset - paragraphProps.getElementStart(leftEle);
+            const blockoffset = left.offset - leftEle.getElementStart();
             if (blockoffset === 0) {
                 leftLine.removeChild(leftEle);
             }
@@ -104,7 +106,7 @@ function backspceDiffLine(left: Point, right: Point, leftLine: HTMLElement, righ
     switch (getType(rightEle)) {
         case 'text': {
             let innerText = rightEle.innerText;
-            innerText = innerText.substring(right.offset - paragraphProps.getElementStart(rightEle));
+            innerText = innerText.substring(right.offset - rightEle.getElementStart());
             if (innerText === '') {
                 rightLine.removeChild(rightEle);
             } else {
@@ -113,7 +115,7 @@ function backspceDiffLine(left: Point, right: Point, leftLine: HTMLElement, righ
             break;
         }
         case 'unit-block': {
-            const blockoffset = right.offset - paragraphProps.getElementStart(rightEle);
+            const blockoffset = right.offset - rightEle.getElementStart();
             if (blockoffset > 0) {
                 rightLine.removeChild(rightEle);
             }
@@ -123,7 +125,7 @@ function backspceDiffLine(left: Point, right: Point, leftLine: HTMLElement, righ
     return left;
 }
 
-function backspaceSameLine(left: Point, right: Point, line: HTMLElement): Point {
+function backspaceSameLine(left: Point, right: Point, line: ParagraphLine): Point {
     const leftEle = binarySearchWhichRange(line.children, left.offset);
     const rightEle = binarySearchWhichRange(line.children, right.offset);
 
@@ -136,7 +138,7 @@ function backspaceSameLine(left: Point, right: Point, line: HTMLElement): Point 
             case 'text': {
                 let innerText = leftEle.innerText;
                 innerText = innerText.substring(0,
-                    left.offset - paragraphProps.getElementStart(leftEle));
+                    left.offset - leftEle.getElementStart());
                 if (innerText === '') {
                     line.removeChild(leftEle);
                 } else {
@@ -145,7 +147,7 @@ function backspaceSameLine(left: Point, right: Point, line: HTMLElement): Point 
                 break;
             }
             case 'unit-block': {
-                const blockoffset = left.offset - paragraphProps.getElementStart(leftEle);
+                const blockoffset = left.offset - leftEle.getElementStart();
                 if (blockoffset === 0) {
                     line.removeChild(leftEle);
                 }
@@ -156,7 +158,7 @@ function backspaceSameLine(left: Point, right: Point, line: HTMLElement): Point 
         switch (getType(rightEle)) {
             case 'text': {
                 let innerText = rightEle.innerText;
-                innerText = innerText.substring(right.offset - paragraphProps.getElementStart(rightEle));
+                innerText = innerText.substring(right.offset - rightEle.getElementStart());
                 if (innerText === '') {
                     line.removeChild(rightEle);
                 } else {
@@ -165,7 +167,7 @@ function backspaceSameLine(left: Point, right: Point, line: HTMLElement): Point 
                 break;
             }
             case 'unit-block': {
-                const blockoffset = right.offset - paragraphProps.getElementStart(rightEle);
+                const blockoffset = right.offset - rightEle.getElementStart();
                 if (blockoffset > 0) {
                     line.removeChild(rightEle);
                 }
@@ -176,8 +178,8 @@ function backspaceSameLine(left: Point, right: Point, line: HTMLElement): Point 
     } else {
         switch (getType(leftEle)) {
             case 'text': {
-                leftEle.innerText = leftEle.innerText.substring(0, left.offset - paragraphProps.getElementStart(leftEle))
-                    + leftEle.innerText.substring(right.offset - paragraphProps.getElementStart(leftEle));
+                leftEle.innerText = leftEle.innerText.substring(0, left.offset - leftEle.getElementStart())
+                    + leftEle.innerText.substring(right.offset - leftEle.getElementStart());
                 if (leftEle.innerText === '') {
                     line.removeChild(leftEle);
                 }

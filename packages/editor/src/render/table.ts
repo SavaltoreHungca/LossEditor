@@ -1,7 +1,7 @@
 import { $$ } from 'utils';
 import { Editor } from "../Editor";
 import { Node } from "editor-core";
-import { mountChild } from './resolveNodeRelation';
+import { mountChild } from './mountChild';
 
 export function tableRendererFactory(editor: Editor) {
     return (parent: Node | undefined, node: Node) => {
@@ -32,7 +32,7 @@ export function cellRendererFactory(editor: Editor) {
         if(!parent) throw new Error();
 
         const { parentUi, nodeUi } = mountChild(editor, parent, node);
-        parent = <Node>parent;
+
         const children = <Array<Node>>parent.children;
 
         $$.setStyle(nodeUi, {

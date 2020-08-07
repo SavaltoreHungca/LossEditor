@@ -8,7 +8,6 @@ export function sentinelSelectionBehavior(node: Node, e: DragState) {
         pointType: 'end',
         offset: 0
     };
-    const srcElement = <HTMLElement>getNodeFromChild(<HTMLElement>e.event?.target);
 
     if (e.pressed && !e.registered) {
         ans.pointType = 'start'

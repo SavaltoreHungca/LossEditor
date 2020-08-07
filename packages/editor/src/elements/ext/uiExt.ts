@@ -7,10 +7,10 @@ export function uiExt(editor: Editor, uiNodeType: UiNodeTypes) {
         ele.setAttribute('data-editor-type', uiNodeType);
 
         return {
-            getStyle: function (ele: HTMLElement): Style | undefined {
+            getStyle: function (): Style | undefined {
                 return ele['ele-style-2ca4a51'];
             },
-            setStyle: function (ele: HTMLElement, style: Style | undefined) {
+            setStyle: function (style: Style | undefined) {
                 if (!style) return;
                 $$.setStyle(ele, style);
                 ele['ele-style-2ca4a51'] = style;

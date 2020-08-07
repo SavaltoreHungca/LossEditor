@@ -1,7 +1,7 @@
 import { NodeManager } from './NodeManager';
 import { data } from './testdata';
 import { DocTree, DocTreeResolver, Node } from 'editor-core';
-import { $$, BidMap, extend, EventManager } from 'utils';
+import { $, BidMap, extend, EventManager, Nil } from 'utils';
 import { listenSelectionToSetCursor } from './selection/cursor';
 import { registryEvents } from './events';
 import { Constants } from './Constants';
@@ -19,10 +19,10 @@ export type SetCursorPositionResult = {
 
 export class Editor {
     container: Container;
-    cursor?: Cursor;
-    viewLines?: ViewLines;
-    backLayer?: BackLayer;
-    regionContainer?: RegionContainer;
+    cursor: Cursor = Nil;
+    viewLines: ViewLines = Nil;
+    backLayer: BackLayer = Nil;
+    regionContainer: RegionContainer = Nil;
 
     eventManager = new EventManager();
     setCursorPositionBehaviorSet = new Map<string, Function>();
@@ -66,7 +66,7 @@ export class Editor {
         // this.render(this.data);
     }
 
-    regisSetCursorPositionBehavior(nodeType: string, behavior: (element: HTMLElement, offset: number, editor: Editor) => SetCursorPositionResult | undefined) {
+    regisSetCursorPositionBehavior<T extends Element>(nodeType: string, behavior: (element: T, offset: number, editor: Editor) => SetCursorPositionResult | undefined) {
         this.setCursorPositionBehaviorSet.set(nodeType, behavior);
     }
 }

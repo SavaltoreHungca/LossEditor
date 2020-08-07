@@ -1,7 +1,8 @@
 import { Editor } from './Editor';
-import { BidMap, $$ } from "utils";
+import { BidMap, $$, ct } from "utils";
 import { Node } from 'editor-core';
-import { DocNode } from './elements/elementTypes';
+import { DocNode, DocNodeTypesMap } from './elements/docElementTypes';
+import { creDocEle } from './elements/creDocEle';
 
 export class NodeManager {
     private nodeMap = new BidMap<Node, DocNode>();
@@ -21,7 +22,7 @@ export class NodeManager {
             if(ifAbsense)
                 ele = ifAbsense(node);
             else
-                ele = $$.creEle('block');
+                ele = creDocEle(this.editor, ct<keyof DocNodeTypesMap>(node.type));
             this.setElement(node, ele);
         }
         return ele;

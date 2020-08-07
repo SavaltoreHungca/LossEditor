@@ -2,17 +2,17 @@ import { ElementInfo } from 'utils'
 
 export type UiNodeTypesMap = {
     'region-container': RegionContainer
-    'cursor' : Cursor
+    'cursor': Cursor
     'container': Container
-    'indentation' : Indentation
+    'indentation': Indentation
     'image': Image
-    'table' : Table
+    'table': Table
     'row': Row
-    'cell' : Cell
+    'cell': Cell
     'view-lines': ViewLines
-    'back-layer' : BackLayer
+    'back-layer': BackLayer
     'paragraph': Paragraph
-    'paragraph-line' : ParagraphLine
+    'paragraph-line': ParagraphLine
     'text': Text
     'unit-block': UnitBlock
     'content-container': ContentContainer
@@ -25,12 +25,8 @@ export type Style = {
 
 export interface UiElement extends HTMLElement {
     getStyle(): Style | undefined
-    setStyle(style: Style): void
+    setStyle(style: Style | undefined): void
     getInfo(): ElementInfo
-}
-
-export interface DocNode extends HTMLElement {
-
 }
 
 export interface Cursor extends UiElement {
@@ -59,6 +55,7 @@ export interface Inlineblock extends ParagraphContext {
 export interface ParagraphLine extends ParagraphContext {
     fitContent(): void
     autoWidth(): void
+    getParagraph(): Paragraph
 }
 export interface Text extends Inlineblock { }
 export interface UnitBlock extends Inlineblock {

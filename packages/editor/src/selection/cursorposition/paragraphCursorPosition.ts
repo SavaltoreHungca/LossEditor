@@ -1,19 +1,18 @@
 import { ParagraphContext } from './../../elements/elementTypes';
 import { Editor } from '../../Editor';
 import { getType } from "../../utils";
-import { $$, ct } from "utils";
+import { $$, ct, Nil } from "utils";
 import { Paragraph, ParagraphLine, Inlineblock } from '../../elements/elementTypes';
+import { DocParagraph } from '../../elements/docElementTypes';
 
-export function setCursorPositionForParagraph(paragraph: Paragraph, offset: number, editor: Editor) {
-    if (!editor.viewLines || !editor.cursor) throw new Error();
-
+export function setCursorPositionForParagraph(paragraph: DocParagraph, offset: number, editor: Editor) {
     const ans = {
         left: 0,
         top: 0,
         height: 0
     };
 
-    const paragraphLines = paragraph.children[0].children[0].children[0].children;
+    const paragraphLines = paragraph.getParaUiEle().children;
     const line = <ParagraphLine>binarySearchWhichRange(paragraphLines, offset);
     const inLineElement = <Inlineblock>binarySearchWhichRange(line.children, offset);
 
@@ -49,7 +48,7 @@ export function setCursorPositionForParagraph(paragraph: Paragraph, offset: numb
 }
 
 export function binarySearchWhichRange(array: HTMLCollection, offset: number) {
-    let foundLine: ParagraphContext;
+    let foundLine: ParagraphContext = Nil;
     let right = array.length - 1;
     let left = 0;
 
@@ -83,5 +82,5 @@ export function binarySearchWhichRange(array: HTMLCollection, offset: number) {
     if (!foundLine) {
         foundLine = ct(array[left]);
     }
-    return <HTMLElement>foundLine;
+    return foundLine;
 }

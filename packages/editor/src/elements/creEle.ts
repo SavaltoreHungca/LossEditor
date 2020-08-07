@@ -52,4 +52,6 @@ export function creEle<K extends keyof UiNodeTypesMap>(editor: Editor, type: K, 
             return extend($$.creEle('block'),
                 [uiExt(editor, 'content-container')]);
     }
+
+    throw new Error();
 }

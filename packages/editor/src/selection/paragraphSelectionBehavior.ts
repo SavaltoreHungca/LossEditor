@@ -1,8 +1,9 @@
-import { DragState, Utils } from "utils";
+import { DragState, $$, ct } from "utils";
 import { SetSelectionResult } from "editor-core";
-import { getNodeFromChild, getType, paragraphProps } from "../utils";
+import { getNodeFromChild, getType } from "../utils";
 import { Constants } from "../Constants";
 import { Node } from 'editor-core';
+import { ParagraphContext, Text, UnitBlock } from "../elements/elementTypes";
 
 export function paragraphSelectionBehavior(node: Node, e: DragState) {
     const ans: SetSelectionResult = {
@@ -10,7 +11,7 @@ export function paragraphSelectionBehavior(node: Node, e: DragState) {
         offset: 0
     };
 
-    const srcElement = <HTMLElement>getNodeFromChild(<HTMLElement>e.event?.target);
+    const srcElement: ParagraphContext = ct(getNodeFromChild(ct(e.event?.target)));
 
     if (e.pressed && !e.registered) {
         ans.pointType = 'start'
@@ -24,21 +25,21 @@ export function paragraphSelectionBehavior(node: Node, e: DragState) {
 }
 
 
-function getMouseOffsetInElement(node: HTMLElement, mouseEvent: MouseEvent): number | undefined {
+function getMouseOffsetInElement(node: ParagraphContext, mouseEvent: MouseEvent): number | undefined {
     switch (getType(node)) {
-        case 'text': return getOffsetInText(node, mouseEvent);
-        case 'unit-block': return getOffsetInUnitBlock(node, mouseEvent);
+        case 'text': return getOffsetInText(ct(node), mouseEvent);
+        case 'unit-block': return getOffsetInUnitBlock(ct(node), mouseEvent);
     }
     return undefined;
 }
 
-function getOffsetInText(textNode: HTMLElement, mouseEvent: MouseEvent) {
-    const mousePosi = Utils.getMousePositionInElement(textNode, mouseEvent);
-    const accuracyWidth = Utils.getStrPx(Constants.WIDTH_BASE_CHAR, textNode).width;
+function getOffsetInText(textNode: Text, mouseEvent: MouseEvent) {
+    const mousePosi = $$.getMousePositionInElement(textNode, mouseEvent);
+    const accuracyWidth = $$.getStrPx(Constants.WIDTH_BASE_CHAR, textNode).width;
     let critical = textNode.innerText.length / 2 + 1;
     while (true) {
         let text = textNode.innerText.substring(0, critical);
-        let textLen = Utils.getStrPx(text, textNode).width;
+        let textLen = $$.getStrPx(text, textNode).width;
         let accuracy = Math.abs(mousePosi.left - textLen);
         if (accuracy < accuracyWidth) {
             let nextText;
@@ -52,7 +53,7 @@ function getOffsetInText(textNode: HTMLElement, mouseEvent: MouseEvent) {
                     nextCritical = critical - 1;
                 }
                 nextText = textNode.innerText.substring(0, nextCritical);
-                nextTextLen = Utils.getStrPx(nextText, textNode).width;
+                nextTextLen = $$.getStrPx(nextText, textNode).width;
                 nextAccuracy = Math.abs(mousePosi.left - nextTextLen);
                 if (nextAccuracy >= accuracy) {
                     break;
@@ -64,7 +65,7 @@ function getOffsetInText(textNode: HTMLElement, mouseEvent: MouseEvent) {
                 }
             }
 
-            return text.length + paragraphProps.getElementStart(textNode);
+            return text.length + textNode.getElementStart();
         }
         if (textLen > mousePosi.left) {
             critical -= critical / 2 + 1;
@@ -77,17 +78,15 @@ function getOffsetInText(textNode: HTMLElement, mouseEvent: MouseEvent) {
     }
 }
 
-function getOffsetInUnitBlock(blockNode: HTMLElement, mouseEvent: MouseEvent) {
-    const mousePosi = Utils.getMousePositionInElement(blockNode, mouseEvent);
-    const unitBlockInfo = Utils.getElementInfo(blockNode);
+function getOffsetInUnitBlock(blockNode: UnitBlock, mouseEvent: MouseEvent) {
+    const mousePosi = $$.getMousePositionInElement(blockNode, mouseEvent);
+    const unitBlockInfo = $$.getElementInfo(blockNode);
     let offset = 0;
     if (mousePosi.left > unitBlockInfo.width / 2) {
         offset = 1;
     }
-    const { type, value } = paragraphProps.getUnitBlockType(blockNode);
 
-    if (offset === 0) return paragraphProps.getElementStart(blockNode);
+    if (offset === 0) return blockNode.getElementStart();
 
-    return paragraphProps.getUnitblockOffset(blockNode)
-        + paragraphProps.getElementStart(blockNode);
+    return blockNode.getUnitblockOffset() + blockNode.getElementStart();
 }

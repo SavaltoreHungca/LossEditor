@@ -1,68 +1,70 @@
-import { paragraphProps, getType, props, createElement } from './../utils';
+import { getType } from './../utils';
 import { Editor } from '../Editor';
 import { Point } from 'editor-core';
 import { binarySearchWhichRange } from '../selection/cursorposition/paragraphCursorPosition';
-import { Utils } from 'utils';
+import { $, ct } from 'utils';
+import { DocParagraph } from '../elements/docElementTypes';
+import { ParagraphLine, Inlineblock, ParagraphContext, UnitBlock } from '../elements/elementTypes';
+import { creEle } from '../elements/creEle';
 
 export function paragraphTypesettingFactory(editor: Editor) {
     return (point: Point) => {
-        const paragraphUi = editor.uiMap.getElement(point.node);
-        const paragraph = paragraphUi.children[0].children[0].children[0];
-        let line: HTMLElement | null | undefined = binarySearchWhichRange(paragraph.children, point.offset);
-        if (line?.previousElementSibling) line = <HTMLElement>line.previousElementSibling;
-        line = findSuitableStartLine(line);
+        const paragraphUi: DocParagraph = ct(editor.uiMap.getElement(point.node));
+        const paragraph = paragraphUi.getParaUiEle();
+        let line: ParagraphLine = ct(binarySearchWhichRange(paragraph.children, point.offset));
+        if (line?.previousElementSibling) line = ct(line.previousElementSibling);
+        line = ct(findSuitableStartLine(line));
 
         if (!line) return;
 
-        let ele = <HTMLElement>line.firstElementChild;
-        let nextstart = paragraphProps.getElementStart(ele);
+        let ele: Inlineblock = ct(line.firstElementChild);
+        let nextstart = ele.getElementStart();
         while (line) {
-            ele = <HTMLElement>line.firstElementChild;
+            ele = ct(line.firstElementChild);
             while (ele) {
-                const next = ele.nextElementSibling;
+                const next: Inlineblock = ct(ele.nextElementSibling);
                 if (isEmptyEle(ele)) {
                     line.removeChild(ele);
                 }
-                ele = <HTMLElement>next;
+                ele = next;
             }
 
-            ele = <HTMLElement>line.firstElementChild;
+            ele = ct(line.firstElementChild);
             if (ele) {
-                isLineExceed(line) ? appendUpLine(line) : fillUpLine(line);
+                isLineExceed(line) ? appendUpLine(editor, line) : fillUpLine(editor, line);
                 while (ele) {
                     nextstart = updateNextStart(ele, nextstart);
-                    ele = <HTMLElement>ele.nextElementSibling;
+                    ele = ct(ele.nextElementSibling);
                 }
             }
 
-            const next = line.nextElementSibling;
+            const next: ParagraphLine = ct(line.nextElementSibling);
 
             if (!line.firstElementChild) {
                 paragraph.removeChild(line);
             } else {
-                paragraphProps.setElementStart(line,
-                    paragraphProps.getElementStart(<HTMLElement>line.firstElementChild));
+                line.setElementStart(ct<Inlineblock>(line.firstElementChild).getElementStart());
             }
-            line = <HTMLElement>next;
+            line = next;
         }
     }
 }
 
-function findSuitableStartLine(line: HTMLElement): HTMLElement | undefined {
+function findSuitableStartLine(line: ParagraphLine): ParagraphLine | undefined {
     if (!line) return undefined;
 
-    const paragraph = <HTMLElement>line.parentElement;
-    let ele = <HTMLElement>line.firstElementChild;
+    const paragraph = line.getParagraph();
+    let ele: Inlineblock = ct(line.firstElementChild);
     if (!ele) {
-        let next = <HTMLElement>line.nextElementSibling;
+        let next: ParagraphLine = ct(line.nextElementSibling);
         paragraph.removeChild(line)
         return findSuitableStartLine(next);
     }
     else if (isEmptyEle(ele)) {
         while (ele && isEmptyEle(ele)) {
-            let next = ele.nextElementSibling;
+            let next: Inlineblock = ct(ele.nextElementSibling);
             line.removeChild(ele);
-            ele = <HTMLElement>next;
+            ele = next;
         }
         if (!ele) {
             return findSuitableStartLine(line);
@@ -75,54 +77,54 @@ function findSuitableStartLine(line: HTMLElement): HTMLElement | undefined {
     }
 }
 
-function isLineExceed(line: HTMLElement): boolean {
-    const paragraph = <HTMLElement>line.parentElement;
-    const maxWidth = Utils.getElementInfo(paragraph).innerWidth;
-    Utils.setStyle(line, { width: 'fit-content' });
+function isLineExceed(line: ParagraphLine): boolean {
+    const paragraph = line.getParagraph();
+    const maxWidth = paragraph.getInfo().innerWidth;
+    line.fitContent();
     const exceed = line.offsetWidth > maxWidth;
-    Utils.setStyle(line, { width: 'auto' });
+    line.autoWidth();
     return exceed;
 }
 
-function fillUpLine(line: HTMLElement) {
-    const paragraph = <HTMLElement>line.parentElement;
-    const maxWidth = Utils.getElementInfo(paragraph).innerWidth;
-    const lastEle = <HTMLElement>line.lastElementChild;
+function fillUpLine(editor: Editor, line: ParagraphLine) {
+    const paragraph = line.getParagraph();
+    const maxWidth = paragraph.getInfo().innerWidth;
+    const lastEle = <Inlineblock>line.lastElementChild;
     if (!lastEle) return;
-    const suitableLine = findSuitableStartLine(<HTMLElement>line.nextElementSibling);
+    const suitableLine = findSuitableStartLine(<ParagraphLine>line.nextElementSibling);
     if (!suitableLine) return;
-    const nextEle = <HTMLElement>suitableLine.firstElementChild;
+    const nextEle = <Inlineblock>suitableLine.firstElementChild;
 
     const lastEleType = getType(lastEle);
     const nextEleType = getType(nextEle);
 
 
     const nEleAppend = () => {
-        const nEle = createElement('text');
-        paragraphProps.setEleUniId(nEle, nextEleId);
-        props.setStyle(nEle, nextEleStyle);
+        const nEle = creEle(editor, 'text');
+        nEle.setEleUniId(nextEleId);
+        nEle.setStyle(nextEleStyle)
         line.appendChild(nEle);
 
         const firstChar = nextEle.innerText.substring(0, 1);
         nEle.innerText += firstChar;
         if (line.offsetWidth > maxWidth) {
             line.removeChild(nEle);
-            Utils.setStyle(line, { width: 'auto' });
+            line.autoWidth();
             return;
         }
         else {
             nextEle.innerText = nextEle.innerText.substring(1);
-            Utils.setStyle(line, { width: 'auto' });
-            fillUpLine(line);
+            line.autoWidth();
+            fillUpLine(editor, line);
             return;
         }
     }
 
-    Utils.setStyle(line, { width: 'fit-content' });
-    const lastEleId = paragraphProps.getEleUniId(lastEle);
-    const nextEleId = paragraphProps.getEleUniId(nextEle);
-    const lastEleStyle = props.getStyle(lastEle);
-    const nextEleStyle = props.getStyle(nextEle);
+    line.fitContent();
+    const lastEleId = lastEle.getEleUniId();
+    const nextEleId = nextEle.getEleUniId();
+    const lastEleStyle = lastEle.getStyle();
+    const nextEleStyle = nextEle.getStyle();
 
     if (nextEleType === 'unit-block') {
         suitableLine.removeChild(nextEle);
@@ -130,12 +132,12 @@ function fillUpLine(line: HTMLElement) {
         if (line.offsetWidth > maxWidth) {
             line.removeChild(nextEle);
             suitableLine.insertBefore(nextEle, suitableLine.firstElementChild);
-            Utils.setStyle(line, { width: 'auto' });
+            line.autoWidth();
             return;
         }
         else {
-            Utils.setStyle(line, { width: 'auto' });
-            fillUpLine(line);
+            line.autoWidth();
+            fillUpLine(editor, line);
             return;
         }
     }
@@ -145,13 +147,13 @@ function fillUpLine(line: HTMLElement) {
             lastEle.innerText += firstChar;
             if (line.offsetWidth > maxWidth) {
                 lastEle.innerText = lastEle.innerText.substring(0, lastEle.innerText.length - 1);
-                Utils.setStyle(line, { width: 'auto' });
+                line.autoWidth();
                 return;
             }
             else {
                 nextEle.innerText = nextEle.innerText.substring(1);
-                fillUpLine(line);
-                Utils.setStyle(line, { width: 'auto' });
+                fillUpLine(editor, line);
+                line.autoWidth();
                 return;
             }
         }
@@ -166,22 +168,22 @@ function fillUpLine(line: HTMLElement) {
     }
 }
 
-function appendUpLine(line: HTMLElement) {
-    const paragraph = <HTMLElement>line.parentElement;
-    const maxWidth = Utils.getElementInfo(paragraph).innerWidth;
+function appendUpLine(editor: Editor, line: ParagraphLine) {
+    const paragraph = line.getParagraph();
+    const maxWidth = paragraph.getInfo().innerWidth;
 
-    Utils.setStyle(line, { width: 'fit-content' });
+    line.fitContent();
     if (line.offsetWidth <= maxWidth) {
-        Utils.setStyle(line, { width: 'auto' });
+        line.autoWidth();
         return;
     }
 
-    const lastEle = <HTMLElement>line.lastElementChild;
+    const lastEle: Inlineblock = ct(line.lastElementChild);
     if (!lastEle) return;
-    let suitableLine = findSuitableStartLine(<HTMLElement>line.nextElementSibling);
+    let suitableLine: ParagraphLine = ct(findSuitableStartLine(ct(line.nextElementSibling)));
     let foundSuitableLine = true;
     if (!suitableLine) {
-        suitableLine = createElement('paragraph-line');
+        suitableLine = creEle(editor, 'paragraph-line');
         paragraph.appendChild(suitableLine);
         foundSuitableLine = false;
     }
@@ -191,11 +193,11 @@ function appendUpLine(line: HTMLElement) {
     const nEleAppend = () => {
         const c = lastEle.innerText.substring(lastEle.innerText.length - 1);
         lastEle.innerText = lastEle.innerText.substring(0, lastEle.innerText.length - 1);
-        const ntext = createElement('text');
+        const ntext = creEle(editor, 'text');
         ntext.innerText = c;
-        (<HTMLElement>suitableLine).appendChild(ntext);
-        props.setStyle(ntext, props.getStyle(lastEle));
-        paragraphProps.setEleUniId(ntext, paragraphProps.getEleUniId(lastEle));
+        suitableLine.appendChild(ntext);
+        ntext.setStyle(lastEle.getStyle());
+        ntext.setEleUniId(lastEle.getEleUniId());
 
         if (lastEle.innerText === '') line.removeChild(lastEle);
     }
@@ -204,21 +206,21 @@ function appendUpLine(line: HTMLElement) {
     if (lastEleType === 'unit-block') {
         line.removeChild(lastEle);
         suitableLine.insertBefore(lastEle, suitableLine.firstElementChild);
-        appendUpLine(line);
+        appendUpLine(editor, line);
         return;
     }
     else if (!foundSuitableLine) {
         nEleAppend();
-        appendUpLine(line);
+        appendUpLine(editor, line);
         return;
     }
     else {
-        const nextEle = <HTMLElement>suitableLine.firstElementChild;
+        const nextEle: Inlineblock = ct(suitableLine.firstElementChild);
         const nextEleType = getType(nextEle);
-        const lastEleId = paragraphProps.getEleUniId(lastEle);
-        const nextEleId = paragraphProps.getEleUniId(nextEle);
-        const lastEleStyle = props.getStyle(lastEle);
-        const nextEleStyle = props.getStyle(nextEle);
+        const lastEleId = lastEle.getEleUniId();
+        const nextEleId = nextEle.getEleUniId();
+        const lastEleStyle = lastEle.getStyle();
+        const nextEleStyle = nextEle.getStyle();
 
         if (nextEleType === 'text' && (lastEleId === nextEleId || (typeof lastEleStyle === 'undefined' && typeof nextEleStyle === 'undefined'))) {
             const c = lastEle.innerText.substring(lastEle.innerText.length - 1);
@@ -227,39 +229,39 @@ function appendUpLine(line: HTMLElement) {
 
             if (lastEle.innerText === '') line.removeChild(lastEle);
 
-            appendUpLine(line);
+            appendUpLine(editor, line);
             return;
         }
         else {
             nEleAppend();
-            appendUpLine(line);
+            appendUpLine(editor, line);
             return;
         }
     }
 }
 
-function isEmptyEle(ele: HTMLElement) {
+function isEmptyEle(ele: Inlineblock) {
     return getType(ele) === 'text' && ele.innerText === '';
 }
 
-function updateNextStart(ele: HTMLElement, nextstart: number): number {
-    paragraphProps.setElementStart(ele, nextstart);
+function updateNextStart(ele: ParagraphContext, nextstart: number): number {
+    ele.setElementStart(nextstart);
     return nextstart + getEleLen(ele);
 }
 
-function getEleLen(ele: HTMLElement): number {
+function getEleLen(ele: ParagraphContext): number {
     switch (getType(ele)) {
         case 'text': {
             return ele.innerText.length;
         }
         case 'unit-block': {
-            return paragraphProps.getUnitblockOffset(ele)
+            return ct<UnitBlock>(ele).getUnitblockOffset();
         }
         case 'paragraph-line': {
             let next = ele.firstElementChild;
             let ans = 0
             while (next) {
-                ans += getEleLen(<HTMLElement>next);
+                ans += getEleLen(ct(next));
                 next = next.nextElementSibling;
             }
             return ans;

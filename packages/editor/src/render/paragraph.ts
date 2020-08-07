@@ -5,10 +5,8 @@ import { Node } from "editor-core";
 import katex from 'katex';
 import { Constants } from "../Constants";
 import { $$ } from "utils";
-import { renderAttachment } from "./renderAttachment";
-import { renderCodeOpen } from "./renderCodeOpen";
 import { indentationWrap } from "./indentationWrap";
-import { mountChild } from "./resolveNodeRelation";
+import { mountChild } from "./mountChild";
 import { Style, Paragraph, ParagraphLine, Text, Inlineblock, UnitBlock } from "../elements/elementTypes";
 import { creEle } from "../elements/creEle";
 
@@ -31,6 +29,20 @@ declare type RenderContext = {
 export interface TextContent {
     str: string
     styleList?: StyleList
+}
+
+function renderAttachment(content: string, unitBlock: Inlineblock) {
+    unitBlock.innerHTML = '<i class="fa fa-file-archive-o fa-2x" aria-hidden="true"></i>';
+    $$.setStyle(unitBlock, {
+        cursor: 'pointer'
+    })
+}
+
+function renderCodeOpen(content: string, unitBlock: Inlineblock) {
+    unitBlock.innerHTML = '<i class="fa fa-codepen fa-2x" aria-hidden="true"></i>';
+    $$.setStyle(unitBlock, {
+        cursor: 'pointer'
+    })
 }
 
 export function paragraphRendererFactor(editor: Editor) {

@@ -4,7 +4,7 @@ import { Constants } from "../Constants";
 import { creEle } from '../elements/creEle';
 import { Editor } from '../Editor';
 
-export function indentationWrap(editor: Editor, container: HTMLElement, padd?: number,): ContentContainer {
+export function indentationWrap<T extends HTMLElement>(editor: Editor, container: T, padd?: number,): ContentContainer {
     const indentation = creEle(editor, 'indentation');
     const contentContainer = creEle(editor, 'content-container');
     container.appendChild(indentation);

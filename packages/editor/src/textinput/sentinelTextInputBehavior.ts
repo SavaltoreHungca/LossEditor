@@ -1,6 +1,6 @@
 import { Editor } from "../Editor";
 import { Point, Node } from "editor-core";
-import { mountChild } from "../render/resolveNodeRelation";
+import { mountChild } from "../render/mountChild";
 
 export function sentinelTextInputBehaviorFactory(editor: Editor) {
     return (point: Point, text: string) => {

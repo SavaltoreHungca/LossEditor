@@ -2,7 +2,6 @@ import { Editor } from "./Editor";
 import { Constants } from "./Constants";
 import { $$, DragState, innerHtml, extend, $ } from "utils";
 import { paragraphRendererFactor } from "./render/paragraph";
-import { captionImageRendererFactory } from "./render/captionImage";
 import { tableRendererFactory, rowRendererFactory, cellRendererFactory } from "./render/table";
 import { paragraphSelectionBehavior } from "./selection/paragraphSelectionBehavior";
 import { setCursorPositionForParagraph } from "./selection/cursorposition/paragraphCursorPosition";
@@ -11,8 +10,6 @@ import { setCursorPositionForSentinel } from "./selection/cursorposition/sentine
 import { sentinelSelectionBehavior } from "./selection/sentinelSelectionBehavior";
 import { paragraphTextInputBehaviorFactory } from "./textinput/paragraphTextInputBehavior";
 import { sentinelTextInputBehaviorFactory } from "./textinput/sentinelTextInputBehavior";
-import { textInputRendererFactor } from "./render/textInput";
-import { imageRendererFactory } from "./render/image";
 import { paragraphBackspaceFactory } from "./textinput/backspace/paragraphBackspceBehavior";
 import { paragraphTypesettingFactory } from "./typesetting/paragraphTypesetting";
 import { Cursor } from "./elements/elementTypes";
@@ -62,9 +59,6 @@ function regisNodeRenderer(editor: Editor) {
         editor.docTree.regisRenderer('root', (parent, node) => { })
         editor.docTree.regisRenderer('sentinel', sentinelRendererFactory(editor));
         editor.docTree.regisRenderer('paragraph', paragraphRendererFactor(editor));
-        editor.docTree.regisRenderer('textInput', textInputRendererFactor(editor));
-        editor.docTree.regisRenderer('image', imageRendererFactory(editor));
-        editor.docTree.regisRenderer('captionImage', captionImageRendererFactory(editor));
         editor.docTree.regisRenderer('table', tableRendererFactory(editor));
         editor.docTree.regisRenderer('row', rowRendererFactory(editor));
         editor.docTree.regisRenderer('cell', cellRendererFactory(editor));
