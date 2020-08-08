@@ -1,7 +1,17 @@
 import { Settings, SettingReceiver } from './Settings';
 import { registryEvents } from './events/events';
 import { EventManager, $$, extend, Nil } from 'utils';
-import { buttomScrollBarExt, eleExt, ButtomScrollBar, Container, Page, Window, RightScrollBar, TopShallow, RightShallow, ButtomSlider, RightSlider, Content, containerExt, windowExt, pageExt, rightScrollBarExt, topShallowExt, rightShallowExt, buttomSliderExt, rightSliderExt, contentExt, creEle } from './elementTyps';
+import { creEle } from './elements/elementTyps';
+import { ButtomScrollBar } from './elements/ButtomScrollBar';
+import { Container } from './elements/Container';
+import { Page } from './elements/Page';
+import { Window } from './elements/Window';
+import { RightScrollBar } from './elements/RightScrollBar';
+import { TopShallow } from './elements/TopShallow';
+import { RightShallow } from './elements/RightShallow';
+import { ButtomSlider } from './elements/ButtomSlider';
+import { RightSlider } from './elements/RightSlider';
+import { Content } from './elements/Content';
 import Constants from './Constants';
 import { regisStyleSheet } from './styleClassSheet';
 import { scrollShow } from './scrollShow';

@@ -1,7 +1,7 @@
 import Constants from "../Constants";
 import { ScrollPage } from "../ScrollPage";
 import { $$, $, innerHtml } from "utils";
-import { creEle } from "../elementTyps";
+import { creEle } from "../elements/elementTyps";
 import { classes } from '../styleClassSheet'
 
 export function assembleElementsAndInitializeUi(sp: ScrollPage) {
