@@ -5,6 +5,12 @@ export interface Page extends Element { }
 
 export function pageExt(sp: ScrollPage) {
     return (ele: HTMLElement) => {
+        ele.addEventListener('scroll', (e: Event)=> {
+            ele.scrollLeft = 0;
+            ele.scrollTop = 0;
+            sp.updatePageSize();
+        })
+
         return {
             getType: () => 'Page'
         }

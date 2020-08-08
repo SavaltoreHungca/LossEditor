@@ -9,9 +9,6 @@ export function sentinelRendererFactory(editor: Editor) {
         
         const {parentUi, nodeUi} = mountChild(editor, parent, node);
 
-        $$.setStyle(nodeUi, {
-            cursor: 'text',
-        });
         if(parent.sentinelAct){
             $$.setStyle(nodeUi, parent.sentinelAct.style);
             nodeUi.innerText = parent.sentinelAct.placeholder || '';

@@ -5,8 +5,11 @@ import { DocParagraph } from '../../elements/DocParagraph';
 import { ParagraphContext } from '../../elements/ParagraphContext';
 import { ParagraphLine } from '../../elements/ParagraphLine';
 import { Inlineblock } from '../../elements/Inlineblock';
+import { DocNode } from '../../elements/DocNode';
 
-export function setCursorPositionForParagraph(paragraph: DocParagraph, offset: number, editor: Editor) {
+export function setCursorPositionForParagraph(docNode: DocNode, offset: number, editor: Editor) {
+    const paragraph: DocParagraph = ct(docNode);
+
     const ans = {
         left: 0,
         top: 0,

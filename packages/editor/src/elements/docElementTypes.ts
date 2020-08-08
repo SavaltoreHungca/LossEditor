@@ -1,7 +1,7 @@
 import { Editor } from "../Editor";
 import { extend, $$ } from "utils";
 import { DocParagraph, docParaExt } from "./DocParagraph";
-import { DocSentinal } from "./DocSentinel";
+import { DocSentinal, docSentinelExt } from "./DocSentinel";
 import { docExt } from "./DocNode";
 
 
@@ -15,7 +15,7 @@ export function creDocEle<K extends keyof DocNodeTypesMap>(editor: Editor, type:
         case 'paragraph':
             return extend($$.creEle('block'), [docExt(editor, type), docParaExt(editor)]);
         case 'sentinel':
-            return extend($$.creEle('block'), [docExt(editor, type)]);
+            return extend($$.creEle('block'), [docExt(editor, type), docSentinelExt(editor)]);
     }
 
     throw new Error();

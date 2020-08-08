@@ -1,11 +1,13 @@
 import { UiElement } from "./UiElement"
 import { Editor } from "../Editor"
-import { $$ } from "utils"
+import { $$, ct } from "utils"
 
 export interface Container extends UiElement { }
 
 export function containerExt(editor: Editor) {
     return (ele: HTMLElement)=>{
+        ct<any>(ele).editor = editor;
+
         $$.setStyle(ele, {
             "white-space": "pre",
             position: "relative",

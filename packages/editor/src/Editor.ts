@@ -1,7 +1,7 @@
 import { NodeManager } from './NodeManager';
 import { DocTree, DocTreeResolver } from 'editor-core';
 import { EventManager, Nil } from 'utils';
-import { listenSelectionToSetCursor } from './selection/cursor';
+import { listenSelectionToSetCursor } from './selection/listenSelectionToSetCursor';
 import { registryEvents } from './events/events';
 import { Constants } from './Constants';
 import { listenUserChangeSelection } from './selection/selectionListener';
@@ -14,12 +14,9 @@ import { Container } from './elements/Container';
 import { regisStyleSheet } from './styleClassSheet';
 import { Settings, SettingRecevier } from './Settings';
 import { creEle } from './elements/elementTypes';
+import { CursorPositionBehavior, KeyDownBehavior } from './behaviorTypes';
 
-export type SetCursorPositionResult = {
-    left: number,
-    top: number,
-    height: number,
-}
+
 
 export class Editor {
     container: Container;
@@ -30,7 +27,8 @@ export class Editor {
 
     settings: Settings = new Settings();
     eventManager = new EventManager();
-    setCursorPositionBehaviorSet = new Map<string, Function>();
+    setCursorPositionBehaviorSet = new Map<string, CursorPositionBehavior>();
+    keyDownBehaviorSet = new Map<string, KeyDownBehavior>();
     docTree: DocTree = new DocTree();
     uiMap: NodeManager;
 
@@ -76,7 +74,11 @@ export class Editor {
         // this.render(this.data);
     }
 
-    regisSetCursorPositionBehavior<T extends Element>(nodeType: string, behavior: (element: T, offset: number, editor: Editor) => SetCursorPositionResult | undefined) {
+    regisSetCursorPositionBehavior(nodeType: string, behavior: CursorPositionBehavior) {
         this.setCursorPositionBehaviorSet.set(nodeType, behavior);
+    }
+
+    regisKeyDownBehavior(nodeType: string, behavior: KeyDownBehavior){
+        this.keyDownBehaviorSet.set(nodeType, behavior);
     }
 }

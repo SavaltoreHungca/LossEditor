@@ -4,9 +4,16 @@ import isHotkey from "is-hotkey";
 
 let skipInputEvent = false;
 export function listenTextInput(editor: Editor) {
-    editor.container.addEventListener('keydown', (event)=>{
-        if(isHotkey('backspace', event)){
+    editor.container.addEventListener('keydown', (event) => {
+        if (isHotkey('backspace', event)) {
             editor.docTree.backspace();
+        }
+        else if (editor.docTree.selection) {
+            const point = editor.docTree.selection.end;
+            if (point) {
+                const behavior = editor.keyDownBehaviorSet.get(point.node.type);
+                if (behavior) behavior(event, editor.docTree.selection);
+            };
         }
     })
 
@@ -24,7 +31,7 @@ export function listenTextInput(editor: Editor) {
 }
 
 function triggleTextInput(editor: Editor, data: string | undefined | null) {
-    if(data && data !== ''){
+    if (data && data !== '') {
         editor.docTree.textInput(data);
     }
 }

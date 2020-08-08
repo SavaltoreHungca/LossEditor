@@ -3,6 +3,7 @@ import { BidMap, $$, ct } from "utils";
 import { Node } from 'editor-core';
 import { DocNodeTypesMap, creDocEle } from './elements/docElementTypes';
 import { DocNode } from './elements/DocNode';
+import { mountChild } from './render/mountChild';
 
 export class NodeManager {
     private nodeMap = new BidMap<Node, DocNode>();
@@ -29,6 +30,16 @@ export class NodeManager {
             this.setElement(node, ele);
         }
         return ele;
+    }
+
+    addNewNode(parent: Node, type: string, isPresenter: boolean, beforeRender: (node: Node) => void) {
+        const node = new Node(type, isPresenter);
+        parent.children = parent.children || [];
+        parent.children.push(node);
+        node.parent = parent;
+        beforeRender(node);
+        this.editor.docTree.render(node);
+        return node;
     }
 
     getNode(element: DocNode) {

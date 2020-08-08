@@ -1,5 +1,5 @@
 import { BackLayer } from './BackLayer';
-import { ViewLines } from './ViewLines';
+import { ViewLines, viewLinesExt } from './ViewLines';
 import { Cursor, cursorExt } from './Cursor';
 import { RegionContainer } from './RegionContainer';
 import { Container, containerExt } from './Container';
@@ -44,7 +44,6 @@ export type Style = {
 
 export function creEle<K extends keyof UiNodeTypesMap>(editor: Editor, type: K, ele?: HTMLElement): UiNodeTypesMap[K] {
     let element: HTMLElement;
-    let style: Object;
     switch (type) {
         case 'container':
             if (!ele) throw new Error();
@@ -56,13 +55,8 @@ export function creEle<K extends keyof UiNodeTypesMap>(editor: Editor, type: K, 
             if (ele) element = $$.wrapEle('absolute', ele); else element = $$.creEle('absolute');
             return extend(element, [uiExt(editor, type)]);
         case 'view-lines':
-            style = {
-                outline: 'none',
-                'user-select': 'none',
-            }
-            if (ele) element = $$.wrapEle('block', ele, style); else element = $$.creEle('block', style);
-            element.setAttribute('tabindex', '1');
-            return extend(element, [uiExt(editor, type)]);
+            if (ele) element = $$.wrapEle('block', ele); else element = $$.creEle('block');
+            return extend(element, [uiExt(editor, type), viewLinesExt(editor)]);
         case 'region-container':
             if (ele) element = $$.wrapEle('absolute', ele); else element = $$.creEle('absolute');
             return extend(element, [uiExt(editor, type)]);
@@ -80,10 +74,10 @@ export function creEle<K extends keyof UiNodeTypesMap>(editor: Editor, type: K, 
                 [uiExt(editor, type), paraCntxtExt(editor), inlineBlockExt(editor), uniBlockExt(editor)]);
         case 'indentation':
             return extend($$.creEle('block'),
-                [uiExt(editor, 'indentation')]);
+                [uiExt(editor, type)]);
         case 'content-container':
             return extend($$.creEle('block'),
-                [uiExt(editor, 'content-container')]);
+                [uiExt(editor, type)]);
     }
 
     throw new Error();

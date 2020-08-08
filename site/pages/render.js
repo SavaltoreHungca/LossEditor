@@ -18,7 +18,7 @@ export function render(container) {
             <button>mem</button>
         </div>
         <div id="${idset.showpanel}" style="margin-top: 10px; border: 1px dotted grey">
-            <div id="${idset.editor}"></div>
+            <div id="${idset.editor}" style="width:150px"></div>
             <div id="${idset.sp}">
                 <div style="width: 1000px; height: 1000px">
                 </div>
