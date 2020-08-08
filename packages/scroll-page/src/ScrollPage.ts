@@ -1,6 +1,6 @@
 import { Settings, SettingReceiver } from './Settings';
 import { registryEvents } from './events/events';
-import { EventManager, $$, extend, Nil } from 'utils';
+import { EventManager, $$, extend, Nil, ct } from 'utils';
 import { creEle } from './elements/elementTyps';
 import { ButtomScrollBar } from './elements/ButtomScrollBar';
 import { Container } from './elements/Container';
@@ -34,14 +34,20 @@ export class ScrollPage {
     settings = new Settings();
     elements: ElementsSet
 
-    constructor(content: HTMLElement, settings?: SettingReceiver) {
+    constructor(settings: SettingReceiver) {
         if (settings) for (let k in settings) this.settings[k] = settings[k];
+
+        if(!this.settings.container && !this.settings.content) throw new Error("内容和容器必须传入一个");
+        if(!this.settings.content && !ct<HTMLElement>(this.settings.container).firstElementChild) throw new Error("指定了容器, 但是容器内容为空");
+        if(!this.settings.content && ct<HTMLElement>(this.settings.container).childElementCount > 1) throw new Error("指定了容器, 但是容器内容数大于1");
+
+        this.settings.content = this.settings.content || ct(ct<HTMLElement>(this.settings.container).firstElementChild);
 
         this.eventManager = new EventManager();
 
         this.elements = {
-            container: creEle(this, 'container'),
-            content: creEle(this, 'content', content),
+            container: creEle(this, 'container', this.settings.container),
+            content: creEle(this, 'content', this.settings.content),
             window: Nil,
             page: Nil,
             buttomScrollBar: Nil,
@@ -56,11 +62,12 @@ export class ScrollPage {
         registryEvents(this);
         // registryListeners(this);
 
-        if (content.parentElement) {
-            const parent = content.parentElement;
+        if (this.elements.content.parentElement !== this.elements.container) {
+            const parent = this.elements.content.parentElement;
+            if (parent) parent.removeChild(this.elements.content);
             const { container } = this.elements;
-            parent.insertBefore(container, content);
-            parent.removeChild(content);
+            container.innerHTML = '';
+            container.appendChild(this.elements.content);
         }
         this.eventManager.triggleEvent(Constants.events.ELEMENTS_CREATED);
     }

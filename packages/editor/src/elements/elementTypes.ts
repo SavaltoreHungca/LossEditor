@@ -1,4 +1,23 @@
-import { ElementInfo } from 'utils'
+import { BackLayer } from './BackLayer';
+import { ViewLines } from './ViewLines';
+import { Cursor, cursorExt } from './Cursor';
+import { RegionContainer } from './RegionContainer';
+import { Container, containerExt } from './Container';
+import { $$, extend } from "utils";
+import { Indentation } from './Indentation';
+import { Image } from './Image';
+import { Table } from './Table';
+import { Row } from './Row';
+import { Cell } from './Cell';
+import { Paragraph } from './Paragraph';
+import { ParagraphLine, lineExt } from './ParagraphLine';
+import { UnitBlock, uniBlockExt } from './UnitBlock';
+import { ContentContainer } from './ContentContainer';
+import { Editor } from '../Editor';
+import { uiExt } from './UiElement';
+import { paraCntxtExt } from './ParagraphContext';
+import { inlineBlockExt } from './Inlineblock';
+import { Text } from './Text';
 
 export type UiNodeTypesMap = {
     'region-container': RegionContainer
@@ -23,44 +42,49 @@ export type Style = {
     [index: string]: string | number
 }
 
-export interface UiElement extends HTMLElement {
-    getStyle(): Style | undefined
-    setStyle(style: Style | undefined): void
-    getInfo(): ElementInfo
-}
+export function creEle<K extends keyof UiNodeTypesMap>(editor: Editor, type: K, ele?: HTMLElement): UiNodeTypesMap[K] {
+    let element: HTMLElement;
+    let style: Object;
+    switch (type) {
+        case 'container':
+            if (!ele) throw new Error();
+            return extend(ele, [uiExt(editor, type), containerExt(editor)]);
+        case 'cursor':
+            if (!ele) throw new Error();
+            return extend($$.wrapEle('absolute', ele), [uiExt(editor, type), cursorExt(editor)]);
+        case 'back-layer':
+            if (ele) element = $$.wrapEle('absolute', ele); else element = $$.creEle('absolute');
+            return extend(element, [uiExt(editor, type)]);
+        case 'view-lines':
+            style = {
+                outline: 'none',
+                'user-select': 'none',
+            }
+            if (ele) element = $$.wrapEle('block', ele, style); else element = $$.creEle('block', style);
+            element.setAttribute('tabindex', '1');
+            return extend(element, [uiExt(editor, type)]);
+        case 'region-container':
+            if (ele) element = $$.wrapEle('absolute', ele); else element = $$.creEle('absolute');
+            return extend(element, [uiExt(editor, type)]);
+        case 'paragraph':
+            return extend($$.creEle('block'),
+                [uiExt(editor, type), paraCntxtExt(editor)]);
+        case 'paragraph-line':
+            return extend($$.creEle('block'),
+                [uiExt(editor, type), paraCntxtExt(editor), lineExt(editor)]);
+        case 'text':
+            return extend($$.creEle('inline'),
+                [uiExt(editor, type), paraCntxtExt(editor), inlineBlockExt(editor)]);
+        case 'unit-block':
+            return extend($$.creEle('inline'),
+                [uiExt(editor, type), paraCntxtExt(editor), inlineBlockExt(editor), uniBlockExt(editor)]);
+        case 'indentation':
+            return extend($$.creEle('block'),
+                [uiExt(editor, 'indentation')]);
+        case 'content-container':
+            return extend($$.creEle('block'),
+                [uiExt(editor, 'content-container')]);
+    }
 
-export interface Cursor extends UiElement {
-    setPosition(left: number, top: number, height?: number): void
+    throw new Error();
 }
-
-export interface Container extends UiElement { }
-export interface ViewLines extends UiElement { }
-export interface BackLayer extends UiElement { }
-export interface RegionContainer extends UiElement { }
-export interface Indentation extends UiElement { }
-export interface ContentContainer extends UiElement { }
-export interface Image extends UiElement { }
-export interface Table extends UiElement { }
-export interface Row extends UiElement { }
-export interface Cell extends UiElement { }
-export interface Paragraph extends UiElement { }
-export interface ParagraphContext extends UiElement {
-    setElementStart(start: number): void
-    getElementStart(): number
-}
-export interface Inlineblock extends ParagraphContext {
-    setEleUniId(id?: string): void
-    getEleUniId(): string
-}
-export interface ParagraphLine extends ParagraphContext {
-    fitContent(): void
-    autoWidth(): void
-    getParagraph(): Paragraph
-}
-export interface Text extends Inlineblock { }
-export interface UnitBlock extends Inlineblock {
-    setUnitBlockType(type: string, value: string): void
-    getUnitblockOffset(): number
-    getUnitBlockType(): { type: string, value: string }
-}
-

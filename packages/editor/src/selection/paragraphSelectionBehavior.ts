@@ -3,7 +3,9 @@ import { SetSelectionResult } from "editor-core";
 import { getNodeFromChild, getType } from "../utils";
 import { Constants } from "../Constants";
 import { Node } from 'editor-core';
-import { ParagraphContext, Text, UnitBlock } from "../elements/elementTypes";
+import { ParagraphContext } from '../elements/ParagraphContext';
+import { Text } from '../elements/Text';
+import { UnitBlock } from '../elements/UnitBlock';
 
 export function paragraphSelectionBehavior(node: Node, e: DragState) {
     const ans: SetSelectionResult = {

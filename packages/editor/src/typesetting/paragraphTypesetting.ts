@@ -3,9 +3,12 @@ import { Editor } from '../Editor';
 import { Point } from 'editor-core';
 import { binarySearchWhichRange } from '../selection/cursorposition/paragraphCursorPosition';
 import { $, ct } from 'utils';
-import { DocParagraph } from '../elements/docElementTypes';
-import { ParagraphLine, Inlineblock, ParagraphContext, UnitBlock } from '../elements/elementTypes';
-import { creEle } from '../elements/creEle';
+import { DocParagraph } from '../elements/DocParagraph';
+import { ParagraphLine } from '../elements/ParagraphLine';
+import { Inlineblock } from '../elements/Inlineblock';
+import { ParagraphContext } from '../elements/ParagraphContext';
+import { UnitBlock } from '../elements/UnitBlock';
+import { creEle } from '../elements/elementTypes';
 
 export function paragraphTypesettingFactory(editor: Editor) {
     return (point: Point) => {

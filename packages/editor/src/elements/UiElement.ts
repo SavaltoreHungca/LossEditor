@@ -1,6 +1,12 @@
-import { Editor } from "../../Editor";
-import { $$, ElementInfo } from "utils";
-import { Style, UiNodeTypes } from "../elementTypes";
+import { Editor } from "../Editor"
+import { $$, ElementInfo } from "utils"
+import { Style, UiNodeTypes } from "./elementTypes";
+
+export interface UiElement extends HTMLElement {
+    getStyle(): Style | undefined
+    setStyle(style: Style | undefined): void
+    getInfo(): ElementInfo
+}
 
 export function uiExt(editor: Editor, uiNodeType: UiNodeTypes) {
     return (ele: HTMLElement) => {

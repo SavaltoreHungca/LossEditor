@@ -1,6 +1,11 @@
-import { Editor } from "../../Editor";
-import { $$, ElementInfo } from "utils";
-import { Style } from "../elementTypes";
+import { UiElement } from "./UiElement"
+import { Editor } from "../Editor"
+import { $$ } from "utils"
+
+export interface ParagraphContext extends UiElement {
+    setElementStart(start: number): void
+    getElementStart(): number
+}
 
 export function paraCntxtExt(editor: Editor) {
     return (ele: HTMLElement)=>{

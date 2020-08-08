@@ -1,9 +1,10 @@
-import { ParagraphContext } from './../../elements/elementTypes';
 import { Editor } from '../../Editor';
 import { getType } from "../../utils";
 import { $$, ct, Nil } from "utils";
-import { Paragraph, ParagraphLine, Inlineblock } from '../../elements/elementTypes';
-import { DocParagraph } from '../../elements/docElementTypes';
+import { DocParagraph } from '../../elements/DocParagraph';
+import { ParagraphContext } from '../../elements/ParagraphContext';
+import { ParagraphLine } from '../../elements/ParagraphLine';
+import { Inlineblock } from '../../elements/Inlineblock';
 
 export function setCursorPositionForParagraph(paragraph: DocParagraph, offset: number, editor: Editor) {
     const ans = {

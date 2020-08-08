@@ -26,9 +26,11 @@ export type ElementTypsMap = {
 }
 
 export function creEle<K extends keyof ElementTypsMap>(sp: ScrollPage, type: K, ele?: HTMLElement): ElementTypsMap[K] {
+    let element;
     switch (type) {
         case 'container':
-            return extend($$.creEle('block'), [eleExt(sp, type), containerExt(sp)]);
+            if (ele) element = ele; else element = $$.creEle('block');
+            return extend(element, [eleExt(sp, type), containerExt(sp)]);
         case 'content':
             if (!ele) throw new Error();
             return extend(ele, [eleExt(sp, type), contentExt(sp)]);

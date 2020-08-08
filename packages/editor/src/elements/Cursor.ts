@@ -1,6 +1,12 @@
-import { Editor } from '../../Editor';
-import { $$ } from 'utils';
-import { classes } from '../../styleClassSheet';
+import { UiElement } from "./UiElement"
+import { Editor } from "../Editor"
+import { $$ } from "utils"
+import { classes } from "../styleClassSheet"
+
+export interface Cursor extends UiElement {
+    setPosition(left: number, top: number, height?: number): void
+}
+
 export function cursorExt(editor: Editor) {
 
     return (cursor: HTMLElement) => {

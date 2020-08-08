@@ -1,7 +1,11 @@
-import { Editor } from "../../Editor";
-import { $$, ElementInfo, ct } from "utils";
-import { Style, Paragraph } from "../elementTypes";
-import { Constants } from "../../Constants";
+import { DocNode } from "./DocNode";
+import { Editor } from "../Editor";
+import { ct } from "utils";
+import { Paragraph } from "./Paragraph";
+
+export interface DocParagraph extends DocNode {
+    getParaUiEle(): Paragraph
+}
 
 export function docParaExt(editor: Editor) {
     return (ele: HTMLElement) => {

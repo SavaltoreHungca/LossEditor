@@ -1,5 +1,4 @@
 import { $$, ct } from "utils";
-import { Constants } from "../Constants";
 import { Editor, SetCursorPositionResult } from "../Editor";
 import { Point } from 'editor-core';
 

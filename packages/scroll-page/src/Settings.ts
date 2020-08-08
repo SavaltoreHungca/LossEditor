@@ -1,5 +1,7 @@
 
 export class Settings implements SettingReceiver {
+    content: undefined
+    container: undefined
     containerWidth = 300
     containerHeight = 300
     bottomScrollBarInner = true
@@ -13,6 +15,7 @@ export class Settings implements SettingReceiver {
 }
 
 export interface SettingReceiver {
+    content?: HTMLElement
     container?: HTMLElement
     containerHeight?: number | string
     containerWidth?: number | string

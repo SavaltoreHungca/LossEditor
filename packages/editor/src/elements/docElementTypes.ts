@@ -1,18 +1,23 @@
-import { Paragraph } from "./elementTypes";
+import { Editor } from "../Editor";
+import { extend, $$ } from "utils";
+import { DocParagraph, docParaExt } from "./DocParagraph";
+import { DocSentinal } from "./DocSentinel";
+import { docExt } from "./DocNode";
+
 
 export type DocNodeTypesMap = {
     'paragraph': DocParagraph
     'sentinel': DocSentinal
 }
 
-export interface DocNode extends HTMLElement {
+export function creDocEle<K extends keyof DocNodeTypesMap>(editor: Editor, type: K, ele?: HTMLElement): DocNodeTypesMap[K] {
+    switch (type) {
+        case 'paragraph':
+            return extend($$.creEle('block'), [docExt(editor, type), docParaExt(editor)]);
+        case 'sentinel':
+            return extend($$.creEle('block'), [docExt(editor, type)]);
+    }
 
+    throw new Error();
 }
 
-export interface DocParagraph extends DocNode {
-    getParaUiEle(): Paragraph
-}
-
-export interface DocSentinal extends DocNode {
-
-}

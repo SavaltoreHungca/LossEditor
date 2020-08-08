@@ -7,8 +7,12 @@ import { Constants } from "../Constants";
 import { $$ } from "utils";
 import { indentationWrap } from "./indentationWrap";
 import { mountChild } from "./mountChild";
-import { Style, Paragraph, ParagraphLine, Text, Inlineblock, UnitBlock } from "../elements/elementTypes";
-import { creEle } from "../elements/creEle";
+import { Style, creEle} from "../elements/elementTypes";
+import { Paragraph } from '../elements/Paragraph';
+import { ParagraphLine } from '../elements/ParagraphLine';
+import { Text } from '../elements/Text';
+import { Inlineblock } from '../elements/Inlineblock';
+import { UnitBlock } from '../elements/UnitBlock';
 
 
 declare type StyleList = Array<[number, number, Style]>;
@@ -47,7 +51,7 @@ function renderCodeOpen(content: string, unitBlock: Inlineblock) {
 
 export function paragraphRendererFactor(editor: Editor) {
     return (parent: Node | undefined, node: Node) => {
-        if(!parent) throw new Error();
+        if (!parent) throw new Error();
 
         const { parentUi, nodeUi } = mountChild(editor, parent, node);
 
@@ -197,7 +201,7 @@ function renderText(editor: Editor, context: RenderContext): void {
 
         context.unit.innerText += context.str[context.strIndex];
         const lineInfo = context.line.getInfo();
-        
+
         if (lineInfo.width > context.maxWidth) {
             const text = context.unit.innerText;
             context.unit.innerText = text.substring(0, text.length - 1);
@@ -231,7 +235,7 @@ function renderUnitBlock(editor: Editor, context: RenderContext): void {
 
     setEleUniIdAndStyle(style, context);
 
-    (<UnitBlock>context.unit).setUnitBlockType(type,value);
+    (<UnitBlock>context.unit).setUnitBlockType(type, value);
     switch (type) {
         case 'formula':
             katex.render(value, context.unit, { throwOnError: false });

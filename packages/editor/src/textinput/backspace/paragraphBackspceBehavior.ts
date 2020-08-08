@@ -3,9 +3,11 @@ import { Selection, Point } from 'editor-core';
 import { binarySearchWhichRange } from '../../selection/cursorposition/paragraphCursorPosition';
 import { getType } from '../../utils';
 import { TextContent } from '../../render/paragraph';
-import { DocParagraph } from '../../elements/docElementTypes';
 import { ct } from 'utils';
-import { Inlineblock, ParagraphLine, Paragraph } from '../../elements/elementTypes';
+import { DocParagraph } from '../../elements/DocParagraph';
+import { Inlineblock } from '../../elements/Inlineblock';
+import { ParagraphLine } from '../../elements/ParagraphLine';
+import { Paragraph } from '../../elements/Paragraph';
 
 export function paragraphBackspaceFactory(editor: Editor) {
     return (selection: Selection) => {

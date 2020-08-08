@@ -1,7 +1,12 @@
-import { Editor } from "../../Editor";
-import { $$, ElementInfo } from "utils";
-import { Style } from "../elementTypes";
-import { Constants } from "../../Constants";
+import { Editor } from "../Editor"
+import { Inlineblock } from "./Inlineblock"
+import { Constants } from "../Constants"
+
+export interface UnitBlock extends Inlineblock {
+    setUnitBlockType(type: string, value: string): void
+    getUnitblockOffset(): number
+    getUnitBlockType(): { type: string, value: string }
+}
 
 export function uniBlockExt(editor: Editor) {
     return (ele: HTMLElement)=>{

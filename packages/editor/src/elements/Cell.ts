@@ -1,7 +1,8 @@
-import { Editor } from "../../Editor";
-import { $$, ElementInfo } from "utils";
-import { Style } from "../elementTypes";
-import { Constants } from "../../Constants";
+import { UiElement } from "./UiElement"
+import { Editor } from "../Editor"
+import { $$ } from "utils"
+
+export interface Cell extends UiElement { }
 
 export function cellExt(editor: Editor) {
     return (ele: HTMLElement) => {

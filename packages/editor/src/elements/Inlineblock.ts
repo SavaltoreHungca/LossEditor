@@ -1,6 +1,11 @@
-import { Editor } from "../../Editor";
-import { $$, ElementInfo } from "utils";
-import { Style } from "../elementTypes";
+import { ParagraphContext } from "./ParagraphContext";
+import { Editor } from "../Editor"
+import { $$ } from "utils"
+
+export interface Inlineblock extends ParagraphContext {
+    setEleUniId(id?: string): void
+    getEleUniId(): string
+}
 
 export function inlineBlockExt(editor: Editor) {
     return (ele: HTMLElement)=>{

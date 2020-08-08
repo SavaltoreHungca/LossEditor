@@ -1,8 +1,8 @@
 import { Editor } from './Editor';
 import { BidMap, $$, ct } from "utils";
 import { Node } from 'editor-core';
-import { DocNode, DocNodeTypesMap } from './elements/docElementTypes';
-import { creDocEle } from './elements/creDocEle';
+import { DocNodeTypesMap, creDocEle } from './elements/docElementTypes';
+import { DocNode } from './elements/DocNode';
 
 export class NodeManager {
     private nodeMap = new BidMap<Node, DocNode>();
