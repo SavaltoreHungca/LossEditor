@@ -1,11 +1,12 @@
 import { Editor } from "../Editor"
-import { $$, ElementInfo } from "utils"
-import { Style, UiNodeTypes } from "./elementTypes";
+import { $$, ElementInfo, RelativePostion } from "utils"
+import { Style, UiNodeTypes } from "./elementTypes"; ''
 
 export interface UiElement extends HTMLElement {
     getStyle(): Style | undefined
     setStyle(style: Style | undefined): void
     getInfo(): ElementInfo
+    getPosiRelativeToViewLines(): RelativePostion
 }
 
 export function uiExt(editor: Editor, uiNodeType: UiNodeTypes) {
@@ -23,6 +24,9 @@ export function uiExt(editor: Editor, uiNodeType: UiNodeTypes) {
             },
             getInfo: function (): ElementInfo {
                 return $$.getElementInfo(ele);
+            },
+            getPosiRelativeToViewLines: function (): RelativePostion {
+                return $$.getRelativePosition(ele, editor.container);
             }
         }
     }

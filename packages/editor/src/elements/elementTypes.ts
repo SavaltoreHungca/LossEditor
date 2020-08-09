@@ -17,7 +17,7 @@ import { Editor } from '../Editor';
 import { uiExt } from './UiElement';
 import { paraCntxtExt } from './ParagraphContext';
 import { inlineBlockExt } from './Inlineblock';
-import { Text } from './Text';
+import { Text, textExt } from './Text';
 
 export type UiNodeTypesMap = {
     'region-container': RegionContainer
@@ -68,7 +68,7 @@ export function creEle<K extends keyof UiNodeTypesMap>(editor: Editor, type: K, 
                 [uiExt(editor, type), paraCntxtExt(editor), lineExt(editor)]);
         case 'text':
             return extend($$.creEle('inline'),
-                [uiExt(editor, type), paraCntxtExt(editor), inlineBlockExt(editor)]);
+                [uiExt(editor, type), paraCntxtExt(editor), inlineBlockExt(editor), textExt(editor)]);
         case 'unit-block':
             return extend($$.creEle('inline'),
                 [uiExt(editor, type), paraCntxtExt(editor), inlineBlockExt(editor), uniBlockExt(editor)]);

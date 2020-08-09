@@ -1,10 +1,9 @@
 import { NodeManager } from './NodeManager';
 import { DocTree, DocTreeResolver } from 'editor-core';
 import { EventManager, Nil } from 'utils';
-import { listenSelectionToSetCursor } from './selection/listenSelectionToSetCursor';
 import { registryEvents } from './events/events';
 import { Constants } from './Constants';
-import { listenUserChangeSelection } from './selection/selectionListener';
+import { listenUserChangeSelection, listenSelectionToSetCursor } from './selection/selectionListener';
 import { listenTextInput } from './textinput/listenTextInput';
 import { Cursor } from './elements/Cursor';
 import { ViewLines } from './elements/ViewLines';

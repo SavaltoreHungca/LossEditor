@@ -25,6 +25,15 @@ export function $(id: string): HTMLElement {
     return <HTMLElement>document.getElementById(id);
 }
 
+export type RelativePostion = {
+    left: number;
+    top: number;
+    right: number;
+    bottom: number;
+    rightBoderLeft: number;
+    bottomBorderLeft: number;
+}
+
 declare type EleTypes = 'block' | 'inline' | 'fixed' | 'absolute' | 'flex' | 'flex-item';
 
 export class $$ {
@@ -337,7 +346,7 @@ export class $$ {
     }
 
 
-    static getRelativePosition(elemt: HTMLElement, parent: HTMLElement) {
+    static getRelativePosition(elemt: HTMLElement, parent: HTMLElement): RelativePostion {
         const originalElement = elemt;
         const ans = {
             left: 0, top: 0,
