@@ -1,9 +1,10 @@
 import { Editor } from './Editor';
-import { BidMap, $$, ct } from "utils";
+import { BidMap, $$, ct, MapObj } from "utils";
 import { Node } from 'editor-core';
 import { DocNodeTypesMap, creDocEle } from './elements/docElementTypes';
 import { DocNode } from './elements/DocNode';
 import { mountChild } from './render/mountChild';
+import { nodeCreator } from './elements/nodeTypes';
 
 export class NodeManager {
     private nodeMap = new BidMap<Node, DocNode>();
@@ -32,12 +33,12 @@ export class NodeManager {
         return ele;
     }
 
-    addNewNode(parent: Node, type: string, isPresenter: boolean, beforeRender: (node: Node) => void) {
-        const node = new Node(type, isPresenter);
+    addNewNode(parent: Node, nodeValue: MapObj, beforeRender?: (node: Node) => void) {
+        const node = nodeCreator(nodeValue);
         parent.children = parent.children || [];
         parent.children.push(node);
         node.parent = parent;
-        beforeRender(node);
+        beforeRender && beforeRender(node);
         this.editor.docTree.render(node);
         return node;
     }

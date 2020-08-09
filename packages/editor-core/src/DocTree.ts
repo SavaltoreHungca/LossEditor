@@ -1,11 +1,14 @@
 import { Selection, Point } from "./Selection";
 import { Node } from './Node';
-import { SetSelectionBehavior, Renderer, TextInputBehavior, EventTypes, BackSpaceBehavior, TypeSettingBehavior, EmptyOrgnizerNodeRnderBehavior } from "./behaviorTypes";
-import { Nil, ct } from "utils";
+import { SetSelectionBehavior, Renderer, TextInputBehavior, EventTypes, BackSpaceBehavior, TypeSettingBehavior, EmptyOrgnizerNodeRnderBehavior, NodeCreator } from "./behaviorTypes";
+import { Nil, ct, MapObj } from "utils";
+import { DocTreeResolver } from "./DocTreeResolver";
 
 export class DocTree {
     root: Node = Nil;
     selection: Selection = Nil;
+
+    docTreeResolver: DocTreeResolver = Nil;
 
     regisdEvents = new Map<string, Array<Function>>();
 
@@ -15,10 +18,20 @@ export class DocTree {
     typesettingBehaviorSet = new Map<string, TypeSettingBehavior>();
     regisdRenderer = new Map<string, Renderer>();
     emptyOrgnizerNodeRnderBehaviorSet = new Map<string, EmptyOrgnizerNodeRnderBehavior>();
+    nodeCreator: NodeCreator;
+
+    constructor(nodeCreator: NodeCreator){
+        this.nodeCreator = nodeCreator;
+    }
 
     setRoot(root: Node) {
         this.root = root;
         return this;
+    }
+
+    buildTree(doc: string | MapObj) {
+        this.docTreeResolver = this.docTreeResolver || new DocTreeResolver(this);
+        this.root = this.docTreeResolver.resolve(doc);
     }
 
     render(rootNode?: Node) {
@@ -29,7 +42,7 @@ export class DocTree {
 
             if (!node.isPresenter && (!node.children || node.children.length === 0)) {
                 const behavior = this.emptyOrgnizerNodeRnderBehaviorSet.get(node.type);
-                if(behavior){
+                if (behavior) {
                     behavior(node);
                 }
             }
@@ -91,7 +104,7 @@ export class DocTree {
         this.typesettingBehaviorSet.set(nodeType, behavior);
     }
 
-    regisEmptyOrgnizerNodeRnderBehavior(nodeType: string, behavior: EmptyOrgnizerNodeRnderBehavior){
+    regisEmptyOrgnizerNodeRnderBehavior(nodeType: string, behavior: EmptyOrgnizerNodeRnderBehavior) {
         this.emptyOrgnizerNodeRnderBehaviorSet.set(nodeType, behavior);
     }
 

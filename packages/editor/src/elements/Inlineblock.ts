@@ -1,6 +1,7 @@
 import { ParagraphContext } from "./ParagraphContext";
 import { Editor } from "../Editor"
-import { $$ } from "utils"
+import { $$, ct } from "utils"
+import { getType } from "../utils";
 
 export interface Inlineblock extends ParagraphContext {
     setEleUniId(id?: string): void
@@ -8,12 +9,12 @@ export interface Inlineblock extends ParagraphContext {
 }
 
 export function inlineBlockExt(editor: Editor) {
-    return (ele: HTMLElement)=>{
+    return (ele: HTMLElement) => {
         return {
-            setEleUniId: function(id?: string): void{
+            setEleUniId: function (id?: string): void {
                 ele.setAttribute('data-uni-id', id || $$.randmonId());
             },
-            getEleUniId: function(): string{
+            getEleUniId: function (): string {
                 return <string>ele.getAttribute('data-uni-id');
             }
         }

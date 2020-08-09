@@ -1,20 +1,36 @@
 import { Node } from './Node'
+import { DocTree } from './DocTree';
+import { MapObj, ct, Nil } from 'utils';
 
 export class DocTreeResolver {
-    static fromObj(obj: any): Node {
-        let ans = undefined;
-        const stack = [obj];
+
+    private docTree: DocTree
+
+    constructor(docTree: DocTree) {
+        this.docTree = docTree;
+    }
+
+    private getDocument(doc: string | MapObj): MapObj {
+        return typeof doc === 'string'? JSON.parse(doc) : doc;
+    }
+
+    resolve(obj: MapObj | string): Node {
+        const document = this.getDocument(obj);
+
+        let ans: Node = Nil;
+        const stack = [document];
+
         const parentMap = new Map<any, Node>();
 
         while (stack.length > 0) {
-            const root = stack.shift();
+            const root: MapObj = ct(stack.shift());
 
             let rootNode: Node;
 
             if (parentMap.get(root)) {
-                rootNode = <Node>parentMap.get(root);
+                rootNode = ct(parentMap.get(root));
             } else {
-                rootNode = this.createNode(root);
+                rootNode = this.docTree.nodeCreator(ct(root));
                 parentMap.set(root, rootNode);
             }
             if (!ans) {
@@ -23,7 +39,7 @@ export class DocTreeResolver {
             if (root.children) {
                 rootNode.children = [];
                 root.children.forEach((item: any) => {
-                    const childNode = this.createNode(item);
+                    const childNode = this.docTree.nodeCreator(ct(item));
                     parentMap.set(item, childNode);
                     rootNode.children?.push(childNode);
                     childNode.parent = rootNode;
@@ -31,16 +47,6 @@ export class DocTreeResolver {
                 });
             }
         }
-        return <Node>ans;
+        return ans;
     }
-
-    private static createNode(obj: any): Node {
-        const node = new Node(obj.type, obj.isPresenter);
-        node.content = obj.content;
-        node.sentinelAct = obj.sentinelAct;
-        node.isCombine = obj.isCombine;
-        node.inCombine = obj.inCombine;
-        return node;
-    }
-
 }

@@ -15,6 +15,7 @@ import { regisStyleSheet } from './styleClassSheet';
 import { Settings, SettingRecevier } from './Settings';
 import { creEle } from './elements/elementTypes';
 import { CursorPositionBehavior, KeyDownBehavior } from './behaviorTypes';
+import { nodeCreator } from './elements/nodeTypes';
 
 
 
@@ -29,7 +30,7 @@ export class Editor {
     eventManager = new EventManager();
     setCursorPositionBehaviorSet = new Map<string, CursorPositionBehavior>();
     keyDownBehaviorSet = new Map<string, KeyDownBehavior>();
-    docTree: DocTree = new DocTree();
+    docTree: DocTree = new DocTree(nodeCreator);
     uiMap: NodeManager;
 
     constructor(settings: SettingRecevier) {
@@ -60,9 +61,8 @@ export class Editor {
     }
 
     render(document: any) {
-        if (!this.viewLines) throw new Error();
+        this.docTree.buildTree(document);
 
-        this.docTree.setRoot(DocTreeResolver.fromObj(document));
         this.eventManager.triggleEvent(Constants.events.DOC_TREE_ROOT_SETED);
         this.viewLines.innerHTML = '';
         this.docTree.render();
@@ -78,7 +78,7 @@ export class Editor {
         this.setCursorPositionBehaviorSet.set(nodeType, behavior);
     }
 
-    regisKeyDownBehavior(nodeType: string, behavior: KeyDownBehavior){
+    regisKeyDownBehavior(nodeType: string, behavior: KeyDownBehavior) {
         this.keyDownBehaviorSet.set(nodeType, behavior);
     }
 }

@@ -1,9 +1,9 @@
-export function extend<T extends Element>(ele: HTMLElement | Element, extendFunctions: Array<(ele: HTMLElement) => Object>): T {
+export function extend(ele: any, extendFunctions: Array<(ele: any) => Object>): any {
     for (const ex of extendFunctions) {
-        const exts = ex(<HTMLElement>ele);
+        const exts = ex(ele);
         for (const name in exts) {
             ele[name] = exts[name];
         }
     }
-    return <T>ele;
+    return ele;
 }

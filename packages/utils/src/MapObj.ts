@@ -1,0 +1,1 @@
+export type MapObj = { [index: string]: any }

@@ -1,20 +1,28 @@
-import { $$ } from 'utils';
+import { $$, ct } from 'utils';
 import { Editor } from '../Editor';
 import { Point } from "editor-core";
-import { binarySearchWhichRange } from '../selection/cursorposition/paragraphCursorPosition';
+import { DocParagraph, NodeParagraph } from '../elements/DocParagraph';
+import { getType } from '../utils';
+import { Text } from '../elements/Text';
 
 export function paragraphTextInputBehaviorFactory(editor: Editor) {
     return (point: Point, text: string) => {
-        if (!point.node.content) point.node.content = {str: ''};
-        point.node.content.str = $$.insertStrBefore(point.node.content.str, point.offset, text);
+        const nodeParagraph: NodeParagraph = ct(point.node);
+        nodeParagraph.insertTextBefore(text, point.offset);
 
-        const paragraphUi = editor.uiMap.getElement(point.node);
-        const lines = paragraphUi.children[0].children[0].children[0].children;
-        const line = binarySearchWhichRange(lines, point.offset);
-        const ele = binarySearchWhichRange(line.children, point.offset);
+        const docParagraph: DocParagraph = ct(editor.uiMap.getElement(point.node));
+        const line = docParagraph.getLineByOffset(point.offset);
+        const ele = line.getInlineBlockByOffset(point.offset);
 
-        ele.innerText = $$.insertStrBefore(ele.innerText, point.offset - ele.getElementStart(), text);
-        
+        switch (getType(ele)) {
+            case 'unit-block':
+                break;
+            case 'text':
+                ct<Text>(ele).insertTextBefore(text, point.offset);
+                break;
+        }
+
+
         const p = {
             node: point.node,
             offset: point.offset + text.length

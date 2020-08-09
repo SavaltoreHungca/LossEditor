@@ -1,5 +1,6 @@
 import { Node } from './Node';
 import { Point, Selection } from './Selection';
+import { MapObj } from 'utils';
 
 export type SetSelectionResult = {
     pointType: 'start' | 'end'
@@ -33,4 +34,8 @@ export interface TypeSettingBehavior {
 
 export interface EmptyOrgnizerNodeRnderBehavior {
     (node: Node): void
+}
+
+export interface NodeCreator{
+    (obj: MapObj): Node
 }

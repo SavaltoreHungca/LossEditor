@@ -4,18 +4,19 @@ import { Node } from "editor-core";
 /// <reference path="./katex.d.ts"/>
 import katex from 'katex';
 import { Constants } from "../Constants";
-import { $$ } from "utils";
+import { $$, ct } from "utils";
 import { indentationWrap } from "./indentationWrap";
 import { mountChild } from "./mountChild";
-import { Style, creEle} from "../elements/elementTypes";
+import { Style, creEle } from "../elements/elementTypes";
 import { Paragraph } from '../elements/Paragraph';
 import { ParagraphLine } from '../elements/ParagraphLine';
 import { Text } from '../elements/Text';
 import { Inlineblock } from '../elements/Inlineblock';
 import { UnitBlock } from '../elements/UnitBlock';
+import { TextContent, NodeParagraph } from "../elements/DocParagraph";
 
 
-declare type StyleList = Array<[number, number, Style]>;
+
 
 declare type RenderContext = {
     str: string,
@@ -30,10 +31,7 @@ declare type RenderContext = {
     styleIdMap: Map<Style, string>,
 }
 
-export interface TextContent {
-    str: string
-    styleList?: StyleList
-}
+
 
 function renderAttachment(content: string, unitBlock: Inlineblock) {
     unitBlock.innerHTML = '<i class="fa fa-file-archive-o fa-2x" aria-hidden="true"></i>';
@@ -55,17 +53,18 @@ export function paragraphRendererFactor(editor: Editor) {
 
         const { parentUi, nodeUi } = mountChild(editor, parent, node);
 
-        const textContent = <TextContent>node.content;
-        const viewLines = indentationWrap(editor, nodeUi, node.indentation);
+        const nodeParagraph: NodeParagraph = ct(node);
+
+        const viewLines = indentationWrap(editor, nodeUi, nodeParagraph.indentation);
 
         const paragraph: Paragraph = creEle(editor, 'paragraph');
 
         viewLines.appendChild(paragraph);
 
-        if (!textContent || !textContent.str) {
+        if (!nodeParagraph || !nodeParagraph.content.str) {
             renderEmptyInParagraph(editor, paragraph);
         } else {
-            appendLineToParagraph(editor, textContent, paragraph);
+            appendLineToParagraph(editor, nodeParagraph, paragraph);
         }
     }
 }
@@ -92,21 +91,16 @@ function renderEmptyInParagraph(editor: Editor, paragraph: Paragraph) {
     line.autoWidth();
 }
 
-export function appendLineToParagraph(editor: Editor, textContent: TextContent, paragraph: Paragraph) {
+export function appendLineToParagraph(editor: Editor, nodeParagraph: NodeParagraph, paragraph: Paragraph) {
     let line: ParagraphLine | undefined = undefined;
 
     const paragraphInfo = paragraph.getInfo();
     let offset = 0;
-    const sortedRanges = new Array<[number, number]>();
-    const styleMap = new Map<[number, number], Style>();
-    (textContent.styleList || []).forEach(item => {
-        const range: [number, number] = [item[0], item[1]];
-        sortedRanges.push(range);
-        styleMap.set(range, item[2]);
-    });
+
+    const {sortedRanges, styleMap} = nodeParagraph.getStyleMapAndSortedRanges();
 
     const context: RenderContext = {
-        str: textContent.str,
+        str: nodeParagraph.content.str,
         strIndex: offset,
         unit: undefined,
         maxWidth: paragraphInfo.innerWidth,
@@ -118,7 +112,7 @@ export function appendLineToParagraph(editor: Editor, textContent: TextContent, 
         styleIdMap: new Map<Style, string>(),
     }
 
-    while (offset < textContent.str.length) {
+    while (offset < context.str.length) {
         line = creEle(editor, 'paragraph-line');
 
         line.setElementStart(offset);

@@ -1,7 +1,6 @@
 import { getType } from './../utils';
 import { Editor } from '../Editor';
 import { Point } from 'editor-core';
-import { binarySearchWhichRange } from '../selection/cursorposition/paragraphCursorPosition';
 import { $, ct } from 'utils';
 import { DocParagraph } from '../elements/DocParagraph';
 import { ParagraphLine } from '../elements/ParagraphLine';
@@ -12,9 +11,9 @@ import { creEle } from '../elements/elementTypes';
 
 export function paragraphTypesettingFactory(editor: Editor) {
     return (point: Point) => {
-        const paragraphUi: DocParagraph = ct(editor.uiMap.getElement(point.node));
-        const paragraph = paragraphUi.getParaUiEle();
-        let line: ParagraphLine = ct(binarySearchWhichRange(paragraph.children, point.offset));
+        const docParagraph: DocParagraph = ct(editor.uiMap.getElement(point.node));
+        const paragraph = docParagraph.getParaUiEle();
+        let line: ParagraphLine = ct(docParagraph.getLineByOffset(point.offset));
         if (line?.previousElementSibling) line = ct(line.previousElementSibling);
         line = ct(findSuitableStartLine(line));
 

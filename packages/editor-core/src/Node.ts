@@ -1,8 +1,8 @@
-import { $$ } from 'utils';
+import { $$, Nil } from 'utils';
 
 export class Node {
-    type: string
-    isPresenter: boolean
+    type: string = Nil
+    isPresenter: boolean = Nil
     isCombine?: boolean
     inCombine?: boolean
     indentation?: number
@@ -22,11 +22,6 @@ export class Node {
             children?.splice(children.indexOf(this), 1);
         }
         this.parent = undefined;
-    }
-
-    constructor(type: string, isPresenter: boolean) {
-        this.type = type;
-        this.isPresenter = isPresenter;
     }
 
     get nextSibling(): Node | undefined {

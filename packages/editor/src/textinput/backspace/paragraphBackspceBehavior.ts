@@ -1,10 +1,8 @@
 import { Editor } from '../../Editor';
 import { Selection, Point } from 'editor-core';
-import { binarySearchWhichRange } from '../../selection/cursorposition/paragraphCursorPosition';
 import { getType } from '../../utils';
-import { TextContent } from '../../render/paragraph';
 import { ct } from 'utils';
-import { DocParagraph } from '../../elements/DocParagraph';
+import { DocParagraph, NodeParagraph } from '../../elements/DocParagraph';
 import { Inlineblock } from '../../elements/Inlineblock';
 import { ParagraphLine } from '../../elements/ParagraphLine';
 import { Paragraph } from '../../elements/Paragraph';
@@ -12,21 +10,21 @@ import { Paragraph } from '../../elements/Paragraph';
 export function paragraphBackspaceFactory(editor: Editor) {
     return (selection: Selection) => {
         const { left, right } = selection.leftAndRight;
-        const paragraphUi: DocParagraph = ct(editor.uiMap.getElement(left.node));
-        const paragraph = paragraphUi.getParaUiEle();
+        const docParagraph: DocParagraph = ct(editor.uiMap.getElement(left.node));
+        const paragraph = docParagraph.getParaUiEle();
 
-        const textContent = <TextContent>left.node.content;
+        const nodeParagraph: NodeParagraph = ct(left.node);
 
-        const leftLine: ParagraphLine = ct(binarySearchWhichRange(paragraph.children, left.offset));
+        const leftLine: ParagraphLine = docParagraph.getLineByOffset(left.offset);
 
         if (selection.isCollapsed) {
-            const p = backspceCollapsed(textContent, left, leftLine);
+            const p = backspceCollapsed(nodeParagraph, left, leftLine);
             editor.docTree.typesetting(left);
             editor.docTree.changeSelection(p, p);
             return;
         }
 
-        const rightLine: ParagraphLine = ct(binarySearchWhichRange(paragraph.children, right.offset));
+        const rightLine: ParagraphLine = docParagraph.getLineByOffset(right.offset);
 
         let p;
         if (leftLine !== rightLine) {
@@ -35,23 +33,23 @@ export function paragraphBackspaceFactory(editor: Editor) {
             p = backspaceSameLine(left, right, leftLine);
         }
 
-        textContent.str = textContent.str.substring(0, left.offset)
-            + textContent.str.substring(right.offset);
+        nodeParagraph.content.str = nodeParagraph.content.str.substring(0, left.offset)
+            + nodeParagraph.content.str.substring(right.offset);
 
         editor.docTree.typesetting(left);
         editor.docTree.changeSelection(p, p);
     }
 }
-function backspceCollapsed(textContent: TextContent, left: Point, leftLine: ParagraphLine): Point {
-    const ele: Inlineblock = ct(binarySearchWhichRange(leftLine.children, left.offset));
+function backspceCollapsed(nodeParagraph: NodeParagraph, left: Point, leftLine: ParagraphLine): Point {
+    const ele: Inlineblock = ct(leftLine.getInlineBlockByOffset(left.offset));
     const eleOffset = left.offset - ele.getElementStart();
 
     switch (getType(ele)) {
         case 'text': {
             ele.innerText = ele.innerText.substring(0, eleOffset - 1)
                 + ele.innerText.substring(eleOffset);
-            textContent.str = textContent.str.substring(0, left.offset - 1)
-                + textContent.str.substring(left.offset);
+            nodeParagraph.content.str = nodeParagraph.content.str.substring(0, left.offset - 1)
+                + nodeParagraph.content.str.substring(left.offset);
 
             left.offset -= 1;
             return left;
@@ -73,7 +71,7 @@ function backspceDiffLine(left: Point, right: Point, leftLine: ParagraphLine, ri
         paragraph.removeChild(leftLine.nextElementSibling);
     }
 
-    const leftEle = binarySearchWhichRange(leftLine.children, left.offset);
+    const leftEle = leftLine.getInlineBlockByOffset(left.offset);
     while (leftEle.nextElementSibling) {
         leftLine.removeChild(leftEle.nextElementSibling);
     }
@@ -100,7 +98,7 @@ function backspceDiffLine(left: Point, right: Point, leftLine: ParagraphLine, ri
     }
 
 
-    const rightEle = binarySearchWhichRange(rightLine.children, right.offset);
+    const rightEle = rightLine.getInlineBlockByOffset(right.offset);
     while (rightEle.previousElementSibling) {
         rightLine.removeChild(rightEle.previousElementSibling);
     }
@@ -128,8 +126,8 @@ function backspceDiffLine(left: Point, right: Point, leftLine: ParagraphLine, ri
 }
 
 function backspaceSameLine(left: Point, right: Point, line: ParagraphLine): Point {
-    const leftEle = binarySearchWhichRange(line.children, left.offset);
-    const rightEle = binarySearchWhichRange(line.children, right.offset);
+    const leftEle = line.getInlineBlockByOffset(left.offset);
+    const rightEle = line.getInlineBlockByOffset(right.offset);
 
     if (leftEle !== rightEle) {
         while (leftEle.nextElementSibling && leftEle.nextElementSibling !== rightEle) {

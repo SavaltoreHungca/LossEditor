@@ -9,17 +9,17 @@ export function sentinelTextInputBehaviorFactory(editor: Editor) {
         editor.uiMap.delete(point.node);
 
 
-        const paragraph = editor.uiMap.addNewNode(parent, 'paragraph', true, (paragraph) => {
-            paragraph.content = {
-                str: ''
-            }
+        const paragraph = editor.uiMap.addNewNode(parent, {
+            type: 'paragraph',
+            isPresenter: true,
+            content: { str: '' }
         })
 
         point = {
             node: paragraph,
             offset: 0
         }
-        
+
         editor.docTree.changeSelection(point, point);
         editor.docTree.textInput(text);
     }
