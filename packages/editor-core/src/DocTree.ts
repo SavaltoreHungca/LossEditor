@@ -12,7 +12,6 @@ export class DocTree {
 
     regisdEvents = new Map<string, Array<Function>>();
 
-    setSelectionBehaviorSet = new Map<string, SetSelectionBehavior>();
     textInputBehaviorSet = new Map<string, TextInputBehavior>();
     backspaceBehaviorSet = new Map<string, BackSpaceBehavior>();
     typesettingBehaviorSet = new Map<string, TypeSettingBehavior>();
@@ -106,33 +105,6 @@ export class DocTree {
 
     regisEmptyOrgnizerNodeRnderBehavior(nodeType: string, behavior: EmptyOrgnizerNodeRnderBehavior) {
         this.emptyOrgnizerNodeRnderBehaviorSet.set(nodeType, behavior);
-    }
-
-    tmpSelection?: Selection
-    setSelection(node: Node, data: any) {
-        const behavior = this.setSelectionBehaviorSet.get(node.type);
-        if (!behavior) throw new Error(`${node.type}的setSelection行为未设置`);
-        const setSelectionResult = behavior(node, data);
-        if (!setSelectionResult) return;
-        switch (setSelectionResult.pointType) {
-            case 'start': {
-                this.tmpSelection = new Selection({
-                    node: node,
-                    offset: setSelectionResult.offset
-                })
-                break;
-            }
-            case 'end': {
-                if (!this.tmpSelection) return;
-                this.tmpSelection.end = {
-                    node: node,
-                    offset: setSelectionResult.offset
-                }
-                this.selection = this.tmpSelection;
-                this.triggleEvent('selection_change', event => event(this.selection));
-                break;
-            }
-        }
     }
 
     backspace(selection?: Selection) {

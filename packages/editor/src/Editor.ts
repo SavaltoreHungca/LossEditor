@@ -1,5 +1,5 @@
 import { NodeManager } from './NodeManager';
-import { DocTree, DocTreeResolver } from 'editor-core';
+import { DocTree } from 'editor-core';
 import { EventManager, Nil } from 'utils';
 import { registryEvents } from './events/events';
 import { Constants } from './Constants';
@@ -47,10 +47,6 @@ export class Editor {
         listenUserChangeSelection(this);
         listenSelectionToSetCursor(this);
         listenTextInput(this);
-        // listenContainerSizeChange(this);
-        // listenSelectionChangeToSetSelectedRegion(this);
-        // listenTextInput(this);
-        // listenUserPressKey(this);
 
         this.docTree.addEventListener('selection_change', sele => {
             console.log(sele);
@@ -65,12 +61,6 @@ export class Editor {
         this.eventManager.triggleEvent(Constants.events.DOC_TREE_ROOT_SETED);
         this.viewLines.innerHTML = '';
         this.docTree.render();
-    }
-
-    updateSize() {
-        // const containerInfo = Utils.getElementInfo(this.container);
-        // Utils.setStyle(this.viewLines, { width: containerInfo.innerWidth });
-        // this.render(this.data);
     }
 
     regisSetCursorPositionBehavior(nodeType: string, behavior: CursorPositionBehavior) {
