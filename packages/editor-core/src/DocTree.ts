@@ -1,6 +1,6 @@
 import { Selection, Point } from "./Selection";
 import { Node } from './Node';
-import { SetSelectionBehavior, Renderer, TextInputBehavior, EventTypes, BackSpaceBehavior, TypeSettingBehavior, EmptyOrgnizerNodeRnderBehavior, NodeCreator } from "./behaviorTypes";
+import { Renderer, TextInputBehavior, EventTypes, BackSpaceBehavior, TypeSettingBehavior, EmptyOrgnizerNodeRnderBehavior, NodeCreator } from "./behaviorTypes";
 import { Nil, ct, MapObj } from "utils";
 import { DocTreeResolver } from "./DocTreeResolver";
 
@@ -81,10 +81,6 @@ export class DocTree {
             this.regisdEvents.set(name, events);
         }
         events.push(listener);
-    }
-
-    regisSetSelectionBehavior<T>(nodeType: string, behavior: SetSelectionBehavior) {
-        this.setSelectionBehaviorSet.set(nodeType, behavior);
     }
 
     regisRenderer(nodeType: string, renderer: Renderer) {

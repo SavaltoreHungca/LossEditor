@@ -8,6 +8,15 @@ export type SetCursorPositionResult = {
     height: number,
 }
 
+export type SetSelectionResult = {
+    pointType: 'start' | 'end'
+    offset: number
+}
+
+export interface SetSelectionBehavior {
+    (node: Node): SetSelectionResult | undefined
+}
+
 export interface CursorPositionBehavior {
     (element: DocNode, offset: number, editor: Editor): SetCursorPositionResult | undefined
 }

@@ -1,6 +1,6 @@
 import { NodeManager } from './NodeManager';
-import { DocTree } from 'editor-core';
-import { EventManager, Nil } from 'utils';
+import { DocTree, Selection } from 'editor-core';
+import { EventManager, Nil, DragState } from 'utils';
 import { registryEvents } from './events/events';
 import { Constants } from './Constants';
 import { listenUserChangeSelection, listenSelectionToSetCursor } from './selection/selectionListener';
@@ -13,7 +13,7 @@ import { Container } from './elements/Container';
 import { regisStyleSheet } from './styleClassSheet';
 import { Settings, SettingRecevier } from './Settings';
 import { creEle } from './elements/elementTypes';
-import { CursorPositionBehavior, KeyDownBehavior } from './behaviorTypes';
+import { CursorPositionBehavior, KeyDownBehavior, SetSelectionBehavior } from './behaviorTypes';
 import { nodeCreator } from './elements/nodeTypes';
 
 
@@ -28,9 +28,12 @@ export class Editor {
     settings: Settings = new Settings();
     eventManager = new EventManager();
     setCursorPositionBehaviorSet = new Map<string, CursorPositionBehavior>();
+    setSelectionWhenClickBehaviorSet = new Map<string, SetSelectionBehavior>();
     keyDownBehaviorSet = new Map<string, KeyDownBehavior>();
     docTree: DocTree = new DocTree(nodeCreator);
     uiMap: NodeManager;
+    tmpSelection: Selection = Nil;
+    whenClick: DragState = Nil;
 
     constructor(settings: SettingRecevier) {
         for (const name in settings) this.settings[name] = settings[name];

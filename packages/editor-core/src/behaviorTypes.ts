@@ -2,15 +2,6 @@ import { Node } from './Node';
 import { Point, Selection } from './Selection';
 import { MapObj } from 'utils';
 
-export type SetSelectionResult = {
-    pointType: 'start' | 'end'
-    offset: number
-}
-
-export interface SetSelectionBehavior {
-    (node: Node, data: any): SetSelectionResult | undefined
-}
-
 export interface Renderer {
     (parent: Node | undefined, node: Node): void
 }
