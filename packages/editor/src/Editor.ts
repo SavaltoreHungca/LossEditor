@@ -3,7 +3,7 @@ import { DocTree, Selection } from 'editor-core';
 import { EventManager, Nil, DragState } from 'utils';
 import { registryEvents } from './events/events';
 import { Constants } from './Constants';
-import { listenUserChangeSelection, listenSelectionToSetCursor } from './selection/selectionListener';
+import { listenUserClick, listenSelectionToSetCursor } from './selection/selectionListener';
 import { listenTextInput } from './textinput/listenTextInput';
 import { Cursor } from './elements/Cursor';
 import { ViewLines } from './elements/ViewLines';
@@ -47,7 +47,7 @@ export class Editor {
         this.eventManager.triggleEvent(Constants.events.CONTAINER_SETED);
         this.eventManager.triggleEvent(Constants.events.DOC_TREE_CREATED);
 
-        listenUserChangeSelection(this);
+        listenUserClick(this);
         listenSelectionToSetCursor(this);
         listenTextInput(this);
 
@@ -68,6 +68,10 @@ export class Editor {
 
     regisSetCursorPositionBehavior(nodeType: string, behavior: CursorPositionBehavior) {
         this.setCursorPositionBehaviorSet.set(nodeType, behavior);
+    }
+
+    regisSetSelectionWhenClickBehaviorSet(nodeType: string, behavior: SetSelectionBehavior){
+        this.setSelectionWhenClickBehaviorSet.set(nodeType, behavior);
     }
 
     regisKeyDownBehavior(nodeType: string, behavior: KeyDownBehavior) {

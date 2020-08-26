@@ -1,25 +1,21 @@
 import { Constants } from './Constants';
-import { EventManager } from 'event-driven';
-import { createElement, Element, wrapElement, NodeListElement, EditorFrameElement, SidePadElement } from './Element';
-import { registryEvents } from './events';
+import { registryEvents } from './events/events';
+import { EventManager, Nil } from 'utils';
+import { creEle } from './elements/elementTypes';
+import { Container } from './elements/Container';
+import { LeftSidePad } from './elements/LeftSidePad';
+import { RightSidePad } from './elements/RightSidePad';
 
-export interface Elements {
-    container?: Element;
-    sidPad?: SidePadElement;
-    editorFrame?: EditorFrameElement;
-    nodeList?: NodeListElement;
-    functionMenu?: Element;
-}
 
 export class MemLoss {
     eventManager: EventManager = new EventManager();
-    elements: Elements = {};
+    
+    container: Container = Nil;
+    leftSidePad: LeftSidePad = Nil;
+    rightSidePad: RightSidePad = Nil;
 
     constructor(container: HTMLElement) {
         registryEvents(this);
-        this.elements = {
-            container: wrapElement(this, container, 'container'),
-        }
-        this.eventManager.triggleEvent(Constants.events.ELEMENTS_BUILD_FINISH);
+        this.container = creEle(this, 'container', container);
     }
 }

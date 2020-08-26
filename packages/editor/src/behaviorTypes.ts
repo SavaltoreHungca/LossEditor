@@ -1,6 +1,7 @@
 import { DocNode } from "./elements/DocNode";
 import { Editor } from ".";
-import { Selection } from "editor-core";
+import { Selection, Node } from "editor-core";
+
 
 export type SetCursorPositionResult = {
     left: number,

@@ -19,7 +19,7 @@ export class DocTree {
     emptyOrgnizerNodeRnderBehaviorSet = new Map<string, EmptyOrgnizerNodeRnderBehavior>();
     nodeCreator: NodeCreator;
 
-    constructor(nodeCreator: NodeCreator){
+    constructor(nodeCreator: NodeCreator) {
         this.nodeCreator = nodeCreator;
     }
 
@@ -128,7 +128,7 @@ export class DocTree {
             this.triggleEvent('selection_change', event => event(this.selection));
         }
     }
-
+    
     textInput(text: string) {
         if (!this.selection) return;
         if (!this.selection.end) return;

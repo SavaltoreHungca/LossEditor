@@ -1,12 +1,12 @@
-import { NodeList } from "../renderNodeList";
 import { FakeRequest as Repository } from './FakeRequest';
+import { NodeCategory } from "./transferTypes";
 
 export interface CallBack<T> {
-    (status: "processing" | "ok" | 'failed', data?: T): void
+    (status: "processing" | "ok" | 'failed', data: T): void
 }
 
 export interface Request {
-    getNodeList(callback: CallBack<NodeList>): void;
+    getNodeList(callback: CallBack<NodeCategory>): void;
     getNodeContent(id: string, callback: CallBack<any>): void; 
 }
 

@@ -1,16 +1,20 @@
+import { Editor } from './../Editor';
 import { DragState } from "utils";
-import { SetSelectionResult } from "editor-core";
 import { getNodeFromChild } from "../utils";
 import { Node } from 'editor-core';
+import { SetSelectionResult } from "../behaviorTypes";
 
-export function sentinelSelectionBehavior(node: Node, e: DragState) {
-    const ans: SetSelectionResult = {
-        pointType: 'end',
-        offset: 0
-    };
-
-    if (e.pressed && !e.registered) {
-        ans.pointType = 'start'
+export function sentinelSelectionBehaviorFactory(editor: Editor) {
+    const e = editor.whenClick;
+    return (node: Node)=>{
+        const ans: SetSelectionResult = {
+            pointType: 'end',
+            offset: 0
+        };
+    
+        if (e.pressed && !e.registered) {
+            ans.pointType = 'start'
+        }
+        return ans;
     }
-    return ans;
 }

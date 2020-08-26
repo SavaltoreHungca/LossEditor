@@ -1,16 +1,37 @@
 import { DragState, $$, ct } from "utils";
 import { getType, getDocNodeFromChild } from "../utils";
 import { Editor } from "../Editor";
-import { Point } from "editor-core";
+import { Point, Selection } from "editor-core";
 
-export function listenUserChangeSelection(editor: Editor) {
+export function listenUserClick(editor: Editor) {
     $$.addDragEvent(editor.viewLines, (e: DragState) => {
         if (!e.event?.target) return;
 
         const srcElement: HTMLElement = ct(e.event.target);
-        const node = getDocNodeFromChild(srcElement);
-        if(node){
-            editor.docTree.setSelection(editor.uiMap.getNode(node), e);
+        const docNode = getDocNodeFromChild(srcElement);
+        if (docNode) {
+            const node = editor.uiMap.getNode(docNode);
+            const behavior = editor.setSelectionWhenClickBehaviorSet.get(node.type);
+            if (behavior) {
+                const rlt = behavior(node);
+                if(!rlt) return;
+                if(rlt.pointType === 'start'){
+                    editor.tmpSelection = new Selection({
+                        node: node,
+                        offset: rlt.offset
+                    });
+                }
+                else if(rlt.pointType === 'end' && editor.tmpSelection){
+                    editor.tmpSelection.end = {
+                        node: node,
+                        offset: rlt.offset
+                    }
+                    editor.docTree.changeSelection(ct(editor.tmpSelection.start), editor.tmpSelection.end);
+                }
+            }
+            else {
+                throw new Error(`${node.type}的鼠标点击改变selection的行为未设置`);
+            }
         }
     })
 }

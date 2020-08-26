@@ -1,29 +1,33 @@
+import { Editor } from './../Editor';
 import { DragState, $$, ct } from "utils";
-import { SetSelectionResult } from "editor-core";
 import { getNodeFromChild, getType } from "../utils";
 import { Constants } from "../Constants";
 import { Node } from 'editor-core';
 import { ParagraphContext } from '../elements/ParagraphContext';
 import { Text } from '../elements/Text';
 import { UnitBlock } from '../elements/UnitBlock';
+import { SetSelectionResult } from "../behaviorTypes";
 
-export function paragraphSelectionBehavior(node: Node, e: DragState) {
-    const ans: SetSelectionResult = {
-        pointType: 'end',
-        offset: 0
-    };
-
-    const srcElement: ParagraphContext = ct(getNodeFromChild(ct(e.event?.target)));
-
-    if (e.pressed && !e.registered) {
-        ans.pointType = 'start'
+export function paragraphSelectionBehaviorFactory(editor: Editor) {
+    const e = editor.whenClick;
+    return (node: Node)=>{
+        const ans: SetSelectionResult = {
+            pointType: 'end',
+            offset: 0
+        };
+    
+        const srcElement: ParagraphContext = ct(getNodeFromChild(ct(e.event?.target)));
+    
+        if (e.pressed && !e.registered) {
+            ans.pointType = 'start'
+        }
+        const offset = getMouseOffsetInElement(srcElement, <MouseEvent>e.event);
+        if (typeof offset === 'undefined') {
+            return undefined;
+        }
+        ans.offset = offset;
+        return ans;
     }
-    const offset = getMouseOffsetInElement(srcElement, <MouseEvent>e.event);
-    if (typeof offset === 'undefined') {
-        return undefined;
-    }
-    ans.offset = offset;
-    return ans;
 }
 
 
