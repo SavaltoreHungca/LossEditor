@@ -1,5 +1,6 @@
 import { Editor } from 'editor';
 import { ScrollPage } from 'scroll-page';
+import { MemLoss } from 'client';
 import { innerHtml, $$, $ } from 'utils'
 
 export function render(container) {
@@ -23,31 +24,32 @@ export function render(container) {
                 <div style="width: 1000px; height: 1000px">
                 </div>
             </div>
-            <div id="${idset.mem}"></div>
+            <div id="${idset.mem}" style="width: 500px; height: 500px"></div>
         </div>
     `)
 
-    new Editor({
-        container: $(idset.editor),
-        document: {
-            type: 'root',
-            sentinelAct: {
-                placeholder: 'type something in here',
-                style: {
-                    color: 'grey'
-                }
-            },
-            children: [{
-                type: 'paragraph',
-                content: {
-                    str: '如果说你是海上的花火,我是兰花的泡沫,这一刻你照亮了我'
-                }
-            }]
-        }
-    });
-    new ScrollPage({
-        container: $(idset.sp),
-        containerHeight: 300,
-        containerWidth: 300
-    });
+    // new Editor({
+    //     container: $(idset.editor),
+    //     document: {
+    //         type: 'root',
+    //         sentinelAct: {
+    //             placeholder: 'type something in here',
+    //             style: {
+    //                 color: 'grey'
+    //             }
+    //         },
+    //         children: [{
+    //             type: 'paragraph',
+    //             content: {
+    //                 str: '如果说你是海上的花火,我是兰花的泡沫,这一刻你照亮了我'
+    //             }
+    //         }]
+    //     }
+    // });
+    // new ScrollPage({
+    //     container: $(idset.sp),
+    //     containerHeight: 300,
+    //     containerWidth: 300
+    // });
+    new MemLoss($(idset.mem));
 }

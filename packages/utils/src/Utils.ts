@@ -168,6 +168,7 @@ export class $$ {
         if (cssText) {
             const styles = cssText.split(';').filter(Boolean);
             for (const style of styles) {
+                if(style.trim() === '') continue;
                 const [name, value] = style.split(':');
                 ans[name.trim()] = value.trim();
             }

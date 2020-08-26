@@ -28,9 +28,9 @@ export function containerExt(memloss: MemLoss) {
             </div>
         `);
 
-        memloss.leftSidePad = creEle(memloss, 'leftSidePad', $(idSet.leftSidePadId));
         memloss.rightSidePad = creEle(memloss, 'rightSidePad', $(idSet.rightSidePadId));
-
+        memloss.leftSidePad = creEle(memloss, 'leftSidePad', $(idSet.leftSidePadId));
+        
         return {};
     }
 }

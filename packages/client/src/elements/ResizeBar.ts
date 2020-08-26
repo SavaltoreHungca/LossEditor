@@ -7,9 +7,8 @@ export interface ResizeBar extends Element {
 
 export function resizeBarExt(memloss: MemLoss){
     return (resizeBar: Element) => {
-        const {leftSidePad, rightSidePad} = memloss;
-
         $$.addDragEvent(resizeBar, (e: DragState) => {
+            const {leftSidePad, rightSidePad} = memloss;
             // nodeList.scrollPage.settings
             const sidPadInfo = leftSidePad.getInfo();
             const editorFrameInfo = rightSidePad.getInfo();
@@ -17,7 +16,7 @@ export function resizeBarExt(memloss: MemLoss){
             leftSidePad.setWidth(sidPadInfo.width + e.deltaX);
             rightSidePad.setWidth(editorFrameInfo.width - e.deltaX);
         })
-        
+
         return {};
     }
 }
