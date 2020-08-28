@@ -8,21 +8,25 @@ import { ScrollPage } from "scroll-page";
 
 
 export interface NodeListPad extends Element {
-    renderNodeList: (nodeList: NodeList) => void
+    renderNodeList: (nodeList: NodeCategory) => void
+    updateSize: () => void
 }
 
 
 export function nodeListPadExt(memLoss: MemLoss) {
-    return (nodeList: Element) => {
+    return (nodeListPad: Element) => {
         const idSet = {
             newPageButton: $$.randmonId(),
             nodeListPane: $$.randmonId(),
             nodeListContent: $$.randmonId(),
+            spContainer: $$.randmonId(),
         }
 
-        innerHtml(nodeList, `
+        innerHtml(nodeListPad, `
             <div id="${idSet.nodeListPane}" style="flex-grow: 1; overflow: hidden">
-                <div id="${idSet.nodeListContent}"></div>
+                <div id="${idSet.spContainer}">
+                    <div id="${idSet.nodeListContent}"></div>
+                </div>
             </div>
             <div class="background-change-selected"
                 style="height: 45px; cursor: pointer; box-shadow: rgba(55, 53, 47, 0.09) 0px -1px 0px;display: flex; align-items: center; min-height: 27px; font-size: 14px; width: 100%; color: rgba(55, 53, 47, 0.6); height: 45px;">
@@ -38,24 +42,29 @@ export function nodeListPadExt(memLoss: MemLoss) {
         `)
 
         const scrollPage = new ScrollPage({
-            container: $(idSet.nodeListPane),
+            container: $(idSet.spContainer),
             rightScrollBarWidth: 5,
             showRightShallow: false,
             hiddenRightScrollBar: true,
-            hiddenBottomScrollBar: true
+            hiddenBottomScrollBar: true,
+            containerWidth: '100%',
+            containerHeight: '100%',
         })
 
         return {
-            renderNodeList: (category: NodeCategory) => {
+            renderNodeList: function (category: NodeCategory){
                 $(idSet.nodeListContent).innerHTML = '';
                 for (let node of category) {
                     const item = creEle(memLoss, 'nodeItem');
                     item.render(node, 1);
                     $(idSet.nodeListContent).appendChild(item);
                 }
-                scrollPage.updatePageSize();
+                this.updateSize()
+            },
+            updateSize: () => {
+                scrollPage.containerSizeFollowOuter();
+                scrollPage.contentWidthFollowContainer();
             }
-
         }
     }
 

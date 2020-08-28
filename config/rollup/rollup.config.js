@@ -182,7 +182,7 @@ function configure(pkg, env, target) {
                 {
                     file: `packages/${pkg.name}/${pkg.module}`,
                     format: 'es',
-                    sourcemap: true,
+                    // sourcemap: true,
                 }
             ],
             // We need to explicitly state which modules are external, meaning that

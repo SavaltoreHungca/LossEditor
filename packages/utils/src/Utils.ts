@@ -129,6 +129,7 @@ export class $$ {
             switch (name) {
                 case 'top': case 'left': case 'bottom': case 'right': case 'width': case 'height':
                 case 'padding': case 'padding-left': case 'padding-top': case 'padding-right': case 'padding-bottom':
+                case 'min-width': case 'max-width': case 'min-height': case 'max-height':
                     if (typeof style[name] === 'number') {
                         style[name] = style[name] + 'px';
                     }

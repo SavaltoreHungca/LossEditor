@@ -14,6 +14,10 @@ export interface LeftSidePad extends Element {
 
 export function leftSidePadExt(memloss: MemLoss) {
     return (leftSidePad: Element) => {
+        leftSidePad.setStyle({
+            'min-width': memloss.settings.leftSidePadMinWidth
+        })
+
         const idSet = {
             resizeBar: $$.randmonId(),
             functionMenu: $$.randmonId(),
@@ -28,10 +32,12 @@ export function leftSidePadExt(memloss: MemLoss) {
             <div id="${idSet.nodeListPad}" style="flex-grow: 1; width: 100%; display: flex; flex-direction: column;"></div>
         `)
 
-        return {
+        const ext = {
             resizeBar: creEle(memloss, 'resizeBar', $(idSet.resizeBar)),
             functionMenu: creEle(memloss, 'functionMenu', $(idSet.functionMenu)),
             nodeListPad: creEle(memloss, 'nodeListPad', $(idSet.nodeListPad)),
         };
+
+        return ext;
     }
 }

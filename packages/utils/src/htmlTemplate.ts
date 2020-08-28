@@ -1,6 +1,7 @@
 import { $$ } from "./Utils";
 
-export function innerHtml(ele: HTMLElement, str: string) {
+export function innerHtml(ele: HTMLElement, str: string, clearBefore?: boolean) {
+    if(clearBefore) ele.innerHTML = '';
     str = str.trim();
 
     const stack = new Array<Node>();

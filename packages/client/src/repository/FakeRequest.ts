@@ -18,20 +18,35 @@ export class FakeRequest implements Request {
     }
 }
 
-const nodelist = [
-    {
-        title: '我的笔记',
-        id: $$.randmonId(),
-        tag: '临时',
-        children: [
-            {
-                title: '读书随记',
-                id: $$.randmonId(),
-                tag: '随记'
-            }
-        ]
-    }
-]
+const nodeitem = {
+    title: '我的笔记',
+    id: $$.randmonId(),
+    tag: '临时',
+    children: [
+        {
+            title: '读书随记',
+            id: $$.randmonId(),
+            tag: '随记',
+            children: [
+                {
+                    title: '读书随记',
+                    id: $$.randmonId(),
+                    tag: '随记'
+                }
+            ]
+        },
+        {
+            title: '读书随记',
+            id: $$.randmonId(),
+            tag: '随记'
+        }
+    ]
+}
+const nodelist: any = [];
+for(let i = 0; i< 100; i++){
+    nodelist.push(nodeitem);
+}
+
 const editorcontent = {
     type: 'root',
     sentinelAct: {

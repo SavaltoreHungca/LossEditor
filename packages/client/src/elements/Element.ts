@@ -2,8 +2,6 @@ import { MemLoss } from "../MemLoss";
 import { $$, ElementInfo } from 'utils';
 import { ElementTypsMap } from "./elementTypes";
 
-const bindDataSetName = $$.randmonId();
-
 export interface Element extends HTMLElement {
     set(name: string, data: any): void;
     get(name: string): any;
@@ -20,6 +18,9 @@ export interface Element extends HTMLElement {
 export function elementExt<K extends keyof ElementTypsMap>(memloss: MemLoss, type: K){
     return (elmt: HTMLElement) => {
         elmt.setAttribute('data-mem-loss-type', type);
+
+        const bindDataSetName = $$.randmonId();
+        elmt[bindDataSetName] = {};
 
         return {
             set: function (name: string, data: any) {

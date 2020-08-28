@@ -29,17 +29,18 @@ export function nodeItemExt(memloss: MemLoss) {
                 nodeItem.set('opend', false);
                 const onsubopen = (self: HTMLElement) => {
                     if (nodeItem.get('opend')) {
-                        innerHtml(self, '<i class="fa fa-caret-right fa-1x" aria-hidden="true"></i>')
+                        innerHtml(self, '<i class="fa fa-caret-right fa-1x" aria-hidden="true"></i>', true)
                         nodeItem.set('opend', false);
                         $(idset.children).innerHTML = '';
                     } else {
-                        innerHtml(self, '<i class="fa fa-caret-down fa-1x" aria-hidden="true"></i>')
+                        innerHtml(self, '<i class="fa fa-caret-down fa-1x" aria-hidden="true"></i>', true)
                         for (let child of node.children || []) {
                             const item = creEle(memloss, 'nodeItem');
                             item.render(child, level + 1);
                             $(idset.children).appendChild(item);
                         }
                         nodeItem.set('opend', true);
+                        memloss.leftSidePad.nodeListPad.updateSize();
                     }
                 }
 
@@ -58,7 +59,7 @@ export function nodeItemExt(memloss: MemLoss) {
                             <span onclick="${$$.anonyFunction(onopeneditor)}(this)" class="text-underline-selected" style="display: inline-block; position: relative">${node.title}</span>
                         </div>
                     </div>
-                    <div id="${idset.children}"/>
+                    <div id="${idset.children}"></div>
                 `)
             }
 

@@ -8,7 +8,7 @@ export function pageExt(sp: ScrollPage) {
         ele.addEventListener('scroll', (e: Event)=> {
             ele.scrollLeft = 0;
             ele.scrollTop = 0;
-            sp.updatePageSize();
+            sp.pageSizeFollowContent();
         })
 
         return {

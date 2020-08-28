@@ -80,10 +80,11 @@ export class ScrollPage {
             const parentInfo = $$.getElementInfo(containerParent);
             container.setWidth(parentInfo.innerWidth);
             container.setHeight(parentInfo.innerHeight);
+            this.pageSizeFollowContent();
         }
     }
 
-    updatePageSize() {
+    pageSizeFollowContent() {
         const { content, page } = this.elements;
         const contentInfo = content.getInfo();
         page.setWidth(contentInfo.width);
@@ -103,6 +104,7 @@ export class ScrollPage {
             if (containerInfo.innerWidth !== content.getInfo().width) {
                 throw new Error("cant't set content width follow container");
             }
+            this.pageSizeFollowContent();
         }
     }
 
@@ -118,6 +120,7 @@ export class ScrollPage {
             if (containerInfo.innerHeight !== content.getInfo().height) {
                 throw new Error("cant't set content height follow container");
             }
+            this.pageSizeFollowContent();
         }
     }
 }

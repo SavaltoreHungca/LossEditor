@@ -70,6 +70,6 @@ export function assembleElementsAndInitializeUi(sp: ScrollPage) {
             }
 
             // sp.updateContainerSize();
-            sp.updatePageSize();
+            sp.pageSizeFollowContent();
         })
 }

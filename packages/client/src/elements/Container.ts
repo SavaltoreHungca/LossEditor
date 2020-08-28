@@ -11,8 +11,16 @@ export function containerExt(memloss: MemLoss) {
     return (container: Element) => {
         container.setStyle({
             display: 'flex',
-            'user-select': 'none'
+            'user-select': 'none',
+            position: 'fixed',
+            width: '100vw',
+            height: '100vh',
+            top: 0,
+            left: 0
         });
+        container.onwheel = function(event: MouseWheelEvent){
+            event.preventDefault();
+        }
 
         const idSet = {
             leftSidePadId: $$.randmonId(),

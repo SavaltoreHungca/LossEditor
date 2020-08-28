@@ -8,6 +8,7 @@ import { FunctionMenu, functionMenuExt } from './FunctionMenu';
 import { NodeListPad, nodeListPadExt } from './NodeListPad';
 import { ResizeBar, resizeBarExt } from './ResizeBar';
 import { NodeItem, nodeItemExt } from './NodeItem';
+import { NotePad, notePadExt } from './NotePad';
 
 export type ElementTypsMap = {
     container: Container
@@ -17,6 +18,7 @@ export type ElementTypsMap = {
     nodeListPad: NodeListPad
     resizeBar: ResizeBar
     nodeItem: NodeItem
+    notePad: NotePad
 }
 
 export function creEle<K extends keyof ElementTypsMap>(memloss: MemLoss, type: K, ele?: HTMLElement): ElementTypsMap[K] {
@@ -43,6 +45,10 @@ export function creEle<K extends keyof ElementTypsMap>(memloss: MemLoss, type: K
         case 'nodeItem':
             if(!ele) element = $$.creEle('block');
             return extend(element, [elementExt(memloss, type), nodeItemExt(memloss)]);
+
+        case 'notePad':
+            if(!ele) element = $$.creEle('block');
+            return extend(element, [elementExt(memloss, type), notePadExt(memloss)]);
     }
     throw new Error();
 }

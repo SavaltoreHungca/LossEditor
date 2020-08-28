@@ -5,6 +5,7 @@ import { creEle } from './elements/elementTypes';
 import { Container } from './elements/Container';
 import { LeftSidePad } from './elements/LeftSidePad';
 import { RightSidePad } from './elements/RightSidePad';
+import { SettingReceiver, Settings } from './Settings';
 
 
 export class MemLoss {
@@ -14,8 +15,14 @@ export class MemLoss {
     leftSidePad: LeftSidePad = Nil;
     rightSidePad: RightSidePad = Nil;
 
-    constructor(container: HTMLElement) {
+    settings = new Settings();
+
+    constructor(settings: SettingReceiver) {
+        if (settings) for (let k in settings) this.settings[k] = settings[k];
+
         registryEvents(this);
-        this.container = creEle(this, 'container', container);
+        this.container = creEle(this, 'container', this.settings.container);
+
+        this.eventManager.triggleEvent(Constants.events.CONTAINER_SETED);
     }
 }

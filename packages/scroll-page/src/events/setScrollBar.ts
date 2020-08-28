@@ -12,6 +12,7 @@ export function setScrollBar(scrollPage: ScrollPage) {
         let { page, buttomScrollBar, buttomSlider, window } = scrollPage.elements;
 
         if (!scrollPage.settings.hiddenBottomScrollBar) {
+            buttomScrollBar.show()
             const pageInfo = page.getInfo();
             const buttomScrollBarInfo = buttomScrollBar.getInfo();
             const windowInfo = window.getInfo();
@@ -39,6 +40,7 @@ export function setScrollBar(scrollPage: ScrollPage) {
         let { page, rightScrollBar, rightSlider, window } = scrollPage.elements;
 
         if (!scrollPage.settings.hiddenRightScrollBar) {
+            rightScrollBar.show();
             const pageInfo = page.getInfo();
             const windowInfo = window.getInfo();
             const rightScrollBarInfo = rightScrollBar.getInfo();
