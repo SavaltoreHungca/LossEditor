@@ -30,12 +30,23 @@ declare type ElementsSet = {
 };
 
 export class ScrollPage {
-    eventManager: EventManager;
+    eventManager: EventManager = Nil;
     settings = new Settings();
-    elements: ElementsSet
+    elements: ElementsSet = Nil;
+    initialized = false
 
     constructor(settings: SettingReceiver) {
+        for (let k in settings) this.settings[k] = settings[k];
+        if(!this.settings.lazyInit){
+            this.init(settings);
+        }
+    }
+
+    init(settings?: SettingReceiver){
         if (settings) for (let k in settings) this.settings[k] = settings[k];
+        if(this.initialized){
+            return;
+        }
 
         if(!this.settings.container && !this.settings.content) throw new Error("内容和容器必须传入一个");
         if(!this.settings.content && !ct<HTMLElement>(this.settings.container).firstElementChild) throw new Error("指定了容器, 但是容器内容为空");
@@ -70,6 +81,8 @@ export class ScrollPage {
             container.appendChild(this.elements.content);
         }
         this.eventManager.triggleEvent(Constants.events.ELEMENTS_CREATED);
+
+        this.initialized = true;
     }
 
     containerSizeFollowOuter() {

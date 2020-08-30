@@ -4,7 +4,7 @@ import { repository } from '../repository/Request';
 
 
 export function initializeData(memloss: MemLoss) {
-    memloss.eventManager.bindEventOn(Constants.events.CONTAINER_SETED, () => {
+    memloss.eventManager.bindEventOn(Constants.events.UI_INITIALIZED, () => {
         const { leftSidePad } = memloss
 
         repository.getNodeList((status, data) => {

@@ -23,6 +23,6 @@ export class MemLoss {
         registryEvents(this);
         this.container = creEle(this, 'container', this.settings.container);
 
-        this.eventManager.triggleEvent(Constants.events.CONTAINER_SETED);
+        this.eventManager.triggleEvent(Constants.events.UI_INITIALIZED);
     }
 }

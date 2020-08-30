@@ -1,5 +1,6 @@
 
 export class Settings implements SettingReceiver {
+    lazyInit = false
     content: undefined
     container: undefined
     containerWidth = 300
@@ -15,6 +16,7 @@ export class Settings implements SettingReceiver {
 }
 
 export interface SettingReceiver {
+    lazyInit?: boolean
     content?: HTMLElement
     container?: HTMLElement
     containerHeight?: number | string
