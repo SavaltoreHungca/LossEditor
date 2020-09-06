@@ -1,18 +1,3 @@
-.hover-show {
-    opacity: 0;
-}
-
-.hover-show:hover {
-    opacity: 1;
-}
-
-.background-change-selected {
-    transition: background 120ms ease-in 0s;
-}
-
-.background-change-selected:hover {
-    background: rgba(55, 53, 47, 0.08);
-}
 
 .text-underline-selected:hover {
     text-decoration: underline;

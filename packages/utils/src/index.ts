@@ -8,3 +8,4 @@ export * from './stepper';
 export * from './ct';
 export * from './Nil';
 export * from './MapObj';
+export * from './mouseHover';

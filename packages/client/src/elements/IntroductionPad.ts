@@ -2,7 +2,7 @@ import { MemLoss } from './../MemLoss';
 import { Element } from "./Element";
 import { innerHtml, $$, $ } from 'utils';
 import { ScrollPage } from 'scroll-page';
-import { Pad } from './RightSidePad';
+import { Pad } from './elementTypes';
 
 export interface IntroductionPad extends Element, Pad {
 }

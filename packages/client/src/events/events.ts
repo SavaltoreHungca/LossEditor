@@ -1,9 +1,9 @@
 import { MemLoss } from "../MemLoss";
-import { initializeData } from "./initializeData";
 import { initializeRightPadContent } from "./initializeRightPadContent";
+import { initializeLeftPadContent } from './initializeLeftPadContent';
 
 export function registryEvents(memLoss: MemLoss) {
-    initializeData(memLoss);
+    initializeLeftPadContent(memLoss);
     initializeRightPadContent(memLoss);
 }
 

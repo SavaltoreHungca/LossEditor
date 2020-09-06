@@ -1,6 +1,7 @@
 import { MemLoss } from './../MemLoss';
 import { Element } from "./Element";
 import { $$, DragState } from 'utils';
+import { Constants } from '../Constants';
 
 export interface ResizeBar extends Element {
 }
@@ -26,7 +27,7 @@ export function resizeBarExt(memloss: MemLoss) {
             leftSidePad.setWidth(leftSidePadSize);
             rightSidePad.setWidth(rightSidePadSize);
 
-            leftSidePad.nodeListPad.updateSize();
+            memloss.eventManager.triggleEvent(Constants.events.RESIZBAR_RESIZING);
         })
 
         return {};

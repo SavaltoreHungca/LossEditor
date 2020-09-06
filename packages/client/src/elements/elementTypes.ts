@@ -1,3 +1,5 @@
+import { RssListPad, rssListPadExt } from './RssListPad';
+import { LeftDirectoryTree, leftDirectoryTreeExt } from './LeftDirectoryTree';
 import { Container, containerExt } from './Container';
 import { $$, ElementInfo, extend, Nil } from 'utils';
 import { MemLoss } from '../MemLoss';
@@ -10,6 +12,12 @@ import { ResizeBar, resizeBarExt } from './ResizeBar';
 import { NodeItem, nodeItemExt } from './NodeItem';
 import { NotePad, notePadExt } from './NotePad';
 import { IntroductionPad, introductionPadExt } from './IntroductionPad';
+import { NoteTab, noteTabExt } from './NoteTab';
+
+export interface Pad {
+    render(): void
+    disappear(): void
+}
 
 export type ElementTypsMap = {
     container: Container
@@ -21,6 +29,9 @@ export type ElementTypsMap = {
     nodeItem: NodeItem
     notePad: NotePad
     introductionPad: IntroductionPad
+    leftDirectoryTree: LeftDirectoryTree
+    rssListPad: RssListPad
+    noteTab: NoteTab
 }
 
 export function creEle<K extends keyof ElementTypsMap>(memloss: MemLoss, type: K, ele?: HTMLElement): ElementTypsMap[K] {
@@ -44,6 +55,7 @@ export function creEle<K extends keyof ElementTypsMap>(memloss: MemLoss, type: K
             break;
 
         case 'nodeListPad':
+            if (!ele) element = $$.creEle('block');
             ans = extend(element, [elementExt(memloss, type), nodeListPadExt(memloss)]);
             break;
 
@@ -63,7 +75,21 @@ export function creEle<K extends keyof ElementTypsMap>(memloss: MemLoss, type: K
 
         case 'introductionPad':
             if (!ele) element = $$.creEle('block');
-            ans =  extend(element, [elementExt(memloss, type), introductionPadExt(memloss)]);
+            ans = extend(element, [elementExt(memloss, type), introductionPadExt(memloss)]);
+            break;
+
+        case 'leftDirectoryTree':
+            ans = extend(element, [elementExt(memloss, type), leftDirectoryTreeExt(memloss)]);
+            break;
+
+        case 'rssListPad':
+            if (!ele) element = $$.creEle('block');
+            ans = extend(element, [elementExt(memloss, type), rssListPadExt(memloss)]);
+            break;
+
+        case 'noteTab':
+            if (!ele) element = $$.creEle('inline');
+            ans = extend(element, [elementExt(memloss, type), noteTabExt(memloss)]);
             break;
     }
     return ans;

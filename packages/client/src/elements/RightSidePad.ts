@@ -1,16 +1,11 @@
 import { MemLoss } from './../MemLoss';
 import { Element } from "./Element";
 import { NotePad } from './NotePad';
-import { creEle } from './elementTypes';
+import { creEle, Pad } from './elementTypes';
 import { ct } from 'utils';
 import { IntroductionPad } from './IntroductionPad';
 
-export interface Pad {
-    render(): void
-    disappear(): void
-}
-
-export interface PadTypsMap {
+interface PadTypsMap {
     notePad: NotePad
     introductionPad: IntroductionPad
 }
@@ -37,6 +32,7 @@ export function rightSidePadExt(memloss: MemLoss) {
             introductionPad: creEle(memloss, 'introductionPad')
         };
 
+        memloss.notePad = ext.notePad;
         rightSidePad.appendChild(ext.notePad);
         rightSidePad.appendChild(ext.introductionPad);
 

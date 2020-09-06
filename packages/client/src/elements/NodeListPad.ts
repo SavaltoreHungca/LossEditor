@@ -2,12 +2,15 @@ import { MemLoss } from "../MemLoss";
 import { Element } from "./Element";
 import { innerHtml, $$, $ } from "utils";
 import { NodeCategory } from "../repository/transferTypes";
-import { creEle } from "./elementTypes";
+import { creEle, Pad } from "./elementTypes";
 import { ScrollPage } from "scroll-page";
+import { repository } from "../repository/Request";
+import { Constants } from "../Constants";
+import { classes } from "../styleClassSheet";
 
 
 
-export interface NodeListPad extends Element {
+export interface NodeListPad extends Element, Pad {
     renderNodeList: (nodeList: NodeCategory) => void
     updateSize: () => void
 }
@@ -15,6 +18,16 @@ export interface NodeListPad extends Element {
 
 export function nodeListPadExt(memLoss: MemLoss) {
     return (nodeListPad: Element) => {
+        nodeListPad.setStyle({
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            'flex-direction': 'column',
+        });
+
+        let shown = false;
+        let initialized = false;
+
         const idSet = {
             newPageButton: $$.randmonId(),
             nodeListPane: $$.randmonId(),
@@ -28,7 +41,7 @@ export function nodeListPadExt(memLoss: MemLoss) {
                     <div id="${idSet.nodeListContent}"></div>
                 </div>
             </div>
-            <div class="background-change-selected"
+            <div class="${classes.backChSelectd}"
                 style="height: 45px; cursor: pointer; box-shadow: rgba(55, 53, 47, 0.09) 0px -1px 0px;display: flex; align-items: center; min-height: 27px; font-size: 14px; width: 100%; color: rgba(55, 53, 47, 0.6); height: 45px;">
                 <div
                     style="flex-shrink: 0; flex-grow: 0; border-radius: 3px; color: rgba(55, 53, 47, 0.6); width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; margin-right: 4px;">
@@ -42,7 +55,7 @@ export function nodeListPadExt(memLoss: MemLoss) {
         `)
 
         const scrollPage = new ScrollPage({
-            container: $(idSet.spContainer),
+            lazyInit: true,
             rightScrollBarWidth: 5,
             showRightShallow: false,
             hiddenRightScrollBar: true,
@@ -51,8 +64,29 @@ export function nodeListPadExt(memLoss: MemLoss) {
             containerHeight: '100%',
         })
 
-        return {
-            renderNodeList: function (category: NodeCategory){
+        const ext = {
+            render: function () {
+                shown = true;
+                nodeListPad.setStyle({ display: 'flex' })
+                scrollPage.init({ container: $(idSet.spContainer) });
+                if (!initialized) repository.getNodeList((status, data) => {
+                    switch (status) {
+                        case 'processing':
+                            break;
+                        case 'ok':
+                            this.renderNodeList(data);
+                            initialized = true;
+                            break;
+                        case 'failed':
+                            break;
+                    }
+                });
+            },
+            disappear: function () {
+                shown = false;
+                nodeListPad.setStyle({ display: 'none' })
+            },
+            renderNodeList: function (category: NodeCategory) {
                 $(idSet.nodeListContent).innerHTML = '';
                 for (let node of category) {
                     const item = creEle(memLoss, 'nodeItem');
@@ -66,6 +100,14 @@ export function nodeListPadExt(memLoss: MemLoss) {
                 scrollPage.contentWidthFollowContainer();
             }
         }
+
+        memLoss.eventManager.bindEventOn(Constants.events.RESIZBAR_RESIZING, () => {
+            if (shown) {
+                ext.updateSize();
+            }
+        });
+
+        return ext;
     }
 
 }

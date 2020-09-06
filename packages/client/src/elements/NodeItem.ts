@@ -3,6 +3,7 @@ import { MemLoss } from '../MemLoss';
 import { innerHtml, $$, $ } from 'utils';
 import { Node } from '../repository/transferTypes';
 import { creEle } from './elementTypes';
+import { classes } from '../styleClassSheet';
 
 export interface NodeItem extends Element {
     render: (node: Node, level: number) => void
@@ -40,23 +41,23 @@ export function nodeItemExt(memloss: MemLoss) {
                             $(idset.children).appendChild(item);
                         }
                         nodeItem.set('opend', true);
-                        memloss.leftSidePad.nodeListPad.updateSize();
+                        memloss.nodeListPad.updateSize();
                     }
                 }
 
                 innerHtml(nodeItem, `
-                    <div id="${idset.titlebar}" class="background-change-selected" style="position: relative; display: block;">
+                    <div id="${idset.titlebar}" class="${classes.backChSelectd}" style="position: relative; display: block;">
                         <div style="padding-left: ${14 * level}px; overflow: hidden; text-overflow: ellipsis; min-width: 0; white-space: nowrap;">
                             <span style="display: inline-block; position: relative">
                                 <div 
-                                    class="background-change-selected"
+                                    class="${classes.backChSelectd}"
                                     style="user-select: none;transition: background 120ms ease-in 0s;cursor: pointer;display: flex;align-items: center;justify-content: center;width: 20px;height: 20px;border-radius: 3px;"
                                     onclick="${$$.anonyFunction(onsubopen)}(this)">
                                     <i class="fa fa-caret-right fa-1x" aria-hidden="true"></i>
                                 </div>
                             </span>
                             <span style="display: inline-block; position: relative">${node.tag}</span>
-                            <span onclick="${$$.anonyFunction(onopeneditor)}(this)" class="text-underline-selected" style="display: inline-block; position: relative">${node.title}</span>
+                            <span onclick="${$$.anonyFunction(onopeneditor)}(this)" class="${classes.textUnderLine}" style="display: inline-block; position: relative">${node.title}</span>
                         </div>
                     </div>
                     <div id="${idset.children}"></div>
@@ -87,7 +88,7 @@ export function nodeItemExt(memloss: MemLoss) {
 //             ['Rename', 'fa-pencil-square-o'],
 //         ].map(item => {
 //             return `
-//             <div class="background-change-selected" style="display: flex; align-items: center; line-height: 120%; width: 100%; user-select: none; min-height: 28px; font-size: 14px;">
+//             <div class="${classes.backChSelectd}" style="display: flex; align-items: center; line-height: 120%; width: 100%; user-select: none; min-height: 28px; font-size: 14px;">
 //                 <div style="display: flex; align-items: center; justify-content: center; margin-left: 14px;">
 //                     <i class="fa ${item[1]}" aria-hidden="true"></i>
 //                 </div>
