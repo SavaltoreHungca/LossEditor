@@ -1,12 +1,12 @@
-import { MemLoss } from "../MemLoss";
-import { Element } from "./Element";
+import { MemLoss } from "../../MemLoss";
+import { Element } from "../Element";
 import { innerHtml, $$, $ } from "utils";
-import { NodeCategory } from "../repository/transferTypes";
-import { creEle, Pad } from "./elementTypes";
+import { NodeCategory } from "../../repository/transferTypes";
+import { creEle, Pad } from "../elementTypes";
 import { ScrollPage } from "scroll-page";
-import { repository } from "../repository/Request";
-import { Constants } from "../Constants";
-import { classes } from "../styleClassSheet";
+import { repository } from "../../repository/Request";
+import { Constants } from "../../Constants";
+import { classes } from "../../styleClassSheet";
 
 
 

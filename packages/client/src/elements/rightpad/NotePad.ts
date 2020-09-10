@@ -1,9 +1,9 @@
-import { MemLoss } from './../MemLoss';
-import { Element } from "./Element";
+import { MemLoss } from '../../MemLoss';
+import { Element } from "../Element";
 import { innerHtml, $$, $ } from 'utils';
 import { ScrollPage } from 'scroll-page';
-import { Pad, creEle } from './elementTypes';
-import { Constants } from '../Constants';
+import { Pad, creEle } from '../elementTypes';
+import { Constants } from '../../Constants';
 
 export interface NotePad extends Element, Pad {
     openTab(
@@ -37,7 +37,7 @@ export function notePadExt(memloss: MemLoss) {
 
         innerHtml(notePad, `
             <div style="wdith: 100%; height: 100%; display: flex; flex-direction: column;">
-                <div id="${idset.crumbs}" style="height: ${notePadTabsHeight}px;">
+                <div id="${idset.crumbs}" style="height: ${notePadTabsHeight}px; background: rgb(247, 246, 243);">
                     <div id="${idset.crumbsSp}">
                         <div id="${idset.crumbsList}" style="height: ${notePadTabsHeight}px; 
                             white-space: nowrap; width: fit-content;">

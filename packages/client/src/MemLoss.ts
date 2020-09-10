@@ -3,11 +3,11 @@ import { registryEvents } from './events/events';
 import { EventManager, Nil } from 'utils';
 import { creEle } from './elements/elementTypes';
 import { Container } from './elements/Container';
-import { LeftSidePad } from './elements/LeftSidePad';
-import { RightSidePad } from './elements/RightSidePad';
+import { LeftSidePad } from './elements/leftpad/LeftSidePad';
+import { RightSidePad } from './elements/rightpad/RightSidePad';
 import { SettingReceiver, Settings } from './Settings';
-import { NodeListPad } from './elements/NodeListPad';
-import { NotePad } from './elements/NotePad';
+import { NodeListPad } from './elements/leftpad/NodeListPad';
+import { NotePad } from './elements/rightpad/NotePad';
 import { regisStyleSheet } from './styleClassSheet';
 
 

@@ -1,18 +1,18 @@
-import { RssListPad, rssListPadExt } from './RssListPad';
-import { LeftDirectoryTree, leftDirectoryTreeExt } from './LeftDirectoryTree';
+import { RssListPad, rssListPadExt } from './leftpad/RssListPad';
+import { LeftDirectoryTree, leftDirectoryTreeExt } from './leftpad/LeftDirectoryTree';
 import { Container, containerExt } from './Container';
 import { $$, ElementInfo, extend, Nil } from 'utils';
 import { MemLoss } from '../MemLoss';
 import { elementExt } from './Element';
-import { LeftSidePad, leftSidePadExt } from './LeftSidePad';
-import { RightSidePad, rightSidePadExt } from './RightSidePad';
-import { FunctionMenu, functionMenuExt } from './FunctionMenu';
-import { NodeListPad, nodeListPadExt } from './NodeListPad';
+import { LeftSidePad, leftSidePadExt } from './leftpad/LeftSidePad';
+import { RightSidePad, rightSidePadExt } from './rightpad/RightSidePad';
+import { FunctionMenu, functionMenuExt } from './leftpad/FunctionMenu';
+import { NodeListPad, nodeListPadExt } from './leftpad/NodeListPad';
 import { ResizeBar, resizeBarExt } from './ResizeBar';
-import { NodeItem, nodeItemExt } from './NodeItem';
-import { NotePad, notePadExt } from './NotePad';
-import { IntroductionPad, introductionPadExt } from './IntroductionPad';
-import { NoteTab, noteTabExt } from './NoteTab';
+import { NodeItem, nodeItemExt } from './leftpad/NodeItem';
+import { NotePad, notePadExt } from './rightpad/NotePad';
+import { IntroductionPad, introductionPadExt } from './rightpad/IntroductionPad';
+import { NoteTab, noteTabExt } from './rightpad/NoteTab';
 
 export interface Pad {
     render(): void

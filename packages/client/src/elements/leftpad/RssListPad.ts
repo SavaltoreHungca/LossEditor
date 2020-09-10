@@ -1,6 +1,6 @@
-import { MemLoss } from './../MemLoss';
-import { Element } from "./Element";
-import { Pad } from "./elementTypes";
+import { MemLoss } from '../../MemLoss';
+import { Element } from "../Element";
+import { Pad } from "../elementTypes";
 
 export interface RssListPad extends Element, Pad {
 

@@ -1,9 +1,9 @@
-import { Element } from './Element';
-import { MemLoss } from '../MemLoss';
+import { Element } from '../Element';
+import { MemLoss } from '../../MemLoss';
 import { innerHtml, $$, $ } from 'utils';
-import { Node } from '../repository/transferTypes';
-import { creEle } from './elementTypes';
-import { classes } from '../styleClassSheet';
+import { Node } from '../../repository/transferTypes';
+import { creEle } from '../elementTypes';
+import { classes } from '../../styleClassSheet';
 
 export interface NodeItem extends Element {
     render: (node: Node, level: number) => void

@@ -1,7 +1,7 @@
-import { MemLoss } from './../MemLoss';
-import { Element } from "./Element";
+import { MemLoss } from '../../MemLoss';
+import { Element } from "../Element";
 import { NotePad } from './NotePad';
-import { creEle, Pad } from './elementTypes';
+import { creEle, Pad } from '../elementTypes';
 import { ct } from 'utils';
 import { IntroductionPad } from './IntroductionPad';
 

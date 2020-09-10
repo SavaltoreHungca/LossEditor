@@ -1,10 +1,10 @@
-import { MemLoss } from './../MemLoss';
-import { Element } from "./Element";
+import { MemLoss } from '../../MemLoss';
+import { Element } from "../Element";
 import { innerHtml, $$, $, ct } from 'utils';
-import { ResizeBar } from './ResizeBar';
+import { ResizeBar } from '../ResizeBar';
 import { FunctionMenu } from './FunctionMenu';
 import { NodeListPad } from './NodeListPad';
-import { creEle, Pad } from './elementTypes';
+import { creEle, Pad } from '../elementTypes';
 import { RssListPad } from './RssListPad';
 
 interface PadTypsMap {

@@ -1,8 +1,8 @@
 import { ct, $$, mouseHover, $ } from 'utils';
 import { innerHtml } from 'utils';
-import { Element } from "./Element";
-import { MemLoss } from "../MemLoss";
-import { classes } from '../styleClassSheet';
+import { Element } from "../Element";
+import { MemLoss } from "../../MemLoss";
+import { classes } from '../../styleClassSheet';
 
 export interface NoteTab extends Element {
     render(name: string, id: string): void

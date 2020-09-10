@@ -1,7 +1,7 @@
-import { Element } from './Element';
-import { MemLoss } from '../MemLoss';
+import { Element } from '../Element';
+import { MemLoss } from '../../MemLoss';
 import { innerHtml } from 'utils';
-import { classes } from '../styleClassSheet';
+import { classes } from '../../styleClassSheet';
 
 export interface FunctionMenu extends Element {
 

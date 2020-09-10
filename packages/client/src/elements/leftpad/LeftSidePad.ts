@@ -1,12 +1,12 @@
 import { LeftDirectoryTree } from './LeftDirectoryTree';
-import { MemLoss } from './../MemLoss';
-import { Element } from "./Element";
+import { MemLoss } from '../../MemLoss';
+import { Element } from "../Element";
 import { innerHtml, $$, $ } from 'utils';
-import { ResizeBar } from './ResizeBar';
+import { ResizeBar } from '../ResizeBar';
 import { FunctionMenu } from './FunctionMenu';
 import { NodeListPad } from './NodeListPad';
-import { creEle } from './elementTypes';
-import { classes } from '../styleClassSheet';
+import { creEle } from '../elementTypes';
+import { classes } from '../../styleClassSheet';
 
 export interface LeftSidePad extends Element {
     resizeBar: ResizeBar
