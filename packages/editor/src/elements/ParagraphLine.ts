@@ -3,7 +3,7 @@ import { Editor } from "../Editor"
 import { $$, ct } from "utils"
 import { Paragraph } from "./Paragraph";
 import { Inlineblock } from "./Inlineblock";
-import { binarySearchWhichRange } from "./docElementTypes";
+import { binarySearchWhichRange } from "./docs/docElementTypes";
 
 export interface ParagraphLine extends ParagraphContext {
     fitContent(): void

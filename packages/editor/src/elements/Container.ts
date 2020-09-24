@@ -1,11 +1,12 @@
 import { UiElement } from "./UiElement"
 import { Editor } from "../Editor"
-import { $$, ct } from "utils"
+import { $, $$, ct, innerHtml } from "utils"
+import { creEle } from "./elementTypes";
 
 export interface Container extends UiElement { }
 
 export function containerExt(editor: Editor) {
-    return (ele: HTMLElement)=>{
+    return (ele: UiElement)=>{
         ct<any>(ele).editor = editor;
 
         $$.setStyle(ele, {
@@ -20,8 +21,41 @@ export function containerExt(editor: Editor) {
             height: 'fit-content',
             outline: 'none',
             'user-select': 'none',
+            border: '1px solid black'
         });
+
         ele.setAttribute('tabindex', '1');
+        
+        ele.setStyle({
+            width: editor.settings.width - 10,
+            height: editor.settings.height - 10
+        })
+
+        const containerInfo = ele.getInfo();
+        const idset = {
+            viewlines: $$.randmonId(),
+            backlayer: $$.randmonId(),
+            cursor: $$.randmonId(),
+            region: $$.randmonId(),
+        }
+
+        innerHtml(ele, `
+            <div id="${idset.viewlines}" 
+                style="top: ${containerInfo.innerTop}px; left: ${containerInfo.innerLeft}px; width: ${containerInfo.innerWidth}px;"></div>
+
+            <div id="${idset.backlayer}"
+                style="top: ${containerInfo.innerTop}px; left: ${containerInfo.innerLeft}px; z-index: -1">
+                <textarea id="${idset.cursor}"></textarea>
+                <div id="${idset.region}"
+                    style="top: ${containerInfo.innerTop}px; left: ${containerInfo.innerLeft}px; width: ${containerInfo.innerWidth}px; z-index: -1"></div>
+            </div>
+        `);
+
+        editor.viewLines = creEle(editor, 'view-lines', $(idset.viewlines));
+        editor.backLayer = creEle(editor, 'back-layer', $(idset.backlayer));
+        editor.regionContainer = creEle(editor, 'region-container', $(idset.region));
+        editor.cursor = creEle(editor, 'cursor', $(idset.cursor));
+
         return {}
     }
 }

@@ -1,4 +1,3 @@
-import { initializeUi } from './initializeUi'
 import { regisNodeRenderer } from './regisNodeRenderer'
 import { regisSetSelectionBehavior } from './regisSetSelectionBehavior'
 import { regisSetCursorPositionBehavior } from './regisSetCursorPositionBehavior'
@@ -9,7 +8,6 @@ import { regisEmptyOrgnizerBehavior } from './regisEmptyOrgnizerBehavior'
 import { regisKeyDownBehavior } from './regisKeyDownBehavior'
 
 export function registryEvents(editor: Editor) {
-    initializeUi(editor);
     regisNodeRenderer(editor);
     regisSetSelectionBehavior(editor);
     regisSetCursorPositionBehavior(editor);

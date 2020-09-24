@@ -5,8 +5,8 @@ import { Node } from 'editor-core';
 import { SetSelectionResult } from "../behaviorTypes";
 
 export function sentinelSelectionBehaviorFactory(editor: Editor) {
-    const e = editor.whenClick;
     return (node: Node)=>{
+        const e = editor.whenClick;
         const ans: SetSelectionResult = {
             pointType: 'end',
             offset: 0

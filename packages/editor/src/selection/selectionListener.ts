@@ -7,6 +7,8 @@ export function listenUserClick(editor: Editor) {
     $$.addDragEvent(editor.viewLines, (e: DragState) => {
         if (!e.event?.target) return;
 
+        editor.whenClick = e;
+
         const srcElement: HTMLElement = ct(e.event.target);
         const docNode = getDocNodeFromChild(srcElement);
         if (docNode) {

@@ -13,8 +13,18 @@ export function setCursorPositionForParagraph(docNode: DocNode, offset: number, 
         height: 0
     };
 
-    const line = docParagraph.getLineByOffset(offset);
-    const inLineElement = line.getInlineBlockByOffset(offset);
+    let line;
+    let inLineElement;
+    if(editor.whenClick && editor.whenClick.clickdInlineEle){
+        inLineElement = editor.whenClick.clickdInlineEle;
+        line = inLineElement.getLine();
+
+        editor.whenClick = Nil;
+    }
+    else {
+        line = docParagraph.getLineByOffset(offset);
+        inLineElement = line.getInlineBlockByOffset(offset);
+    }
 
     switch (getType(inLineElement)) {
         case 'text': {

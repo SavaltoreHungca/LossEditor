@@ -5,7 +5,7 @@ import { registryEvents } from './events/events';
 import { Constants } from './Constants';
 import { listenUserClick, listenSelectionToSetCursor } from './selection/selectionListener';
 import { listenTextInput } from './textinput/listenTextInput';
-import { Cursor } from './elements/Cursor';
+import { Cursor, WhenClick } from './elements/Cursor';
 import { ViewLines } from './elements/ViewLines';
 import { BackLayer } from './elements/BackLayer';
 import { RegionContainer } from './elements/RegionContainer';
@@ -19,7 +19,7 @@ import { nodeCreator } from './elements/nodeTypes';
 
 
 export class Editor {
-    container: Container;
+    container: Container = Nil;
     cursor: Cursor = Nil;
     viewLines: ViewLines = Nil;
     backLayer: BackLayer = Nil;
@@ -33,13 +33,15 @@ export class Editor {
     docTree: DocTree = new DocTree(nodeCreator);
     uiMap: NodeManager;
     tmpSelection: Selection = Nil;
-    whenClick: DragState = Nil;
+    whenClick: WhenClick = Nil;
 
     constructor(settings: SettingRecevier) {
         for (const name in settings) this.settings[name] = settings[name];
 
-        this.container = creEle(this, 'container', this.settings.container);
         this.uiMap = new NodeManager(this);
+
+        creEle(this, 'scroll-frame', this.settings.container);
+        
 
         regisStyleSheet(this);
         registryEvents(this);

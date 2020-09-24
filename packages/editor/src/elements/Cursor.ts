@@ -1,7 +1,12 @@
 import { UiElement } from "./UiElement"
 import { Editor } from "../Editor"
-import { $$ } from "utils"
+import { $$, DragState } from "utils"
 import { classes } from "../styleClassSheet"
+import { Inlineblock } from "./Inlineblock"
+
+export interface WhenClick extends DragState {
+    clickdInlineEle?: Inlineblock
+}
 
 export interface Cursor extends UiElement {
     setPosition(left: number, top: number, height?: number): void

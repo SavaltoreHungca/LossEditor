@@ -1,7 +1,7 @@
 import { Editor } from './Editor';
 import { BidMap, $$, ct, MapObj } from "utils";
 import { Node } from 'editor-core';
-import { DocNodeTypesMap, creDocEle } from './elements/docElementTypes';
+import { DocNodeTypesMap, creDocEle } from './elements/docs/docElementTypes';
 import { DocNode } from './elements/DocNode';
 import { mountChild } from './render/mountChild';
 import { nodeCreator } from './elements/nodeTypes';

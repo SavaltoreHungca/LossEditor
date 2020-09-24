@@ -1,5 +1,14 @@
+import { Editor } from 'editor';
+import { ScrollPage } from 'scroll-page';
+import { MemLoss } from 'client';
+import { innerHtml, $$, $ } from 'utils'
+import { renderMemLoss } from './renderMemLoss';
+import { renderScrollPage } from './renderScrollPage';
+
 export function renderEditor(container) {
     new Editor({
+        width: 300,
+        height: 300,
         container: container,
         document: {
             type: 'root',

@@ -18,6 +18,7 @@ import { uiExt } from './UiElement';
 import { paraCntxtExt } from './ParagraphContext';
 import { inlineBlockExt } from './Inlineblock';
 import { Text, textExt } from './Text';
+import { ScrollFrame, scrollFrameExt } from './ScrollFrame';
 
 export type UiNodeTypesMap = {
     'region-container': RegionContainer
@@ -35,6 +36,7 @@ export type UiNodeTypesMap = {
     'text': Text
     'unit-block': UnitBlock
     'content-container': ContentContainer
+    'scroll-frame': ScrollFrame
 }
 export type UiNodeTypes = keyof UiNodeTypesMap;
 
@@ -78,6 +80,8 @@ export function creEle<K extends keyof UiNodeTypesMap>(editor: Editor, type: K, 
         case 'content-container':
             return extend($$.creEle('block'),
                 [uiExt(editor, type)]);
+        case 'scroll-frame':
+            return extend(ele, [uiExt(editor, type), scrollFrameExt(editor)]);
     }
 
     throw new Error();

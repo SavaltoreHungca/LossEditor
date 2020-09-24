@@ -5,7 +5,7 @@ import { Paragraph } from "./Paragraph";
 import { Node } from 'editor-core';
 import { Style } from "./elementTypes";
 import { ParagraphLine } from "./ParagraphLine";
-import { binarySearchWhichRange } from "./docElementTypes";
+import { binarySearchWhichRange } from "./docs/docElementTypes";
 
 export interface DocParagraph extends DocNode {
     getParaUiEle(): Paragraph

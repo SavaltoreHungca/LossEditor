@@ -9,22 +9,28 @@ import { UnitBlock } from '../elements/UnitBlock';
 import { SetSelectionResult } from "../behaviorTypes";
 
 export function paragraphSelectionBehaviorFactory(editor: Editor) {
-    const e = editor.whenClick;
+    
     return (node: Node)=>{
+        const e = editor.whenClick;
+
         const ans: SetSelectionResult = {
             pointType: 'end',
             offset: 0
         };
     
         const srcElement: ParagraphContext = ct(getNodeFromChild(ct(e.event?.target)));
-    
-        if (e.pressed && !e.registered) {
-            ans.pointType = 'start'
-        }
+
         const offset = getMouseOffsetInElement(srcElement, <MouseEvent>e.event);
         if (typeof offset === 'undefined') {
             return undefined;
         }
+
+        if (e.pressed && !e.registered) {
+            ans.pointType = 'start'
+        }else{
+            editor.whenClick.clickdInlineEle = ct(srcElement);
+        }
+
         ans.offset = offset;
         return ans;
     }

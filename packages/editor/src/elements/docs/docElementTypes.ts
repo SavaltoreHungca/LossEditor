@@ -1,9 +1,9 @@
-import { Editor } from "../Editor";
+import { Editor } from "../../Editor";
 import { extend, $$, Nil, ct } from "utils";
-import { DocParagraph, docParaExt } from "./DocParagraph";
-import { DocSentinal, docSentinelExt } from "./DocSentinel";
-import { docExt } from "./DocNode";
-import { ParagraphContext } from "./ParagraphContext";
+import { DocParagraph, docParaExt } from "../DocParagraph";
+import { DocSentinal, docSentinelExt } from "../DocSentinel";
+import { docExt } from "../DocNode";
+import { ParagraphContext } from "../ParagraphContext";
 
 
 export type DocNodeTypesMap = {
