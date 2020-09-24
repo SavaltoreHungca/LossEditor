@@ -1,5 +1,5 @@
-import { Editor } from "../Editor";
-import { DocNodeTypesMap } from "./docs/docElementTypes";
+import { Editor } from "../../Editor";
+import { DocNodeTypesMap } from "./docElementTypes";
 
 export interface DocNode extends HTMLElement {
 

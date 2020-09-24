@@ -1,6 +1,6 @@
 import { Editor } from "../../Editor";
 import { $$ } from "utils";
-import { DocNode } from "../../elements/DocNode";
+import { DocNode } from "../../elements/docs/DocNode";
 
 export function setCursorPositionForSentinel(sentinel: DocNode, offset: number, editor: Editor) {
     const posi = $$.getRelativePosition(sentinel, editor.viewLines);

@@ -1,6 +1,6 @@
 import { MapObj, extend } from "utils";
 import { Node } from "editor-core";
-import { nodeParaExt } from "./DocParagraph";
+import { nodeParaExt } from "../docs/DocParagraph";
 
 export function nodeCreator<T extends Node>(obj: MapObj): T | Node {
     const node = new Node();

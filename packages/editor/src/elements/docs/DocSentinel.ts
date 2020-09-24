@@ -1,5 +1,5 @@
 import { DocNode } from "./DocNode";
-import { Editor } from "../Editor";
+import { Editor } from "../../Editor";
 import { $$ } from "utils";
 
 export interface DocSentinal extends DocNode {

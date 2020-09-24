@@ -1,8 +1,8 @@
 import { Editor } from '../../Editor';
 import { getType } from "../../utils";
 import { $$, ct, Nil } from "utils";
-import { DocParagraph } from '../../elements/DocParagraph';
-import { DocNode } from '../../elements/DocNode';
+import { DocParagraph } from '../../elements/docs/DocParagraph';
+import { DocNode } from '../../elements/docs/DocNode';
 
 export function setCursorPositionForParagraph(docNode: DocNode, offset: number, editor: Editor) {
     const docParagraph: DocParagraph = ct(docNode);

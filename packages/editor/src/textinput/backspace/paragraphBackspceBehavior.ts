@@ -2,7 +2,7 @@ import { Editor } from '../../Editor';
 import { Selection, Point } from 'editor-core';
 import { getType } from '../../utils';
 import { ct } from 'utils';
-import { DocParagraph, NodeParagraph } from '../../elements/DocParagraph';
+import { DocParagraph, NodeParagraph } from '../../elements/docs/DocParagraph';
 import { Inlineblock } from '../../elements/Inlineblock';
 import { ParagraphLine } from '../../elements/ParagraphLine';
 import { Paragraph } from '../../elements/Paragraph';

@@ -2,9 +2,9 @@ import { Editor } from './Editor';
 import { BidMap, $$, ct, MapObj } from "utils";
 import { Node } from 'editor-core';
 import { DocNodeTypesMap, creDocEle } from './elements/docs/docElementTypes';
-import { DocNode } from './elements/DocNode';
+import { DocNode } from './elements/docs/DocNode';
 import { mountChild } from './render/mountChild';
-import { nodeCreator } from './elements/nodeTypes';
+import { nodeCreator } from './elements/nodes/nodeTypes';
 
 export class NodeManager {
     private nodeMap = new BidMap<Node, DocNode>();

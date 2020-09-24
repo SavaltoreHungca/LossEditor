@@ -1,7 +1,7 @@
 import { $$, ct } from 'utils';
 import { Editor } from '../Editor';
 import { Point } from "editor-core";
-import { DocParagraph, NodeParagraph } from '../elements/DocParagraph';
+import { DocParagraph, NodeParagraph } from '../elements/docs/DocParagraph';
 import { getType } from '../utils';
 import { Text } from '../elements/Text';
 

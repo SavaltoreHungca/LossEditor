@@ -1,11 +1,11 @@
 import { DocNode } from "./DocNode";
-import { Editor } from "../Editor";
+import { Editor } from "../../Editor";
 import { ct, Nil, $$ } from "utils";
-import { Paragraph } from "./Paragraph";
+import { Paragraph } from "../Paragraph";
 import { Node } from 'editor-core';
-import { Style } from "./elementTypes";
-import { ParagraphLine } from "./ParagraphLine";
-import { binarySearchWhichRange } from "./docs/docElementTypes";
+import { Style } from "../elementTypes";
+import { ParagraphLine } from "../ParagraphLine";
+import { binarySearchWhichRange } from "./docElementTypes";
 
 export interface DocParagraph extends DocNode {
     getParaUiEle(): Paragraph

@@ -14,7 +14,7 @@ import { regisStyleSheet } from './styleClassSheet';
 import { Settings, SettingRecevier } from './Settings';
 import { creEle } from './elements/elementTypes';
 import { CursorPositionBehavior, KeyDownBehavior, SetSelectionBehavior } from './behaviorTypes';
-import { nodeCreator } from './elements/nodeTypes';
+import { nodeCreator } from './elements/nodes/nodeTypes';
 
 
 

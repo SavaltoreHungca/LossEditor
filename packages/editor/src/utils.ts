@@ -1,7 +1,7 @@
 import { ct } from 'utils';
 import { UiNodeTypes } from "./elements/elementTypes"
 import { UiElement } from './elements/UiElement';
-import { DocNode } from './elements/DocNode';
+import { DocNode } from './elements/docs/DocNode';
 
 export function getType(node: HTMLElement): UiNodeTypes | undefined {
     const type = node.getAttribute('data-editor-type')

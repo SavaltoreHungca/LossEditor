@@ -1,4 +1,4 @@
-import { DocNode } from "./elements/DocNode";
+import { DocNode } from "./elements/docs/DocNode";
 import { Editor } from ".";
 import { Selection, Node } from "editor-core";
 
