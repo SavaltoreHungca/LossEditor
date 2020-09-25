@@ -480,6 +480,19 @@ export class $$ {
         elemt.className += " " + c;
     }
 
+    static removeClass(elemt: HTMLElement, c: string) {
+        if(elemt.className){
+            const classNames = elemt.className.split(/\s+/);
+            let newClassName = '';
+            classNames.forEach((it)=>{
+                if(it !== c){
+                    newClassName += ' ' + it;
+                }
+            })
+            elemt.className = newClassName;
+        }
+    }
+
     static randmonId() {
         return "_" + uuid.v1().replace(/-/g, '');
     }

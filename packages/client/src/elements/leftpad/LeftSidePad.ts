@@ -31,7 +31,7 @@ export function leftSidePadExt(memloss: MemLoss) {
                 style="position: absolute; right: 0px; top: 0px; width: 5px; height: 100%; box-shadow: rgba(0, 0, 0, 0.1) 2px 0px 0px; cursor: col-resize; background: rgba(0, 0, 0, 0.1); z-index: 101;">
             </div>
             <div id="${idSet.functionMenu}" style="width: 100%; "></div>
-            <div id="${idSet.leftDirectoryTree}" style="flex-grow: 1; width: 100%;"></div>
+            <div id="${idSet.leftDirectoryTree}" style="flex-grow: 1; height: 0; width: 100%; overflow: hidden; "></div>
         `)
 
         const ext = {

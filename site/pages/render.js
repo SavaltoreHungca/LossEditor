@@ -15,7 +15,7 @@ export function render(container) {
         <div Container id="${idset.container}" style="margin-top: 10px; border: 1px dotted grey"></div>
     `)
 
-    // renderMemLoss($(idset.container));
+    renderMemLoss($(idset.container));
     // renderScrollPage($(idset.container));
-    renderEditor($(idset.container));
+    // renderEditor($(idset.container));
 }

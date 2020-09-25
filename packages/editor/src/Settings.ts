@@ -1,6 +1,7 @@
 import { Nil } from 'utils';
 
 export class Settings implements SettingRecevier {
+    lazyInit = false
     container = Nil
     document = defaultDocument
     width = Nil
@@ -8,10 +9,11 @@ export class Settings implements SettingRecevier {
 }
 
 export interface SettingRecevier {
-    container: HTMLElement
+    lazyInit?: boolean
+    container?: HTMLElement
     document?: object | string
-    width: number
-    height: number
+    width?: number
+    height?: number
 }
 
 const defaultDocument = {

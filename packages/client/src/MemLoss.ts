@@ -30,5 +30,9 @@ export class MemLoss {
         this.container = creEle(this, 'container', this.settings.container);
 
         this.eventManager.triggleEvent(Constants.events.UI_INITIALIZED);
+
+        window.addEventListener('resize', ()=>{
+            this.eventManager.triggleEvent(Constants.events.RESIZBAR_RESIZING);
+        })
     }
 }

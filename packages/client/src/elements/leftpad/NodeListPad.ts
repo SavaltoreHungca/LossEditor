@@ -36,7 +36,7 @@ export function nodeListPadExt(memLoss: MemLoss) {
         }
 
         innerHtml(nodeListPad, `
-            <div id="${idSet.nodeListPane}" style="flex-grow: 1; overflow: hidden">
+            <div id="${idSet.nodeListPane}" style="flex-grow: 1; height: 0; overflow: hidden">
                 <div id="${idSet.spContainer}">
                     <div id="${idSet.nodeListContent}"></div>
                 </div>
@@ -69,18 +69,20 @@ export function nodeListPadExt(memLoss: MemLoss) {
                 shown = true;
                 nodeListPad.setStyle({ display: 'flex' })
                 scrollPage.init({ container: $(idSet.spContainer) });
-                if (!initialized) repository.getNodeList((status, data) => {
-                    switch (status) {
-                        case 'processing':
-                            break;
-                        case 'ok':
-                            this.renderNodeList(data);
-                            initialized = true;
-                            break;
-                        case 'failed':
-                            break;
-                    }
-                });
+                if (!initialized) {
+                    repository.getNodeList((status, data) => {
+                        switch (status) {
+                            case 'processing':
+                                break;
+                            case 'ok':
+                                this.renderNodeList(data);
+                                initialized = true;
+                                break;
+                            case 'failed':
+                                break;
+                        }
+                    });
+                }
             },
             disappear: function () {
                 shown = false;
@@ -90,21 +92,21 @@ export function nodeListPadExt(memLoss: MemLoss) {
                 $(idSet.nodeListContent).innerHTML = '';
                 for (let node of category) {
                     const item = creEle(memLoss, 'nodeItem');
-                    item.render(node, 1);
                     $(idSet.nodeListContent).appendChild(item);
+                    item.render(node, 1);
                 }
                 this.updateSize()
             },
             updateSize: () => {
-                scrollPage.containerSizeFollowOuter();
-                scrollPage.contentWidthFollowContainer();
-            }
+                if(shown){
+                    scrollPage.containerSizeFollowOuter();
+                    scrollPage.contentWidthFollowContainer();
+                }
+            },
         }
 
         memLoss.eventManager.bindEventOn(Constants.events.RESIZBAR_RESIZING, () => {
-            if (shown) {
-                ext.updateSize();
-            }
+            ext.updateSize();
         });
 
         return ext;

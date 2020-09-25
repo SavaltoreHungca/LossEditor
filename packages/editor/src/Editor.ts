@@ -1,6 +1,6 @@
 import { NodeManager } from './NodeManager';
 import { DocTree, Selection } from 'editor-core';
-import { EventManager, Nil, DragState } from 'utils';
+import { EventManager, Nil, DragState, MapObj } from 'utils';
 import { registryEvents } from './events/events';
 import { Constants } from './Constants';
 import { listenUserClick, listenSelectionToSetCursor } from './selection/selectionListener';
@@ -15,10 +15,12 @@ import { Settings, SettingRecevier } from './Settings';
 import { creEle } from './elements/elementTypes';
 import { CursorPositionBehavior, KeyDownBehavior, SetSelectionBehavior } from './behaviorTypes';
 import { nodeCreator } from './elements/nodes/nodeTypes';
+import { ScrollFrame } from './elements/ScrollFrame';
 
 
 
 export class Editor {
+    scrollFrame: ScrollFrame = Nil;
     container: Container = Nil;
     cursor: Cursor = Nil;
     viewLines: ViewLines = Nil;
@@ -31,24 +33,37 @@ export class Editor {
     setSelectionWhenClickBehaviorSet = new Map<string, SetSelectionBehavior>();
     keyDownBehaviorSet = new Map<string, KeyDownBehavior>();
     docTree: DocTree = new DocTree(nodeCreator);
-    uiMap: NodeManager;
+    uiMap: NodeManager = Nil;
     tmpSelection: Selection = Nil;
     whenClick: WhenClick = Nil;
 
+    isInitialized = false;
+
     constructor(settings: SettingRecevier) {
         for (const name in settings) this.settings[name] = settings[name];
-
         this.uiMap = new NodeManager(this);
-
-        creEle(this, 'scroll-frame', this.settings.container);
-        
-
         regisStyleSheet(this);
         registryEvents(this);
 
-        this.eventManager.triggleEvent(Constants.events.CONTAINER_SETED);
-        this.eventManager.triggleEvent(Constants.events.DOC_TREE_CREATED);
+        if (!this.settings.lazyInit) {
+            this.initialize()
+        }
 
+    }
+
+    setSettings(settings: SettingRecevier) {
+        for (const name in settings) this.settings[name] = settings[name];
+    }
+
+    initialize(settings?: SettingRecevier) {
+        if (this.isInitialized) return;
+
+        if (settings) {
+            for (const name in settings) this.settings[name] = settings[name];
+        }
+
+        this.scrollFrame = creEle(this, 'scroll-frame', this.settings.container);
+        this.eventManager.triggleEvent(Constants.events.DOC_TREE_CREATED);
         listenUserClick(this);
         listenSelectionToSetCursor(this);
         listenTextInput(this);
@@ -57,13 +72,23 @@ export class Editor {
             console.log(sele);
         })
 
-        this.render(this.settings.document);
+        this.isInitialized = true;
     }
 
-    render(document: any) {
+    render(document: string | MapObj) {
+        if (!this.isInitialized) {
+            this.initialize();
+        }
+
+        if ( !document 
+            || (typeof document === 'string' && document.trim() === '')
+            || (typeof document === 'object' && Object.keys(document).length === 0)
+        ) {
+            document = this.settings.document;
+        }
+
         this.docTree.buildTree(document);
 
-        this.eventManager.triggleEvent(Constants.events.DOC_TREE_ROOT_SETED);
         this.viewLines.innerHTML = '';
         this.docTree.render();
     }
@@ -72,11 +97,15 @@ export class Editor {
         this.setCursorPositionBehaviorSet.set(nodeType, behavior);
     }
 
-    regisSetSelectionWhenClickBehaviorSet(nodeType: string, behavior: SetSelectionBehavior){
+    regisSetSelectionWhenClickBehaviorSet(nodeType: string, behavior: SetSelectionBehavior) {
         this.setSelectionWhenClickBehaviorSet.set(nodeType, behavior);
     }
 
     regisKeyDownBehavior(nodeType: string, behavior: KeyDownBehavior) {
         this.keyDownBehaviorSet.set(nodeType, behavior);
+    }
+
+    sizeFollowOutContainer() {
+        if(this.scrollFrame) this.scrollFrame.updateSize();
     }
 }

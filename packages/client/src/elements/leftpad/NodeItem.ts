@@ -1,69 +1,106 @@
 import { Element } from '../Element';
 import { MemLoss } from '../../MemLoss';
-import { innerHtml, $$, $ } from 'utils';
+import { innerHtml, $$, $, Nil } from 'utils';
 import { Node } from '../../repository/transferTypes';
 import { creEle } from '../elementTypes';
 import { classes } from '../../styleClassSheet';
+import { repository } from "../../repository/Request";
 
 export interface NodeItem extends Element {
     render: (node: Node, level: number) => void
+    toggleFold(shouldFold?: boolean): void
+    isOpend: boolean
+    nodeData: Node
+    level: number
 }
 
 export function nodeItemExt(memloss: MemLoss) {
     return (nodeItem: Element) => {
         nodeItem.setStyle({
             cursor: 'pointer', width: '100%'
-        })
+        });
+
+        const idset = {
+            children: $$.randmonId(),
+            titlebar: $$.randmonId(),
+            oepnButton: $$.randmonId(),
+            title: $$.randmonId(),
+        }
         return {
-            render: (node: Node, level: number) => {
-
-                const idset = {
-                    children: $$.randmonId(),
-                    titlebar: $$.randmonId(),
-                }
-
-                // 点击标题打开node
-                const onopeneditor = (self: HTMLElement) => {
-                    
-                }
-
-                nodeItem.set('opend', false);
-                const onsubopen = (self: HTMLElement) => {
-                    if (nodeItem.get('opend')) {
-                        innerHtml(self, '<i class="fa fa-caret-right fa-1x" aria-hidden="true"></i>', true)
-                        nodeItem.set('opend', false);
-                        $(idset.children).innerHTML = '';
-                    } else {
-                        innerHtml(self, '<i class="fa fa-caret-down fa-1x" aria-hidden="true"></i>', true)
-                        for (let child of node.children || []) {
-                            const item = creEle(memloss, 'nodeItem');
-                            item.render(child, level + 1);
-                            $(idset.children).appendChild(item);
-                        }
-                        nodeItem.set('opend', true);
-                        memloss.nodeListPad.updateSize();
-                    }
-                }
+            render: function (node: Node, level: number) {
+                this.nodeData = node;
+                this.level = level;
 
                 innerHtml(nodeItem, `
                     <div id="${idset.titlebar}" class="${classes.backChSelectd}" style="position: relative; display: block;">
                         <div style="padding-left: ${14 * level}px; overflow: hidden; text-overflow: ellipsis; min-width: 0; white-space: nowrap;">
                             <span style="display: inline-block; position: relative">
-                                <div 
+                                <div id="${idset.oepnButton}"
                                     class="${classes.backChSelectd}"
                                     style="user-select: none;transition: background 120ms ease-in 0s;cursor: pointer;display: flex;align-items: center;justify-content: center;width: 20px;height: 20px;border-radius: 3px;"
-                                    onclick="${$$.anonyFunction(onsubopen)}(this)">
+                                    >
                                     <i class="fa fa-caret-right fa-1x" aria-hidden="true"></i>
                                 </div>
                             </span>
                             <span style="display: inline-block; position: relative">${node.tag}</span>
-                            <span onclick="${$$.anonyFunction(onopeneditor)}(this)" class="${classes.textUnderLine}" style="display: inline-block; position: relative">${node.title}</span>
+                            <span id="${idset.title}" class="${classes.textUnderLine}" style="display: inline-block; position: relative; margin-left: 8px">${node.title}</span>
                         </div>
                     </div>
-                    <div id="${idset.children}"></div>
-                `)
-            }
 
+                    <div id="${idset.children}"></div>
+                `, true);
+
+                $(idset.oepnButton).addEventListener('click', () => {
+                    this.toggleFold()
+                })
+                $(idset.title).addEventListener('click', () => {
+                    // 点击标题打开node
+                    repository.getNodeContent(this.nodeData.id, (status, data) => {
+                        switch (status) {
+                            case 'ok':
+                                memloss.notePad.openTab({
+                                    id: this.nodeData.id,
+                                    name: this.nodeData.title,
+                                    content: data
+                                });
+                                break;
+                            case 'processing':
+                                break;
+                            case 'failed':
+                                break
+                        }
+                    })
+                })
+
+            },
+            toggleFold: function (shouldFold?: boolean) {
+                if (typeof shouldFold === 'undefined') {
+                    shouldFold = !this.isOpend;
+                }
+
+                if (shouldFold) {
+                    innerHtml($(idset.oepnButton), '<i class="fa fa-caret-down fa-1x" aria-hidden="true"></i>', true)
+
+                    for (let child of this.nodeData.children || []) {
+                        const item = creEle(memloss, 'nodeItem');
+                        $(idset.children).appendChild(item);
+                        item.render(child, this.level + 1);
+                    }
+
+                    this.isOpend = true;
+                }
+                else {
+                    innerHtml($(idset.oepnButton), '<i class="fa fa-caret-right fa-1x" aria-hidden="true"></i>', true)
+
+                    $(idset.children).innerHTML = '';
+                    this.isOpend = false;
+                }
+
+                memloss.nodeListPad.updateSize();
+            },
+            isOpend: false,
+            level: 1,
+            nodeData: <Node>Nil
         };
     }
 }

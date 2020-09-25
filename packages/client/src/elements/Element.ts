@@ -13,6 +13,7 @@ export interface Element extends HTMLElement {
     setStyle(style: Object): void;
     getInfo(consumer?: (info: ElementInfo) => void): ElementInfo;
     addClass(c: string): void;
+    removeClass(c: string): void;
 }
 
 export function elementExt<K extends keyof ElementTypsMap>(memloss: MemLoss, type: K){
@@ -68,6 +69,9 @@ export function elementExt<K extends keyof ElementTypsMap>(memloss: MemLoss, typ
             },
             addClass: function (c: string) {
                 $$.addClass(elmt, c);
+            },
+            removeClass: function(c: string) {
+                $$.removeClass(elmt, c);
             }
         }
     }

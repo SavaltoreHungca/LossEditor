@@ -21,7 +21,7 @@ export class FakeRequest implements Request {
 const nodeitem = {
     title: '我的笔记',
     id: $$.randmonId(),
-    tag: '临时',
+    tag: '😄',
     children: [
         {
             title: '读书随记',
@@ -55,4 +55,10 @@ const editorcontent = {
             color: 'grey'
         }
     },
+    children: [{
+        type: 'paragraph',
+        content: {
+            str: '如果说你是海上的花火,我是兰花的泡沫,这一刻你照亮了我'
+        }
+    }]
 }

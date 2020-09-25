@@ -19,7 +19,7 @@ export interface LeftDirectoryTree extends Element {
 }
 
 export function leftDirectoryTreeExt(memloss: MemLoss) {
-    return (leftSidePad: Element) => {
+    return (leftDirectoryTree: Element) => {
 
         const ext = {
             switchPad: function <K extends keyof PadTypsMap>(name: K) {
@@ -35,8 +35,8 @@ export function leftDirectoryTreeExt(memloss: MemLoss) {
         };
 
         memloss.nodeListPad = ext.nodeListPad;
-        leftSidePad.appendChild(ext.nodeListPad);
-        leftSidePad.appendChild(ext.rssListPad);
+        leftDirectoryTree.appendChild(ext.nodeListPad);
+        leftDirectoryTree.appendChild(ext.rssListPad);
 
         return ext;
     }

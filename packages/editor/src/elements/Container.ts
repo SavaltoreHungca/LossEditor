@@ -21,14 +21,13 @@ export function containerExt(editor: Editor) {
             height: 'fit-content',
             outline: 'none',
             'user-select': 'none',
-            border: '1px solid black'
         });
 
         ele.setAttribute('tabindex', '1');
         
         ele.setStyle({
-            width: editor.settings.width - 10,
-            height: editor.settings.height - 10
+            width: editor.settings.width * 0.6,
+            height: editor.settings.height * 0.6
         })
 
         const containerInfo = ele.getInfo();
