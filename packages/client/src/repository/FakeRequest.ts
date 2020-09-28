@@ -13,52 +13,56 @@ export class FakeRequest implements Request {
     getNodeContent(id: string, callback: CallBack<any>): void {
         callback('processing', Nil);
         window.setTimeout(() => {
-            callback('ok', editorcontent);
+            callback('ok', editorcontent());
         }, 500)
     }
 }
 
-const nodeitem = {
-    title: '我的笔记',
-    id: $$.randmonId(),
-    tag: '😄',
-    children: [
-        {
-            title: '读书随记',
-            id: $$.randmonId(),
-            tag: '随记',
-            children: [
-                {
-                    title: '读书随记',
-                    id: $$.randmonId(),
-                    tag: '随记'
-                }
-            ]
-        },
-        {
-            title: '读书随记',
-            id: $$.randmonId(),
-            tag: '随记'
-        }
-    ]
+const nodeitem = function () {
+    return {
+        title: `${$$.randomAlphabetStr()}`,
+        id: $$.randmonId(),
+        tag: `${$$.randomEmoji()}`,
+        children: [
+            {
+                title: `${$$.randomAlphabetStr()}`,
+                id: $$.randmonId(),
+                tag: `${$$.randomEmoji()}`,
+                children: [
+                    {
+                        title: `${$$.randomAlphabetStr()}`,
+                        id: $$.randmonId(),
+                        tag: `${$$.randomEmoji()}`,
+                    }
+                ]
+            },
+            {
+                title: `${$$.randomAlphabetStr()}`,
+                id: $$.randmonId(),
+                tag: `${$$.randomEmoji()}`,
+            }
+        ]
+    }
 }
 const nodelist: any = [];
-for(let i = 0; i< 100; i++){
-    nodelist.push(nodeitem);
+for (let i = 0; i < 100; i++) {
+    nodelist.push(nodeitem());
 }
 
-const editorcontent = {
-    type: 'root',
-    sentinelAct: {
-        placeholder: 'type something in here',
-        style: {
-            color: 'grey'
-        }
-    },
-    children: [{
-        type: 'paragraph',
-        content: {
-            str: '如果说你是海上的花火,我是兰花的泡沫,这一刻你照亮了我'
-        }
-    }]
+const editorcontent = function () {
+    return {
+        type: 'root',
+        sentinelAct: {
+            placeholder: 'type something in here',
+            style: {
+                color: 'grey'
+            }
+        },
+        children: [{
+            type: 'paragraph',
+            content: {
+                str: `${$$.randomAlphabetStr(100)}`
+            }
+        }]
+    }
 }

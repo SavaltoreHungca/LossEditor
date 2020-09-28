@@ -169,7 +169,7 @@ export class $$ {
         if (cssText) {
             const styles = cssText.split(';').filter(Boolean);
             for (const style of styles) {
-                if(style.trim() === '') continue;
+                if (style.trim() === '') continue;
                 const [name, value] = style.split(':');
                 ans[name.trim()] = value.trim();
             }
@@ -481,11 +481,11 @@ export class $$ {
     }
 
     static removeClass(elemt: HTMLElement, c: string) {
-        if(elemt.className){
+        if (elemt.className) {
             const classNames = elemt.className.split(/\s+/);
             let newClassName = '';
-            classNames.forEach((it)=>{
-                if(it !== c){
+            classNames.forEach((it) => {
+                if (it !== c) {
                     newClassName += ' ' + it;
                 }
             })
@@ -500,6 +500,110 @@ export class $$ {
         const funcName = this.randmonId();
         window[funcName] = func;
         return funcName;
+    }
+
+    static randomInt(len?: number) {
+        if (typeof len !== 'number') {
+            len = 100;
+        }
+        return Math.ceil(Math.random() * Math.pow(10, Math.ceil(len / 10))) % len;
+    }
+
+    static randomAlphabetStr(len?: number) {
+        if (typeof len !== 'number') {
+            len = 6;
+        }
+        const set = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        let ans = '';
+        for (let i = 0; i < len; i++) {
+            ans += set[this.randomInt(set.length)];
+        }
+        return ans;
+    }
+
+    static randomEmoji(len?: number) {
+        if (typeof len !== 'number') {
+            len = 1;
+        }
+        const set = [
+            '😀', '😁', '😂', '😃', '😄', '😅', '😆', '😉', '😊', '😋', '😎', '😍', '😘', '😗', '😙', '😚', '😇', '😐', '😑', '😶', '😏', '😣', '😥', '😮', '😯', '😪', '😫', '😴', '😌', '😛', '😜', '😝', '😒', '😓', '😔', '😕', '😲', '😷', '😖', '😞', '😟', '😤', '😢', '😭', '😦', '😧', '😨', '😬', '😰', '😱', '😳', '😵', '😡', '😠',
+            '👦','👧','👨','👩','👴','👵','👶','👱','👮','👲','👳','👷','👸','💂','🎅','👰','👼','💆','💇','🙍','🙎','🙅','🙆','💁','🙋','🙇','🙌','🙏','👤','👥','🚶','🏃','👯','💃','👫','👬','👭','💏','💑','👪',        
+        ]
+        let ans = '';
+        for (let i = 0; i < len; i++) {
+            ans += set[this.randomInt(set.length)];
+        }
+        return ans;
+    }
+
+    static addContextMenu(elemt: HTMLElement, 
+        listener: (contextMenuContainer: HTMLElement, opration: {cancelMenu: ()=>void, makeVisible: ()=>void},evt: MouseEvent) => void, 
+        whenCancelMenu?: () => void) {
+
+        elemt.addEventListener('contextmenu', (e: MouseEvent) => {
+            e.preventDefault();
+            const moousePosi = $$.getMousePositionInElement(document.body, e);
+
+            const contextMenu: HTMLElement = $$.creEle('absolute');
+            document.body.appendChild(contextMenu);
+
+            $$.setStyle(contextMenu, {
+                left: moousePosi.left,
+                top: moousePosi.top,
+            });
+
+            const makeVisible = ()=>{
+                const menuInfo = $$.getElementInfo(contextMenu);
+                const rectInfo = contextMenu.getBoundingClientRect();
+
+                // 高度超出
+                if(rectInfo.top + menuInfo.height > window.innerHeight){
+                    $$.setStyle(contextMenu, {
+                        top: menuInfo.top - (rectInfo.top + menuInfo.height - window.innerHeight),
+                    });
+                }
+
+                // 宽度超出
+                if(rectInfo.left + menuInfo.width > window.innerWidth){
+                    $$.setStyle(contextMenu, {
+                        left: menuInfo.left - (rectInfo.left + menuInfo.width - window.innerWidth)
+                    })
+                }
+            }
+
+            const stopPropagation = (e: MouseEvent) => {
+                e.stopPropagation();
+            }
+            const cancel = () => {
+                document.body.removeChild(contextMenu);
+                window.removeEventListener('click', cancel);
+                window.removeEventListener('contextmenu', cancelCon);
+                if(whenCancelMenu) whenCancelMenu();
+            }
+
+            // 避免第一次打开就被关闭
+            let firstContextMenu = true
+            const cancelCon = () => {
+                if (firstContextMenu) {
+                    firstContextMenu = false;
+                    return;
+                }
+                cancel();
+            }
+
+            window.addEventListener('click', cancel);
+            window.addEventListener('contextmenu', cancelCon);
+            contextMenu.addEventListener('click', stopPropagation);
+            contextMenu.addEventListener('contextmenu', stopPropagation);
+
+
+            listener(contextMenu, {
+                cancelMenu: ()=>{cancel()},
+                makeVisible: makeVisible
+            },e);
+
+            makeVisible();
+        })
     }
 
     static getCommonAncestor<T>(n1: T, n2: T, getParent: (node: T) => T | undefined | null, root?: T): T | undefined {

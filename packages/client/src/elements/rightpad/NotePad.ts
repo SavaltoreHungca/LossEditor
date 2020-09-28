@@ -11,9 +11,22 @@ export interface NotePad extends Element, Pad {
     openTab(tabInfo: { id: string, name: string, content: string }): void
     updateSize(): void
     tabList: Array<NoteTab>
+    switchTab(tabId: string): boolean
+    closeTab(tabId: string): void
 }
 
 export function notePadExt(memloss: MemLoss) {
+    const idset = {
+        crumbsSp: $$.randmonId(),
+        crumbsList: $$.randmonId(),
+
+        noteContent: $$.randmonId(),
+        noteFootBar: $$.randmonId(),
+
+        note: $$.randmonId(),
+        introPad: $$.randmonId(),
+    }
+
     return (notePad: Element) => {
         const { notePadTabsHeight } = memloss.settings
 
@@ -23,14 +36,6 @@ export function notePadExt(memloss: MemLoss) {
             background: 'white',
             display: 'none'
         })
-
-        const idset = {
-            crumbsSp: $$.randmonId(),
-            crumbsList: $$.randmonId(),
-
-            noteContent: $$.randmonId(),
-            noteFootBar: $$.randmonId()
-        }
 
         let shown = false;
 
@@ -53,7 +58,7 @@ export function notePadExt(memloss: MemLoss) {
         const crumbsSp = new ScrollPage({
             lazyInit: true,
             showTopShallow: false,
-            bottomScrollBarHeight: 5,
+            bottomScrollBarHeight: 2,
             hiddenRightScrollBar: true,
             containerHeight: 35,
         })
@@ -83,18 +88,77 @@ export function notePadExt(memloss: MemLoss) {
                 shown = false;
             },
             openTab: function (tabInfo: { id: string, name: string, content: string | MapObj }) {
+                memloss.rightSidePad.switchPad('notePad');
+
+                if (this.switchTab(tabInfo.id)) {
+                    return;
+                }
 
                 const noteTab = creEle(memloss, 'noteTab');
                 $(idset.crumbsList).appendChild(noteTab);
-                noteTab.render(tabInfo.name, tabInfo.id);
+                noteTab.render(tabInfo.name, tabInfo.id, tabInfo.content);
+                noteTab.toggleSelected(true);
 
                 editor.render(tabInfo.content);
                 this.tabList.push(noteTab);
-                
+
+                this.updateSize();
+            },
+            switchTab: function (tabId: string) {
+                let isSuccess = false;
+                this.tabList.forEach((it) => {
+                    if (it.tabId === tabId) {
+                        it.toggleSelected(true);
+                        editor.render(it.savedData);
+                        isSuccess = true;
+                    }
+                })
+                if (isSuccess) {
+                    this.tabList.forEach((it) => {
+                        if (it.tabId !== tabId) {
+                            it.toggleSelected(false);
+                        }
+                    })
+                }
+                return isSuccess;
+            },
+            closeTab: function (tabId: string) {
+                let posi = -1;
+                this.tabList.forEach((it, index) => {
+                    if (it.tabId === tabId) {
+                        posi = index;
+                    }
+                });
+
+                if (posi !== -1) {
+                    const needRemove = this.tabList[posi]
+
+                    this.tabList.splice(posi, 1);
+
+                    if (needRemove.selected) {
+                        if (posi < this.tabList.length) {
+                            this.switchTab(this.tabList[posi].tabId);
+                        }
+                        else if (this.tabList.length > 0) {
+                            if (this.tabList.length === 1) {
+                                this.switchTab(this.tabList[0].tabId);
+                            }
+                            else {
+                                this.switchTab(this.tabList[posi - 1].tabId);
+                            }
+                        }
+                    }
+                    $(idset.crumbsList).removeChild(needRemove);
+                }
+
+                if(this.tabList.length === 0) {
+                    memloss.rightSidePad.switchPad('introductionPad');
+                }
+
                 this.updateSize();
             },
             updateSize: function () {
-                if(shown){
+                if (shown) {
                     crumbsSp.containerSizeFollowOuter();
                     editor.sizeFollowOutContainer();
                 }

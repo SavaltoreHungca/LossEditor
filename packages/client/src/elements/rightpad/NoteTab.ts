@@ -1,15 +1,16 @@
-import { ct, $$, mouseHover, $ } from 'utils';
+import { ct, $$, mouseHover, $, Nil } from 'utils';
 import { innerHtml } from 'utils';
 import { Element } from "../Element";
 import { MemLoss } from "../../MemLoss";
 import { classes } from '../../styleClassSheet';
 
 export interface NoteTab extends Element {
-    render(name: string, id: string): void
+    render(name: string, id: string, content: any): void
     tabId: string
     selected: boolean
     setCloserOpacity(value: number): void
-    toggleSelected(isSelected?: boolean): void
+    toggleSelected(isSelected?: boolean, callback?: (isSelected: boolean) => void): void
+    savedData: any
 }
 
 export function noteTabExt(memloss: MemLoss) {
@@ -49,17 +50,18 @@ export function noteTabExt(memloss: MemLoss) {
 
 
         return {
-            render: function (name: string, id: string) {
+            render: function (name: string, id: string, content: any) {
                 if (rendered) {
                     return;
                 }
 
                 this.tabId = ct(id);
+                this.savedData = content;
                 $(idset.name).innerHTML = name;
 
                 mouseHover(noteTab, (status) => {
 
-                    if(this.selected) return;
+                    if (this.selected) return;
 
                     switch (status) {
                         case 'hover': $$.setStyle($(idset.closer), { opacity: 1 }); break;
@@ -67,24 +69,29 @@ export function noteTabExt(memloss: MemLoss) {
                     }
                 })
 
-                noteTab.onclick = ()=>{
-                    this.toggleSelected(true);
-                }
+                noteTab.addEventListener('click', (evt) => {
+                    evt.stopPropagation();
+                    memloss.notePad.switchTab(this.tabId);
+                })
+                $(idset.closer).addEventListener('click', (evt) => {
+                    evt.stopPropagation();
+                    memloss.notePad.closeTab(this.tabId);
+                })
 
                 rendered = true;
             },
-            tabId: undefined,
+            tabId: Nil,
             selected: false,
-            setCloserOpacity: function(value: number){
+            setCloserOpacity: function (value: number) {
                 $$.setStyle($(idset.closer), { opacity: value });
             },
-            toggleSelected: function(isSelected?: boolean){
-                if(typeof isSelected === 'undefined'){
+            toggleSelected: function (isSelected?: boolean, callback?: (isSelected: boolean) => void) {
+                if (typeof isSelected === 'undefined') {
                     isSelected = !this.selected;
                 }
 
-                if(isSelected){
-                    memloss.notePad.tabList.forEach((it)=>{
+                if (isSelected) {
+                    memloss.notePad.tabList.forEach((it) => {
                         it.removeClass(classes.tabSelected);
                         it.selected = false;
                         it.setCloserOpacity(0);
@@ -98,7 +105,12 @@ export function noteTabExt(memloss: MemLoss) {
                     this.selected = false;
                     this.setCloserOpacity(0);
                 }
+
+                if (callback) {
+                    callback(isSelected);
+                }
             },
+            savedData: Nil
         }
     }
 }
