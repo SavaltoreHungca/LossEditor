@@ -33,6 +33,48 @@ const nodeitem = function () {
                         title: `${$$.randomAlphabetStr()}`,
                         id: $$.randmonId(),
                         tag: `${$$.randomEmoji()}`,
+                        children: [
+                            {
+                                title: `${$$.randomAlphabetStr(1000)}`,
+                                id: $$.randmonId(),
+                                tag: `${$$.randomEmoji()}`,
+                                children: [
+                                    {
+                                        title: `${$$.randomAlphabetStr()}`,
+                                        id: $$.randmonId(),
+                                        tag: `${$$.randomEmoji()}`,
+                                        children: [
+                                            {
+                                                title: `${$$.randomAlphabetStr()}`,
+                                                id: $$.randmonId(),
+                                                tag: `${$$.randomEmoji()}`,
+                                                children: [
+                                                    {
+                                                        title: `${$$.randomAlphabetStr()}`,
+                                                        id: $$.randmonId(),
+                                                        tag: `${$$.randomEmoji()}`,
+                                                        children: [
+                                                            {
+                                                                title: `${$$.randomAlphabetStr()}`,
+                                                                id: $$.randmonId(),
+                                                                tag: `${$$.randomEmoji()}`,
+                                                                children: [
+                                                                    {
+                                                                        title: `${$$.randomAlphabetStr()}`,
+                                                                        id: $$.randmonId(),
+                                                                        tag: `${$$.randomEmoji()}`,
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ]
             },
