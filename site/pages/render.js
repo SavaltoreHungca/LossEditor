@@ -12,10 +12,10 @@ export function render(container) {
     }
 
     innerHtml(container, `
-        <div Container id="${idset.container}" style="margin-top: 10px; border: 1px dotted grey"></div>
+        <div Container id="${idset.container}" style="margin-top: 10px; width: 600px; height: 600px; "></div>
     `)
 
-    renderMemLoss($(idset.container));
+    // renderMemLoss($(idset.container));
     // renderScrollPage($(idset.container));
-    // renderEditor($(idset.container));
+    renderEditor($(idset.container));
 }

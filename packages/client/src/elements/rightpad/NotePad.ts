@@ -65,8 +65,8 @@ export function notePadExt(memloss: MemLoss) {
 
         const editor = new Editor({
             lazyInit: true,
-            width: 2000,
-            height: 2000,
+            width: 200,
+            height: 200,
         });
 
         const ext = {
