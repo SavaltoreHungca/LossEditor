@@ -13,7 +13,7 @@ import { ParagraphLine } from '../elements/ParagraphLine';
 import { Text } from '../elements/Text';
 import { Inlineblock } from '../elements/Inlineblock';
 import { UnitBlock } from '../elements/UnitBlock';
-import { TextContent, NodeParagraph } from "../elements/docs/DocParagraph";
+import { NodeParagraph } from "../elements/nodes/NodeParagraph";
 
 
 

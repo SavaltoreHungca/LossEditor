@@ -3,10 +3,11 @@ import { KeyDownBehavior } from "../../behaviorTypes";
 import { isHotkey } from 'is-hotkey';
 import { ct, $$, Nil } from "utils";
 import { Point, Selection } from "editor-core";
-import { NodeParagraph, DocParagraph } from "../../elements/docs/DocParagraph";
+import { DocParagraph } from "../../elements/docs/DocParagraph";
 import { ParagraphLine } from "../../elements/ParagraphLine";
 import { Inlineblock } from "../../elements/Inlineblock";
 import { getType } from "../../utils";
+import { NodeParagraph } from "../../elements/nodes/NodeParagraph";
 
 export function paragraphKeyDownBehavior(editor: Editor): KeyDownBehavior {
     return (event, selection) => {

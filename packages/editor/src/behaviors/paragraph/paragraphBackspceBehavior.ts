@@ -2,10 +2,11 @@ import { Editor } from '../../Editor';
 import { Selection, Point } from 'editor-core';
 import { getType } from '../../utils';
 import { ct } from 'utils';
-import { DocParagraph, NodeParagraph } from '../../elements/docs/DocParagraph';
+import { DocParagraph } from '../../elements/docs/DocParagraph';
 import { Inlineblock } from '../../elements/Inlineblock';
 import { ParagraphLine } from '../../elements/ParagraphLine';
 import { Paragraph } from '../../elements/Paragraph';
+import { NodeParagraph } from '../../elements/nodes/NodeParagraph';
 
 export function paragraphBackspaceFactory(editor: Editor) {
     return (selection: Selection) => {
@@ -194,4 +195,9 @@ function backspaceSameLine(left: Point, right: Point, line: ParagraphLine): Poin
         }
     }
     return left;
+}
+
+// 检查 paragraph 是否被删空
+function checkIsEmpty(paragraph: Paragraph){
+    
 }
