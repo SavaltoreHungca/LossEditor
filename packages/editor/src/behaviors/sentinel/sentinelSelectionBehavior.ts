@@ -1,8 +1,8 @@
-import { Editor } from './../Editor';
+import { Editor } from '../../Editor';
 import { DragState } from "utils";
-import { getNodeFromChild } from "../utils";
+import { getNodeFromChild } from "../../utils";
 import { Node } from 'editor-core';
-import { SetSelectionResult } from "../behaviorTypes";
+import { SetSelectionResult } from "../../behaviorTypes";
 
 export function sentinelSelectionBehaviorFactory(editor: Editor) {
     return (node: Node)=>{

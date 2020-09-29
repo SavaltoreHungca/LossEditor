@@ -1,13 +1,13 @@
-import { getType } from './../utils';
-import { Editor } from '../Editor';
+import { getType } from '../../utils';
+import { Editor } from '../../Editor';
 import { Point } from 'editor-core';
 import { $, ct } from 'utils';
-import { DocParagraph } from '../elements/docs/DocParagraph';
-import { ParagraphLine } from '../elements/ParagraphLine';
-import { Inlineblock } from '../elements/Inlineblock';
-import { ParagraphContext } from '../elements/ParagraphContext';
-import { UnitBlock } from '../elements/UnitBlock';
-import { creEle } from '../elements/elementTypes';
+import { DocParagraph } from '../../elements/docs/DocParagraph';
+import { ParagraphLine } from '../../elements/ParagraphLine';
+import { Inlineblock } from '../../elements/Inlineblock';
+import { ParagraphContext } from '../../elements/ParagraphContext';
+import { UnitBlock } from '../../elements/UnitBlock';
+import { creEle } from '../../elements/elementTypes';
 
 export function paragraphTypesettingFactory(editor: Editor) {
     return (point: Point) => {

@@ -1,6 +1,6 @@
 import { Editor } from "../Editor";
-import { setCursorPositionForParagraph } from "../selection/cursorposition/paragraphCursorPosition";
-import { setCursorPositionForSentinel } from "../selection/cursorposition/sentinelCursorPosition";
+import { setCursorPositionForParagraph } from "../behaviors/paragraph/paragraphCursorPosition";
+import { setCursorPositionForSentinel } from "../behaviors/sentinel/sentinelCursorPosition";
 
 export function regisSetCursorPositionBehavior(editor: Editor) {
     editor.regisSetCursorPositionBehavior('paragraph', setCursorPositionForParagraph);

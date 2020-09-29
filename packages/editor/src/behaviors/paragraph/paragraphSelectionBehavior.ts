@@ -1,12 +1,12 @@
-import { Editor } from './../Editor';
+import { Editor } from '../../Editor';
 import { DragState, $$, ct } from "utils";
-import { getNodeFromChild, getType } from "../utils";
-import { Constants } from "../Constants";
+import { getNodeFromChild, getType } from "../../utils";
+import { Constants } from "../../Constants";
 import { Node } from 'editor-core';
-import { ParagraphContext } from '../elements/ParagraphContext';
-import { Text } from '../elements/Text';
-import { UnitBlock } from '../elements/UnitBlock';
-import { SetSelectionResult } from "../behaviorTypes";
+import { ParagraphContext } from '../../elements/ParagraphContext';
+import { Text } from '../../elements/Text';
+import { UnitBlock } from '../../elements/UnitBlock';
+import { SetSelectionResult } from "../../behaviorTypes";
 
 export function paragraphSelectionBehaviorFactory(editor: Editor) {
     

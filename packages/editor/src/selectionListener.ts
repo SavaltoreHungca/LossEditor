@@ -1,6 +1,6 @@
 import { DragState, $$, ct } from "utils";
-import { getType, getDocNodeFromChild } from "../utils";
-import { Editor } from "../Editor";
+import { getType, getDocNodeFromChild } from "./utils";
+import { Editor } from "./Editor";
 import { Point, Selection } from "editor-core";
 
 export function listenUserClick(editor: Editor) {

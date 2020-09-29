@@ -1,5 +1,5 @@
 import { Editor } from "../Editor";
-import { rootEmptyOrgnizerFactory } from "../whenEmptyOrgnizer/rootEmptyOrgnizerFactory";
+import { rootEmptyOrgnizerFactory } from "../behaviors/root/rootEmptyOrgnizerFactory";
 import { Constants } from "../Constants";
 
 export function regisEmptyOrgnizerBehavior(editor: Editor) {

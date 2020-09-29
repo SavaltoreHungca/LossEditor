@@ -1,4 +1,4 @@
-import { Editor } from "../Editor";
+import { Editor } from "../../Editor";
 import { Point, Node } from "editor-core";
 import { ct } from "utils";
 

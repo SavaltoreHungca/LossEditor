@@ -1,5 +1,5 @@
-import { Editor } from "../Editor";
-import { Constants } from "../Constants";
+import { Editor } from "./Editor";
+import { Constants } from "./Constants";
 import isHotkey from "is-hotkey";
 
 let skipInputEvent = false;

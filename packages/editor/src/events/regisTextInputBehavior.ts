@@ -1,8 +1,8 @@
 import { Editor } from "../Editor";
 import { Constants } from "../Constants";
-import { paragraphTextInputBehaviorFactory } from "../textinput/paragraphTextInputBehavior";
-import { sentinelTextInputBehaviorFactory } from "../textinput/sentinelTextInputBehavior";
-import { paragraphBackspaceFactory } from "../textinput/backspace/paragraphBackspceBehavior";
+import { paragraphTextInputBehaviorFactory } from "../behaviors/paragraph/paragraphTextInputBehavior";
+import { sentinelTextInputBehaviorFactory } from "../behaviors/sentinel/sentinelTextInputBehavior";
+import { paragraphBackspaceFactory } from "../behaviors/paragraph/paragraphBackspceBehavior";
 
 export function regisTextInputBehavior(editor: Editor) {
     editor.eventManager.bindEventOn(Constants.events.DOC_TREE_CREATED, () => {

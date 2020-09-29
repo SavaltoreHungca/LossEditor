@@ -1,9 +1,9 @@
 import { $$, ct } from 'utils';
-import { Editor } from '../Editor';
+import { Editor } from '../../Editor';
 import { Point } from "editor-core";
-import { DocParagraph, NodeParagraph } from '../elements/docs/DocParagraph';
-import { getType } from '../utils';
-import { Text } from '../elements/Text';
+import { DocParagraph, NodeParagraph } from '../../elements/docs/DocParagraph';
+import { getType } from '../../utils';
+import { Text } from '../../elements/Text';
 
 export function paragraphTextInputBehaviorFactory(editor: Editor) {
     return (point: Point, text: string) => {
