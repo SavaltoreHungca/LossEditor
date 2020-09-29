@@ -9,6 +9,7 @@ import { SettingReceiver, Settings } from './Settings';
 import { NodeListPad } from './elements/leftpad/NodeListPad';
 import { NotePad } from './elements/rightpad/NotePad';
 import { regisStyleSheet } from './styleClassSheet';
+import { GlobalSearch } from './elements/GlobalSearch';
 
 
 export class MemLoss {
@@ -20,6 +21,7 @@ export class MemLoss {
 
     nodeListPad: NodeListPad = Nil;
     notePad: NotePad = Nil;
+    globalSearch: GlobalSearch = Nil;
 
     settings = new Settings();
 

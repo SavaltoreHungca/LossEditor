@@ -409,6 +409,26 @@ export class $$ {
         ids.push(window.setTimeout(func, delay));
     }
 
+    static stopPropagation(elemt: any, evtName: string){
+        elemt.addEventListener(evtName, (e: Event)=>{
+            e.stopPropagation();
+        })
+    }
+
+    static preventDefault(elemt: any, evtName: string){
+        elemt.addEventListener(evtName, (e: Event)=>{
+            e.preventDefault();
+        })
+    }
+
+    static addExecuteOneEvt(elmt: any, evtName: string, listener: Function){
+        const l = (evnt: any)=>{
+            elmt.removeEventListener(evtName, l);
+            listener(evnt);
+        }
+        elmt.addEventListener(evtName, l);
+    }
+
     static addDragEvent(element: HTMLElement, callback: Function) {
         const dragStateId = uuid.v1();
         this.dragStates.set(dragStateId, {

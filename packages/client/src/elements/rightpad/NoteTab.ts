@@ -28,10 +28,11 @@ export function noteTabExt(memloss: MemLoss) {
         const idset = {
             closer: $$.randmonId(),
             name: $$.randmonId(),
+            tab: $$.randmonId(),
         }
 
         innerHtml(noteTab, `
-            <div style="display: flex; flex-direction: column; 
+            <div id="${idset.tab}" style="display: flex; flex-direction: column; 
                         justify-content: center;height: ${notePadTabsHeight}px;
                         ">
                 <div>
@@ -78,6 +79,8 @@ export function noteTabExt(memloss: MemLoss) {
                     memloss.notePad.closeTab(this.tabId);
                 })
 
+                this.addContextMenu();
+
                 rendered = true;
             },
             tabId: Nil,
@@ -110,7 +113,35 @@ export function noteTabExt(memloss: MemLoss) {
                     callback(isSelected);
                 }
             },
-            savedData: Nil
+            savedData: Nil,
+            addContextMenu: function(){
+                const menuidset = {
+                    closeall: $$.randmonId()
+                }
+
+                $$.addContextMenu($(idset.tab), (menu, opt, evt)=>{
+                    innerHtml(menu, `
+                        <div style="width: fit-content; border-radius: 3px; background: white; position: relative; box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px; z-index: 102">
+                            <div style="display: flex; flex-direction: column; width: 220px; height: 100%;">
+                                ${getContextMenuItem(menuidset.closeall, 'Close all', 'fa-times')}
+                            </div>
+                        </div>
+                    `)
+                })
+            }
         }
     }
+}
+
+function getContextMenuItem(id: string, name: string, tagType: string) {
+    return `
+        <div id="${id}" class="${classes.backChSelectd}" style="display: flex; align-items: center; line-height: 120%; width: 100%; user-select: none; min-height: 28px; font-size: 14px;">
+            <div style="display: flex; align-items: center; justify-content: center; margin-left: 14px;">
+                <i class="fa ${tagType}" aria-hidden="true"></i>
+            </div>
+            <div style="padding-left: 5px">
+                ${name}
+            </div>
+        </div>
+    `
 }

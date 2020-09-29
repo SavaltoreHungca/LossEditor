@@ -13,6 +13,7 @@ import { NodeItem, nodeItemExt } from './leftpad/NodeItem';
 import { NotePad, notePadExt } from './rightpad/NotePad';
 import { IntroductionPad, introductionPadExt } from './rightpad/IntroductionPad';
 import { NoteTab, noteTabExt } from './rightpad/NoteTab';
+import { GlobalSearch, globalSearchExt } from './GlobalSearch';
 
 export interface Pad {
     render(): void
@@ -32,6 +33,7 @@ export type ElementTypsMap = {
     leftDirectoryTree: LeftDirectoryTree
     rssListPad: RssListPad
     noteTab: NoteTab
+    globalSearch: GlobalSearch
 }
 
 export function creEle<K extends keyof ElementTypsMap>(memloss: MemLoss, type: K, ele?: HTMLElement): ElementTypsMap[K] {
@@ -90,6 +92,11 @@ export function creEle<K extends keyof ElementTypsMap>(memloss: MemLoss, type: K
         case 'noteTab':
             if (!ele) element = $$.creEle('inline');
             ans = extend(element, [elementExt(memloss, type), noteTabExt(memloss)]);
+            break;
+
+        case 'globalSearch':
+            if (!ele) element = $$.creEle('block');
+            ans = extend(element, [elementExt(memloss, type), globalSearchExt(memloss)]);
             break;
     }
     return ans;

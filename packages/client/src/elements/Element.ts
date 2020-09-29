@@ -11,6 +11,7 @@ export interface Element extends HTMLElement {
     setTop(top: number): void;
     setLeft(left: number): void;
     setStyle(style: Object): void;
+    removeStyle(...names: string[]): void;
     getInfo(consumer?: (info: ElementInfo) => void): ElementInfo;
     addClass(c: string): void;
     removeClass(c: string): void;
@@ -63,6 +64,9 @@ export function elementExt<K extends keyof ElementTypsMap>(memloss: MemLoss, typ
             },
             setStyle: function (style: Object) {
                 $$.setStyle(elmt, style);
+            },
+            removeStyle: function(...names: string[]) {
+                $$.removeStyle(elmt, ...names);
             },
             getInfo: function (consumer?: (info: ElementInfo) => void) {
                 return $$.getElementInfo(elmt, consumer);
