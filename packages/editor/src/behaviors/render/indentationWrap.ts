@@ -1,9 +1,9 @@
 
 import { $$ } from "utils";
-import { Constants } from "../Constants";
-import { Editor } from '../Editor';
-import { ContentContainer } from "../elements/ContentContainer";
-import { creEle } from "../elements/elementTypes";
+import { Constants } from "../../Constants";
+import { Editor } from '../../Editor';
+import { ContentContainer } from "../../elements/ContentContainer";
+import { creEle } from "../../elements/elementTypes";
 
 export function indentationWrap<T extends HTMLElement>(editor: Editor, container: T, padd?: number,): ContentContainer {
     const indentation = creEle(editor, 'indentation');

@@ -1,5 +1,5 @@
 import { $$ } from 'utils';
-import { Editor } from "../Editor";
+import { Editor } from "../../Editor";
 import { Node } from "editor-core";
 import { mountChild } from './mountChild';
 

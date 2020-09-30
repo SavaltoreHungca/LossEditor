@@ -1,3 +1,4 @@
+import { DocRoot } from './DocRoot';
 import { Editor } from "../../Editor";
 import { extend, $$, Nil, ct } from "utils";
 import { DocParagraph, docParaExt } from "./DocParagraph";
@@ -9,10 +10,18 @@ import { ParagraphContext } from "../ParagraphContext";
 export type DocNodeTypesMap = {
     'paragraph': DocParagraph
     'sentinel': DocSentinal
+    'root': DocRoot
 }
 
-export function creDocEle<K extends keyof DocNodeTypesMap>(editor: Editor, type: K, ele?: HTMLElement): DocNodeTypesMap[K] {
+export function creDocEle<K extends keyof DocNodeTypesMap>(
+        editor: Editor, 
+        type: K, 
+        ele?: HTMLElement
+    ): DocNodeTypesMap[K] {
+
     switch (type) {
+        case 'root':
+            return extend(ele, [docExt(editor, type)])
         case 'paragraph':
             return extend($$.creEle('block'), [docExt(editor, type), docParaExt(editor)]);
         case 'sentinel':

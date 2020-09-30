@@ -1,9 +1,8 @@
 import { Editor } from './Editor';
-import { BidMap, $$, ct, MapObj } from "utils";
+import { BidMap, $$, ct, MapObj, Nil } from "utils";
 import { Node } from 'editor-core';
 import { DocNodeTypesMap, creDocEle } from './elements/docs/docElementTypes';
 import { DocNode } from './elements/docs/DocNode';
-import { mountChild } from './render/mountChild';
 import { nodeCreator } from './elements/nodes/nodeTypes';
 
 // node 和 docElement 的映射
@@ -13,6 +12,11 @@ export class NodeManager {
 
     constructor(editor: Editor) {
         this.editor = editor;
+    }
+
+    hasThenGetElement(node: Node): DocNode{
+        if(this.hasElement(node)) return this.getElement(node);
+        return Nil;
     }
 
     hasElement(node: Node | undefined): boolean {
@@ -25,7 +29,7 @@ export class NodeManager {
             if (ifAbsense)
                 ele = ifAbsense(node);
             else if (node.type === 'root') {
-                ele = this.editor.viewLines;
+                ele = creDocEle(this.editor, 'root', this.editor.viewLines);
             }
             else
                 ele = creDocEle(this.editor, ct<keyof DocNodeTypesMap>(node.type));

@@ -22,11 +22,12 @@ export function paragraphBackspaceFactory(editor: Editor) {
             const p = backspceCollapsed(nodeParagraph, left, leftLine);
             editor.docTree.typesetting(left);
 
-            if(docParagraph.isEmpty()){
-                // editor.docTree.
+            if(docParagraph.isEmpty()) {
+                editor.docTree.nodeBecomeEmpty(nodeParagraph);
             }
-
-            editor.docTree.changeSelection(p, p);
+            else {
+                editor.docTree.changeSelection(p, p);
+            }
             return;
         }
 

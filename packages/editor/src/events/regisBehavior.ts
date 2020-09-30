@@ -1,8 +1,8 @@
 import { Editor } from "../Editor";
 import { Constants } from "../Constants";
-import { paragraphRendererFactor } from "../render/paragraph";
-import { tableRendererFactory, rowRendererFactory, cellRendererFactory } from "../render/table";
-import { sentinelRendererFactory } from "../render/sentinel";
+import { paragraphRendererFactor } from "../behaviors/render/paragraph";
+import { tableRendererFactory, rowRendererFactory, cellRendererFactory } from "../behaviors/render/table";
+import { sentinelRendererFactory } from "../behaviors/render/sentinel";
 import { paragraphTextInputBehaviorFactory } from "../behaviors/paragraph/paragraphTextInputBehavior";
 import { sentinelTextInputBehaviorFactory } from "../behaviors/sentinel/sentinelTextInputBehavior";
 import { paragraphBackspaceFactory } from "../behaviors/paragraph/paragraphBackspceBehavior";

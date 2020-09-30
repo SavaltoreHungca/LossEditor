@@ -1,19 +1,19 @@
-import { Editor } from "../Editor";
+import { Editor } from "../../Editor";
 import { Node } from "editor-core";
 
 /// <reference path="./katex.d.ts"/>
 import katex from 'katex';
-import { Constants } from "../Constants";
+import { Constants } from "../../Constants";
 import { $$, ct } from "utils";
 import { indentationWrap } from "./indentationWrap";
 import { mountChild } from "./mountChild";
-import { Style, creEle } from "../elements/elementTypes";
-import { Paragraph } from '../elements/Paragraph';
-import { ParagraphLine } from '../elements/ParagraphLine';
-import { Text } from '../elements/Text';
-import { Inlineblock } from '../elements/Inlineblock';
-import { UnitBlock } from '../elements/UnitBlock';
-import { NodeParagraph } from "../elements/nodes/NodeParagraph";
+import { Style, creEle } from "../../elements/elementTypes";
+import { Paragraph } from '../../elements/Paragraph';
+import { ParagraphLine } from '../../elements/ParagraphLine';
+import { Text } from '../../elements/Text';
+import { Inlineblock } from '../../elements/Inlineblock';
+import { UnitBlock } from '../../elements/UnitBlock';
+import { NodeParagraph } from "../../elements/nodes/NodeParagraph";
 
 
 

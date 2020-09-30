@@ -32,7 +32,7 @@ export function getDocNodeFromChild(node: HTMLElement): DocNode | undefined {
     while (true) {
         const type = cur.getAttribute('data-editor-doc-type')
         if (type) {
-            return cur
+            return ct(cur);
         }
         if (cur.parentElement) {
             cur = cur.parentElement

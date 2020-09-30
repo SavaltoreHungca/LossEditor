@@ -126,6 +126,12 @@ export class DocTree {
         behavior(end, text);
     }
 
+    nodeBecomeEmpty(node: Node) {
+        const behavior = this.behaviorSet.WhenNodeBecomeEmptyBehavior.get(node.type);
+        if (!behavior) throw new Error(`${node.type}的变空行为未设定`);
+        behavior(node);
+    }
+
     walkTree(consumer: (node: Node) => void) {
         if (!this.root) return;
         const stack = [this.root];
