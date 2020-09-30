@@ -11,7 +11,7 @@ export function listenTextInput(editor: Editor) {
         else if (editor.docTree.selection) {
             const point = editor.docTree.selection.end;
             if (point) {
-                const behavior = editor.keyDownBehaviorSet.get(point.node.type);
+                const behavior = editor.behaviorSet.KeyDownBehavior.get(point.node.type);
                 if (behavior) behavior(event, editor.docTree.selection);
             };
         }

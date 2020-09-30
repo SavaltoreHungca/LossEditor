@@ -1,6 +1,6 @@
 import { NodeManager } from './NodeManager';
 import { DocTree, Selection } from 'editor-core';
-import { EventManager, Nil, DragState, MapObj } from 'utils';
+import { EventManager, Nil, DragState, MapObj, ct } from 'utils';
 import { registryEvents } from './events/events';
 import { Constants } from './Constants';
 import { listenUserClick, listenSelectionToSetCursor } from './selectionListener';
@@ -13,7 +13,7 @@ import { Container } from './elements/Container';
 import { regisStyleSheet } from './styleClassSheet';
 import { Settings, SettingRecevier } from './Settings';
 import { creEle } from './elements/elementTypes';
-import { CursorPositionBehavior, KeyDownBehavior, SetSelectionBehavior } from './behaviorTypes';
+import { BehaviorTypes, CursorPositionBehavior, KeyDownBehavior, SetSelectionBehavior } from './behaviorTypes';
 import { nodeCreator } from './elements/nodes/nodeTypes';
 import { ScrollFrame } from './elements/ScrollFrame';
 
@@ -29,13 +29,17 @@ export class Editor {
 
     settings: Settings = new Settings();
     eventManager = new EventManager();
-    setCursorPositionBehaviorSet = new Map<string, CursorPositionBehavior>();
-    setSelectionWhenClickBehaviorSet = new Map<string, SetSelectionBehavior>();
-    keyDownBehaviorSet = new Map<string, KeyDownBehavior>();
+
     docTree: DocTree = new DocTree(nodeCreator);
     uiMap: NodeManager = Nil;
     tmpSelection: Selection = Nil;
     whenClick: WhenClick = Nil;
+
+    behaviorSet = {
+        CursorPositionBehavior: new Map<string, CursorPositionBehavior>(),
+        SetSelectionBehavior: new Map<string, SetSelectionBehavior>(),
+        KeyDownBehavior: new Map<string, KeyDownBehavior>(),
+    }
 
     isInitialized = false;
 
@@ -93,16 +97,9 @@ export class Editor {
         this.docTree.render();
     }
 
-    regisSetCursorPositionBehavior(nodeType: string, behavior: CursorPositionBehavior) {
-        this.setCursorPositionBehaviorSet.set(nodeType, behavior);
-    }
 
-    regisSetSelectionWhenClickBehaviorSet(nodeType: string, behavior: SetSelectionBehavior) {
-        this.setSelectionWhenClickBehaviorSet.set(nodeType, behavior);
-    }
-
-    regisKeyDownBehavior(nodeType: string, behavior: KeyDownBehavior) {
-        this.keyDownBehaviorSet.set(nodeType, behavior);
+    regisBehavior<K extends keyof BehaviorTypes>(nodeType: string, behaviorType: K, behavior: BehaviorTypes[K]){
+        this.behaviorSet[behaviorType].set(nodeType, ct(behavior));
     }
 
     sizeFollowOutContainer() {

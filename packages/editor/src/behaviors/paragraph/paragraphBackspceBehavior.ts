@@ -21,6 +21,11 @@ export function paragraphBackspaceFactory(editor: Editor) {
         if (selection.isCollapsed) {
             const p = backspceCollapsed(nodeParagraph, left, leftLine);
             editor.docTree.typesetting(left);
+
+            if(docParagraph.isEmpty()){
+                // editor.docTree.
+            }
+
             editor.docTree.changeSelection(p, p);
             return;
         }
@@ -195,9 +200,4 @@ function backspaceSameLine(left: Point, right: Point, line: ParagraphLine): Poin
         }
     }
     return left;
-}
-
-// 检查 paragraph 是否被删空
-function checkIsEmpty(paragraph: Paragraph){
-    
 }

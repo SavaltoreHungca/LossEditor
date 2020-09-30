@@ -6,6 +6,7 @@ import { DocNode } from './elements/docs/DocNode';
 import { mountChild } from './render/mountChild';
 import { nodeCreator } from './elements/nodes/nodeTypes';
 
+// node 和 docElement 的映射
 export class NodeManager {
     private nodeMap = new BidMap<Node, DocNode>();
     private editor: Editor;

@@ -14,6 +14,12 @@ export type SetSelectionResult = {
     offset: number
 }
 
+export interface BehaviorTypes {
+    SetSelectionBehavior: SetSelectionBehavior
+    CursorPositionBehavior: CursorPositionBehavior
+    KeyDownBehavior: KeyDownBehavior
+}
+
 export interface SetSelectionBehavior {
     (node: Node): SetSelectionResult | undefined
 }

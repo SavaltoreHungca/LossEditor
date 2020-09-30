@@ -1,6 +1,6 @@
 import { Selection, Point } from "./Selection";
 import { Node } from './Node';
-import { Renderer, TextInputBehavior, EventTypes, BackSpaceBehavior, TypeSettingBehavior, EmptyOrgnizerNodeRnderBehavior, NodeCreator } from "./behaviorTypes";
+import { Renderer, TextInputBehavior, EventTypes, BackSpaceBehavior, TypeSettingBehavior, EmptyOrgnizerNodeRnderBehavior, NodeCreator, WhenNodeBecomeEmptyBehavior, BehaviorTypes } from "./behaviorTypes";
 import { Nil, ct, MapObj } from "utils";
 import { DocTreeResolver } from "./DocTreeResolver";
 
@@ -9,15 +9,19 @@ export class DocTree {
     selection: Selection = Nil;
 
     docTreeResolver: DocTreeResolver = Nil;
-
+    nodeCreator: NodeCreator;
     regisdEvents = new Map<string, Array<Function>>();
 
-    textInputBehaviorSet = new Map<string, TextInputBehavior>();
-    backspaceBehaviorSet = new Map<string, BackSpaceBehavior>();
-    typesettingBehaviorSet = new Map<string, TypeSettingBehavior>();
-    regisdRenderer = new Map<string, Renderer>();
-    emptyOrgnizerNodeRnderBehaviorSet = new Map<string, EmptyOrgnizerNodeRnderBehavior>();
-    nodeCreator: NodeCreator;
+    behaviorSet = {
+        TextInputBehavior: new Map<string, TextInputBehavior>(),
+        BackSpaceBehavior: new Map<string, BackSpaceBehavior>(),
+        TypeSettingBehavior: new Map<string, TypeSettingBehavior>(),
+        Renderer: new Map<string, Renderer>(),
+        // 渲染节点时, 节点为空时的行为
+        EmptyOrgnizerNodeRnderBehavior: new Map<string, EmptyOrgnizerNodeRnderBehavior>(),
+        // 编辑文本时, 当前节点为空时的行为
+        WhenNodeBecomeEmptyBehavior: new Map<string, WhenNodeBecomeEmptyBehavior>(),
+    }
 
     constructor(nodeCreator: NodeCreator) {
         this.nodeCreator = nodeCreator;
@@ -35,12 +39,12 @@ export class DocTree {
 
     render(rootNode?: Node) {
         const startRender = (node: Node) => {
-            const render = this.regisdRenderer.get(node.type);
+            const render = this.behaviorSet.Renderer.get(node.type);
             if (!render) throw new Error(`${node.type}的渲染器未注册`);
             render(node.parent, node);
 
             if (!node.isPresenter && (!node.children || node.children.length === 0)) {
-                const behavior = this.emptyOrgnizerNodeRnderBehaviorSet.get(node.type);
+                const behavior = this.behaviorSet.EmptyOrgnizerNodeRnderBehavior.get(node.type);
                 if (behavior) {
                     behavior(node);
                 }
@@ -83,24 +87,8 @@ export class DocTree {
         events.push(listener);
     }
 
-    regisRenderer(nodeType: string, renderer: Renderer) {
-        this.regisdRenderer.set(nodeType, renderer);
-    }
-
-    regisTextInputBehavior(nodeType: string, behavior: TextInputBehavior) {
-        this.textInputBehaviorSet.set(nodeType, behavior);
-    }
-
-    regisBackSpceBehavior(nodeType: string, behavior: BackSpaceBehavior) {
-        this.backspaceBehaviorSet.set(nodeType, behavior);
-    }
-
-    regisTypesettingBehavior(nodeType: string, behavior: TypeSettingBehavior) {
-        this.typesettingBehaviorSet.set(nodeType, behavior);
-    }
-
-    regisEmptyOrgnizerNodeRnderBehavior(nodeType: string, behavior: EmptyOrgnizerNodeRnderBehavior) {
-        this.emptyOrgnizerNodeRnderBehaviorSet.set(nodeType, behavior);
+    regisBehavior<K extends keyof BehaviorTypes>(nodeType: string, behaviorType: K, behavior: BehaviorTypes[K]) {
+        this.behaviorSet[behaviorType].set(nodeType, ct(behavior));
     }
 
     backspace(selection?: Selection) {
@@ -110,14 +98,14 @@ export class DocTree {
         if (selection.relativePostionStartEnd === 'OVERLAPPING') {
             let { end } = selection;
             end = <Point>end;
-            const behavior = this.backspaceBehaviorSet.get(end.node.type);
+            const behavior = this.behaviorSet.BackSpaceBehavior.get(end.node.type);
             if (!behavior) throw new Error(`${end.node.type}的backspce行为未定义`);
             behavior(selection);
         }
     }
 
     typesetting(point: Point) {
-        const behavior = this.typesettingBehaviorSet.get(point.node.type);
+        const behavior = this.behaviorSet.TypeSettingBehavior.get(point.node.type);
         if (!behavior) throw new Error(`${point.node.type}的排版行为未设定`);
         behavior(point);
     }
@@ -128,12 +116,12 @@ export class DocTree {
             this.triggleEvent('selection_change', event => event(this.selection));
         }
     }
-    
+
     textInput(text: string) {
         if (!this.selection) return;
         if (!this.selection.end) return;
         const { end } = this.selection
-        const behavior = this.textInputBehaviorSet.get(end.node.type);
+        const behavior = this.behaviorSet.TextInputBehavior.get(end.node.type);
         if (!behavior) throw new Error(`${end.node.type}的输入行为未定义`);
         behavior(end, text);
     }

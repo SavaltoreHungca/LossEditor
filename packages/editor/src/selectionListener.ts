@@ -13,7 +13,7 @@ export function listenUserClick(editor: Editor) {
         const docNode = getDocNodeFromChild(srcElement);
         if (docNode) {
             const node = editor.uiMap.getNode(docNode);
-            const behavior = editor.setSelectionWhenClickBehaviorSet.get(node.type);
+            const behavior = editor.behaviorSet.SetSelectionBehavior.get(node.type);
             if (behavior) {
                 const rlt = behavior(node);
                 if(!rlt) return;
@@ -41,7 +41,7 @@ export function listenUserClick(editor: Editor) {
 export function listenSelectionToSetCursor(editor: Editor) {
     editor.docTree.addEventListener('selection_change', selection => {
         const point: Point = ct(selection.end);
-        const behavior = editor.setCursorPositionBehaviorSet.get(point.node.type);
+        const behavior = editor.behaviorSet.CursorPositionBehavior.get(point.node.type);
         if (!behavior) return;
         const result = behavior(editor.uiMap.getElement(point.node), point.offset, editor);
         if (result) {
