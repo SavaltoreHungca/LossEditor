@@ -1,5 +1,5 @@
 import { NodeManager } from './NodeManager';
-import { DocTree, Selection } from 'editor-core';
+import { DocTree, Selection, Node } from 'editor-core';
 import { EventManager, Nil, DragState, MapObj, ct } from 'utils';
 import { registryEvents } from './events/events';
 import { Constants } from './Constants';
@@ -95,6 +95,10 @@ export class Editor {
 
         this.viewLines.innerHTML = '';
         this.docTree.render();
+    }
+
+    reRenderNode(node: Node){
+        this.docTree.render(node);
     }
 
 

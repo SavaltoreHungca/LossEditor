@@ -1,7 +1,7 @@
 import { Node } from './Node'
 import { $$ } from 'utils';
 
-export type Point = {
+export interface Point {
     node: Node
     offset: number
 }

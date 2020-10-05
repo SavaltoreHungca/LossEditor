@@ -48,7 +48,7 @@ export function paragraphBackspaceFactory(editor: Editor) {
     }
 }
 function backspceCollapsed(nodeParagraph: NodeParagraph, left: Point, leftLine: ParagraphLine): Point {
-    const ele: Inlineblock = ct(leftLine.getInlineBlockByOffset(left.offset));
+    const ele: Inlineblock = leftLine.getInlineBlockByOffset(left.offset);
     const eleOffset = left.offset - ele.getElementStart();
 
     switch (getType(ele)) {

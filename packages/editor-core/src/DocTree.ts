@@ -1,6 +1,6 @@
 import { Selection, Point } from "./Selection";
 import { Node } from './Node';
-import { Renderer, TextInputBehavior, EventTypes, BackSpaceBehavior, TypeSettingBehavior, EmptyOrgnizerNodeRnderBehavior, NodeCreator, WhenNodeBecomeEmptyBehavior, BehaviorTypes } from "./behaviorTypes";
+import { Renderer, TextInputBehavior, EventTypes, BackSpaceBehavior, TypeSettingBehavior, EmptyOrgnizerNodeRnderBehavior, NodeCreator, WhenNodeBecomeEmptyBehavior, BehaviorTypes, ChildRemoved } from "./behaviorTypes";
 import { Nil, ct, MapObj } from "utils";
 import { DocTreeResolver } from "./DocTreeResolver";
 
@@ -21,15 +21,11 @@ export class DocTree {
         EmptyOrgnizerNodeRnderBehavior: new Map<string, EmptyOrgnizerNodeRnderBehavior>(),
         // 编辑文本时, 当前节点为空时的行为
         WhenNodeBecomeEmptyBehavior: new Map<string, WhenNodeBecomeEmptyBehavior>(),
+        ChildRemoved: new Map<string, ChildRemoved>(),
     }
 
     constructor(nodeCreator: NodeCreator) {
         this.nodeCreator = nodeCreator;
-    }
-
-    setRoot(root: Node) {
-        this.root = root;
-        return this;
     }
 
     buildTree(doc: string | MapObj) {
@@ -132,18 +128,9 @@ export class DocTree {
         behavior(node);
     }
 
-    walkTree(consumer: (node: Node) => void) {
-        if (!this.root) return;
-        const stack = [this.root];
-        while (stack.length > 0) {
-            const root: Node = ct(stack.shift());
-            consumer(root);
-            const children = root.children;
-            if (children) {
-                children.forEach(child => {
-                    stack.push(child);
-                })
-            }
-        }
+    childHasRemoved(node: Node, child: Node){
+        const behavior = this.behaviorSet.ChildRemoved.get(node.type);
+        if (!behavior) throw new Error(`${node.type}的子节点被移除行为未设定`);
+        behavior(node, child);
     }
 }

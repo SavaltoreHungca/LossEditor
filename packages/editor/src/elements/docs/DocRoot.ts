@@ -8,7 +8,7 @@ export interface DocRoot extends DocNode {
 
 export function docRootExt(editor: Editor){
 
-    return (sentinel: HTMLElement)=> {
+    return (docRoot: HTMLElement)=> {
         return {
 
         }

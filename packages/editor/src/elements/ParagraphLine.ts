@@ -10,6 +10,8 @@ export interface ParagraphLine extends ParagraphContext {
     autoWidth(): void
     getParagraph(): Paragraph
     getInlineBlockByOffset(offset: number): Inlineblock
+    priviousLine(): ParagraphLine | undefined;
+    nextLine(): ParagraphLine | undefined;
 }
 
 export function lineExt(editor: Editor) {
@@ -26,6 +28,14 @@ export function lineExt(editor: Editor) {
             },
             getInlineBlockByOffset: function (offset: number): Inlineblock {
                 return ct(binarySearchWhichRange(ele.children, offset));
+            },
+            priviousLine: function(){
+                const privous = ele.previousElementSibling;
+                if(privous) return ct(privous);
+            },
+            nextLine: function(){
+                const next = ele.nextElementSibling;
+                if(next) return ct(next);
             }
         }
     }

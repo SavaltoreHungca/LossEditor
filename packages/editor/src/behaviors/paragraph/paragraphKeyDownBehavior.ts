@@ -24,6 +24,9 @@ export function paragraphKeyDownBehavior(editor: Editor): KeyDownBehavior {
         else if (isHotkey('ArrowDown', event)) {
             arrowDown(editor, point, selection);
         }
+        else if(isHotkey('enter', event)) {
+            console.log('shit');
+        }
     }
 }
 
@@ -58,31 +61,6 @@ function arrowUp(editor: Editor, point: Point, selection: Selection) {
     point.offset = preLineCursorOffset;
     editor.docTree.changeSelection(point, point);
     return;
-
-    // let preLineEle: Inlineblock = ct(preLine.firstElementChild);
-    // let preLineNextEle: Inlineblock = preLineEle ? ct(preLineEle.nextElementSibling) : Nil;
-    // while (preLineEle) {
-    //     if (!preLineNextEle) {
-    //         point.offset = preLineEle.getElementStart();
-    //         editor.docTree.changeSelection(point, point);
-    //         return;
-    //     }
-    //     else if (preLineCursorOffset >= preLineEle.getElementStart() && preLineCursorOffset <= preLineNextEle.getElementStart()) {
-    //         switch (getType(preLineEle)) {
-    //             case 'text':
-    //                 point.offset = preLineCursorOffset;
-    //                 editor.docTree.changeSelection(point, point);
-    //                 return;
-    //             case 'unit-block':
-    //                 point.offset = preLineEle.getElementStart();
-    //                 editor.docTree.changeSelection(point, point);
-    //                 return;
-    //         }
-    //     }
-    //     preLineEle = preLineNextEle
-    //     preLineNextEle = preLineNextEle ? ct(preLineNextEle.nextElementSibling) : Nil;
-    // }
-
 }
 
 function arrowDown(editor: Editor, point: Point, selection: Selection) {
@@ -101,3 +79,4 @@ function arrowDown(editor: Editor, point: Point, selection: Selection) {
     editor.docTree.changeSelection(point, point);
     return;
 }
+

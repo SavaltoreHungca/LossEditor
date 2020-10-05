@@ -14,6 +14,7 @@ export interface BehaviorTypes {
     EmptyOrgnizerNodeRnderBehavior: EmptyOrgnizerNodeRnderBehavior
     WhenNodeBecomeEmptyBehavior: WhenNodeBecomeEmptyBehavior
     Renderer: Renderer
+    ChildRemoved: ChildRemoved
 }
 
 export interface NodeCreator {
@@ -42,4 +43,8 @@ export interface EmptyOrgnizerNodeRnderBehavior {
 
 export interface WhenNodeBecomeEmptyBehavior {
     (node: Node): void
+}
+
+export interface ChildRemoved {
+    (node: Node, removedChild: Node): void
 }
