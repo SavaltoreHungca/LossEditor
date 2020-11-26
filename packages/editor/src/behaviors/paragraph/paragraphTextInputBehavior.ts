@@ -5,9 +5,11 @@ import { DocParagraph } from '../../elements/docs/DocParagraph';
 import { getType } from '../../utils';
 import { Text } from '../../elements/Text';
 import { NodeParagraph } from '../../elements/nodes/NodeParagraph';
+import { backspace } from './paragraphBackspceBehavior';
 
 export function paragraphTextInputBehaviorFactory(editor: Editor) {
     return (point: Point, text: string) => {
+        const selection = editor.docTree.selection;
         const nodeParagraph: NodeParagraph = ct(point.node);
         nodeParagraph.insertTextBefore(text, point.offset);
 
@@ -22,7 +24,6 @@ export function paragraphTextInputBehaviorFactory(editor: Editor) {
                 ct<Text>(ele).insertTextBefore(text, point.offset);
                 break;
         }
-
 
         const p = {
             node: point.node,

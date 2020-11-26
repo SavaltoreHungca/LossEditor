@@ -46,7 +46,7 @@ export function containerExt(editor: Editor) {
                 style="top: ${containerInfo.innerTop}px; left: ${containerInfo.innerLeft}px; z-index: -1">
                 <textarea id="${idset.cursor}"></textarea>
                 <div id="${idset.region}"
-                    style="top: ${containerInfo.innerTop}px; left: ${containerInfo.innerLeft}px; width: ${containerInfo.innerWidth}px; z-index: -1"></div>
+                    style="top: ${containerInfo.innerTop}px; left: ${containerInfo.innerLeft}px; z-index: -1"></div>
             </div>
         `);
 

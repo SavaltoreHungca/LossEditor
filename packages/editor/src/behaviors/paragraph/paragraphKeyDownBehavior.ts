@@ -9,6 +9,7 @@ import { Inlineblock } from "../../elements/Inlineblock";
 import { getType } from "../../utils";
 import { NodeParagraph } from "../../elements/nodes/NodeParagraph";
 
+// FIXME: 当存在 unit-block 元素时偏移量计算不对
 export function paragraphKeyDownBehavior(editor: Editor): KeyDownBehavior {
     return (event, selection) => {
         const point: Point = ct(selection.end);
@@ -38,9 +39,7 @@ function arrowLeft(editor: Editor, point: Point, selection: Selection) {
 
 function arrowRight(editor: Editor, point: Point, selection: Selection) {
     const nodeParagraph: NodeParagraph = ct(point.node);
-    point.offset += 1;
-    if (point.offset > nodeParagraph.content.str.length) point.offset -= 1;
-
+    if (point.offset < nodeParagraph.content.str.length) point.offset += 1;
     editor.docTree.changeSelection(point, point);
 }
 

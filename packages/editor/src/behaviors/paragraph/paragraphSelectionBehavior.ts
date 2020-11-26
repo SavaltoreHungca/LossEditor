@@ -8,6 +8,7 @@ import { Text } from '../../elements/Text';
 import { UnitBlock } from '../../elements/UnitBlock';
 import { SetSelectionResult } from "../../behaviorTypes";
 
+// 设置 Selection 的行为
 export function paragraphSelectionBehaviorFactory(editor: Editor) {
     
     return (node: Node)=>{

@@ -26,7 +26,7 @@ export interface Renderer {
 }
 
 export interface TextInputBehavior {
-    (point: Point, text: string): void
+    (selection: Selection, text: string): void
 }
 
 export interface BackSpaceBehavior {

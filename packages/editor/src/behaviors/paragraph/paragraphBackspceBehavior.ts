@@ -10,43 +10,48 @@ import { NodeParagraph } from '../../elements/nodes/NodeParagraph';
 
 export function paragraphBackspaceFactory(editor: Editor) {
     return (selection: Selection) => {
-        const { left, right } = selection.leftAndRight;
-        const docParagraph: DocParagraph = ct(editor.uiMap.getElement(left.node));
-        const paragraph = docParagraph.getParaUiEle();
-
-        const nodeParagraph: NodeParagraph = ct(left.node);
-
-        const leftLine: ParagraphLine = docParagraph.getLineByOffset(left.offset);
-
-        if (selection.isCollapsed) {
-            const p = backspceCollapsed(nodeParagraph, left, leftLine);
-            editor.docTree.typesetting(left);
-
-            if(docParagraph.isEmpty()) {
-                editor.docTree.nodeBecomeEmpty(nodeParagraph);
-            }
-            else {
-                editor.docTree.changeSelection(p, p);
-            }
-            return;
-        }
-
-        const rightLine: ParagraphLine = docParagraph.getLineByOffset(right.offset);
-
-        let p;
-        if (leftLine !== rightLine) {
-            p = backspceDiffLine(left, right, leftLine, rightLine);
-        } else {
-            p = backspaceSameLine(left, right, leftLine);
-        }
-
-        nodeParagraph.content.str = nodeParagraph.content.str.substring(0, left.offset)
-            + nodeParagraph.content.str.substring(right.offset);
-
-        editor.docTree.typesetting(left);
-        editor.docTree.changeSelection(p, p);
+        backspace(editor, selection, false);
     }
 }
+
+export function backspace(editor: Editor, selection: Selection, pressSelectionChange: boolean){
+    const { left, right } = selection.leftAndRight;
+    const docParagraph: DocParagraph = ct(editor.uiMap.getElement(left.node));
+    const paragraph = docParagraph.getParaUiEle();
+
+    const nodeParagraph: NodeParagraph = ct(left.node);
+
+    const leftLine: ParagraphLine = docParagraph.getLineByOffset(left.offset);
+
+    if (selection.isCollapsed) {
+        const p = backspceCollapsed(nodeParagraph, left, leftLine);
+        editor.docTree.typesetting(left);
+
+        if(docParagraph.isEmpty()) {
+            editor.docTree.nodeBecomeEmpty(nodeParagraph);
+        }
+        else {
+            editor.docTree.changeSelection(p, p, pressSelectionChange);
+        }
+        return;
+    }
+
+    const rightLine: ParagraphLine = docParagraph.getLineByOffset(right.offset);
+
+    let p;
+    if (leftLine !== rightLine) {
+        p = backspceDiffLine(left, right, leftLine, rightLine);
+    } else {
+        p = backspaceSameLine(left, right, leftLine);
+    }
+
+    nodeParagraph.content.str = nodeParagraph.content.str.substring(0, left.offset)
+        + nodeParagraph.content.str.substring(right.offset);
+
+    editor.docTree.typesetting(left);
+    editor.docTree.changeSelection(p, p, pressSelectionChange);
+}
+
 function backspceCollapsed(nodeParagraph: NodeParagraph, left: Point, leftLine: ParagraphLine): Point {
     const ele: Inlineblock = leftLine.getInlineBlockByOffset(left.offset);
     const eleOffset = left.offset - ele.getElementStart();

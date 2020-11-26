@@ -13,7 +13,7 @@ import { Container } from './elements/Container';
 import { regisStyleSheet } from './styleClassSheet';
 import { Settings, SettingRecevier } from './Settings';
 import { creEle } from './elements/elementTypes';
-import { BehaviorTypes, CursorPositionBehavior, KeyDownBehavior, SetSelectionBehavior } from './behaviorTypes';
+import { BehaviorTypes, CursorPositionBehavior, KeyDownBehavior, RenderSelectionBehavior, SetSelectionBehavior } from './behaviorTypes';
 import { nodeCreator } from './elements/nodes/nodeTypes';
 import { ScrollFrame } from './elements/ScrollFrame';
 
@@ -39,6 +39,7 @@ export class Editor {
         CursorPositionBehavior: new Map<string, CursorPositionBehavior>(),
         SetSelectionBehavior: new Map<string, SetSelectionBehavior>(),
         KeyDownBehavior: new Map<string, KeyDownBehavior>(),
+        RenderSelectionBehavior: new Map<string, RenderSelectionBehavior>(),
     }
 
     isInitialized = false;

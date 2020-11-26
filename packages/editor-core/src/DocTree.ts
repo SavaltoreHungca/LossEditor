@@ -87,6 +87,7 @@ export class DocTree {
         this.behaviorSet[behaviorType].set(nodeType, ct(behavior));
     }
 
+    // 删除键行为
     backspace(selection?: Selection) {
         selection = selection ? selection : this.selection;
         if (!selection) return;
@@ -100,12 +101,14 @@ export class DocTree {
         }
     }
 
+    // 重新排版
     typesetting(point: Point) {
         const behavior = this.behaviorSet.TypeSettingBehavior.get(point.node.type);
         if (!behavior) throw new Error(`${point.node.type}的排版行为未设定`);
         behavior(point);
     }
 
+    // 改变选取
     changeSelection(start: Point, end: Point, pressEventTriggle?: boolean) {
         this.selection = new Selection(start, end);
         if (!pressEventTriggle) {
@@ -113,21 +116,24 @@ export class DocTree {
         }
     }
 
+    // 文本输入
     textInput(text: string) {
         if (!this.selection) return;
         if (!this.selection.end) return;
         const { end } = this.selection
         const behavior = this.behaviorSet.TextInputBehavior.get(end.node.type);
         if (!behavior) throw new Error(`${end.node.type}的输入行为未定义`);
-        behavior(end, text);
+        behavior(this.selection, text);
     }
 
+    // 节点的变空行为
     nodeBecomeEmpty(node: Node) {
         const behavior = this.behaviorSet.WhenNodeBecomeEmptyBehavior.get(node.type);
         if (!behavior) throw new Error(`${node.type}的变空行为未设定`);
         behavior(node);
     }
 
+    // 子节点被移除行为
     childHasRemoved(node: Node, child: Node){
         const behavior = this.behaviorSet.ChildRemoved.get(node.type);
         if (!behavior) throw new Error(`${node.type}的子节点被移除行为未设定`);

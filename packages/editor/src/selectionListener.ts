@@ -3,6 +3,7 @@ import { getType, getDocNodeFromChild } from "./utils";
 import { Editor } from "./Editor";
 import { Point, Selection } from "editor-core";
 
+// 改变 Selection
 export function listenUserClick(editor: Editor) {
     $$.addDragEvent(editor.viewLines, (e: DragState) => {
         if (!e.event?.target) return;
@@ -38,6 +39,7 @@ export function listenUserClick(editor: Editor) {
     })
 }
 
+// 设置鼠标位置
 export function listenSelectionToSetCursor(editor: Editor) {
     editor.docTree.addEventListener('selection_change', selection => {
         const point: Point = ct(selection.end);
@@ -49,4 +51,14 @@ export function listenSelectionToSetCursor(editor: Editor) {
         }
         editor.cursor.focus({ preventScroll: true });
     })
+}
+
+// 渲染选区
+export function renderSelection(editor: Editor) {
+    editor.docTree.addEventListener('selection_change', selection => {
+        const {left, right} = selection.leftAndRight;
+        const behavior = editor.behaviorSet.RenderSelectionBehavior.get(left.node.type);
+        if(!behavior) throw new Error(`${left.node.type}的selection渲染行为未设置`);
+        behavior(selection, false);
+    });
 }

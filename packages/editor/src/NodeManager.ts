@@ -23,6 +23,7 @@ export class NodeManager {
         return node && this.nodeMap.getvalue(node) ? true : false;
     }
 
+    // 获取和 DocTree 相对应的 Html 元素
     getElement(node: Node, ifAbsense?: (node: Node) => DocNode) {
         let ele = this.nodeMap.getvalue(node);
         if (!ele) {
@@ -38,6 +39,7 @@ export class NodeManager {
         return ele;
     }
 
+    // 添加 DocTree 的节点
     addNewNode(parent: Node, nodeValue: MapObj, beforeRender?: (node: Node) => void) {
         const node = nodeCreator(nodeValue);
         parent.children = parent.children || [];
@@ -52,11 +54,13 @@ export class NodeManager {
         return this.nodeMap.getkey(element);
     }
 
+    // 设置和 DocTree 相对应的 Html 节点
     setElement(node: Node, element: DocNode) {
         element.setAttribute('data-editor-doc-type', node.type);
         this.nodeMap.set(node, element);
     }
 
+    // 删除 DocTree 的节点并做相应的清理
     delete(node: Node) {
         if (this.hasElement(node.parent)) {
             const ele = this.getElement(<Node>node.parent);

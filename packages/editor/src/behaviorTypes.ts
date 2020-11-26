@@ -18,6 +18,7 @@ export interface BehaviorTypes {
     SetSelectionBehavior: SetSelectionBehavior
     CursorPositionBehavior: CursorPositionBehavior
     KeyDownBehavior: KeyDownBehavior
+    RenderSelectionBehavior: RenderSelectionBehavior
 }
 
 export interface SetSelectionBehavior {
@@ -30,4 +31,8 @@ export interface CursorPositionBehavior {
 
 export interface KeyDownBehavior {
     (event: KeyboardEvent, selection: Selection): void
+}
+
+export interface RenderSelectionBehavior {
+    (selection: Selection, shouldSelectAll: boolean): void
 }

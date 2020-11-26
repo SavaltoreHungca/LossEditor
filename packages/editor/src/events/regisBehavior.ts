@@ -14,6 +14,7 @@ import { sentinelSelectionBehaviorFactory } from "../behaviors/sentinel/sentinel
 import { setCursorPositionForParagraph } from "../behaviors/paragraph/paragraphCursorPosition";
 import { setCursorPositionForSentinel } from "../behaviors/sentinel/sentinelCursorPosition";
 import { paragraphWhenEmptyBehavior } from "../behaviors/paragraph/paragraphWhenEmptyBehavior";
+import { paragraphSelectionRenderBehavior } from "../behaviors/paragraph/paragraphSelectionRenderBehavior";
 import { rootChildHasRemovedBehavior } from "../behaviors/root/rootChildHasRemovedBehavior";
 import { sentinelBackspaceFactory } from "../behaviors/sentinel/sentinelBackspceBehavior";
 
@@ -32,6 +33,7 @@ export function regisBehavior(editor: Editor) {
         editor.regisBehavior('paragraph', 'CursorPositionBehavior', setCursorPositionForParagraph);
         editor.regisBehavior('paragraph', 'SetSelectionBehavior', paragraphSelectionBehaviorFactory(editor))
         editor.regisBehavior('paragraph', 'KeyDownBehavior', paragraphKeyDownBehavior(editor));
+        editor.regisBehavior('paragraph', 'RenderSelectionBehavior', paragraphSelectionRenderBehavior(editor));
 
 
         editor.docTree.regisBehavior('sentinel', 'Renderer', sentinelRendererFactory(editor));

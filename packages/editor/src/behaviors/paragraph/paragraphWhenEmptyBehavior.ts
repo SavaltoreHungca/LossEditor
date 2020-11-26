@@ -10,6 +10,7 @@ export function paragraphWhenEmptyBehavior(editor: Editor) {
             const docParent = docParagraph.getParentDocNode();
             editor.uiMap.delete(node);
             
+            // 当 paragraph 为空后, 通知其父节点其将被移除
             editor.docTree.childHasRemoved(editor.uiMap.getNode(docParent), node);
         }
     }
