@@ -71,8 +71,6 @@ function configure(pkg, env, target) {
                     'Stack',
                     'is',
                 ],
-                'react-dom': ['findDOMNode'],
-                'react-dom/server': ['renderToStaticMarkup'],
             },
         }),
 
@@ -109,8 +107,7 @@ function configure(pkg, env, target) {
                                 esmodules: isModule,
                             },
                         },
-                ],
-                '@babel/preset-react',
+                ]
             ],
             plugins: [
                 [

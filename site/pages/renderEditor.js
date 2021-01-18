@@ -1,8 +1,8 @@
 import { Editor } from 'editor';
 import { ScrollPage } from 'scroll-page';
-import { MemLoss } from 'client';
+// import { MemLoss } from 'client';
 import { innerHtml, $$, $ } from 'utils'
-import { renderMemLoss } from './renderMemLoss';
+// import { renderMemLoss } from './renderMemLoss';
 import { renderScrollPage } from './renderScrollPage';
 
 export function renderEditor(container) {

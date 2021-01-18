@@ -1,6 +1,6 @@
 import { $$, ct } from 'utils';
 import { Editor } from '../../Editor';
-import { Point } from "editor-core";
+import { Point, Selection } from "editor-core";
 import { DocParagraph } from '../../elements/docs/DocParagraph';
 import { getType } from '../../utils';
 import { Text } from '../../elements/Text';
@@ -8,8 +8,10 @@ import { NodeParagraph } from '../../elements/nodes/NodeParagraph';
 import { backspace } from './paragraphBackspceBehavior';
 
 export function paragraphTextInputBehaviorFactory(editor: Editor) {
-    return (point: Point, text: string) => {
-        const selection = editor.docTree.selection;
+    return (selection: Selection, text: string) => {
+
+        // const selection = editor.docTree.selection;
+        let point: Point = ct(selection.end);
         const nodeParagraph: NodeParagraph = ct(point.node);
         nodeParagraph.insertTextBefore(text, point.offset);
 

@@ -1,9 +1,11 @@
 import { Editor } from "../../Editor";
-import { Point, Node } from "editor-core";
+import { Point, Node, Selection } from "editor-core";
 import { ct } from "utils";
 
 export function sentinelTextInputBehaviorFactory(editor: Editor) {
-    return (point: Point, text: string) => {
+    return (selection: Selection, text: string) => {
+        let point: Point = ct(selection.end);
+
         const parent: Node = ct(point.node.parent);
 
         editor.uiMap.delete(point.node);
