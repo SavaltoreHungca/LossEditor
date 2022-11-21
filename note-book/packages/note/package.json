@@ -1,0 +1,17 @@
+{
+    "name": "note",
+    "description": "",
+    "version": "0.0.0",
+    "main": "dist/index.js",
+    "module": "dist/index.es.js",
+    "types": "dist/index.d.ts",
+    "umd": "dist/note.js",
+    "umdMin": "dist/note.min.js",
+    "sideEffects": false,
+    "files": [
+      "dist/"
+    ],
+    "dependencies": {
+    }
+  }
+  
