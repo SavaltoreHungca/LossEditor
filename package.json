@@ -42,6 +42,7 @@
     "@types/node": "^12.12.14",
     "@types/react": "^16.9.13",
     "@types/react-dom": "^16.9.4",
+    "@types/uuid": "^8.0.0",
     "@typescript-eslint/eslint-plugin": "^2.9.0",
     "@typescript-eslint/parser": "^2.9.0",
     "babel-eslint": "^10.0.3",
@@ -83,11 +84,9 @@
     "rollup-plugin-typescript2": "^0.25.2",
     "rollup-plugin-uglify": "^6.0.3",
     "source-map-loader": "^0.2.4",
-    "typescript": "^3.7.2",
-    "@types/uuid": "^8.0.0"
+    "typescript": "^3.7.2"
   },
   "dependencies": {
-  },
-  "peerDependencies": {
+    "yarn": "^1.22.19"
   }
 }
